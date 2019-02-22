@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js / editor</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=100, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
+	</head>
+	<body ontouchstart="">
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+
+		<script src="{{ url_for('static', filename='js/build/three.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/libs/system.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/controls/EditorControls.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/controls/TransformControls.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/libs/jszip.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/libs/inflate.min.js') }}"></script> <!-- FBX -->
+		<script src="{{ url_for('static', filename='js/examples/js/renderers/Projector.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/renderers/RaytracingRenderer.js') }}"></script>
+		
+		<script src="{{ url_for('static', filename='js/libs/codemirror/codemirror.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/codemirror/mode/javascript.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/codemirror/mode/glsl.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/esprima.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/jsonlint.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/glslprep.min.js') }}"></script>
+		
+		<script src="{{ url_for('static', filename='js/libs/codemirror/addon/dialog.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/codemirror/addon/show-hint.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/codemirror/addon/tern.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/acorn/acorn.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/acorn/acorn_loose.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/acorn/walk.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/polyfill.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/signal.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/tern.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/def.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/comment.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/infer.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ternjs/doc_comment.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/tern-threejs/threejs.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/signals.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ui.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/ui.three.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/app.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Player.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Script.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/examples/js/vr/WebVR.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Storage.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Editor.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Config.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/History.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Loader.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.File.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.Run.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.Edit.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.Add.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.Play.js') }}"></script>
+		<!-- <script src="js/Menubar.View.js"></script> -->
+		<script src="{{ url_for('static', filename='js/Menubar.Examples.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.Help.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Menubar.Status.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Scene.js') }}"></script>	
+		<script src="{{ url_for('static', filename='js/Sidebar.Project.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Yellow.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Supports.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Sections.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Pointloads.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Settings.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Settings.Shortcuts.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Settings.Viewport.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Properties.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Object.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Geometry.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Geometry.Geometry.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Geometry.BufferGeometry.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Geometry.Modifiers.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.History.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Strings.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Toolbar.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Viewport.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Viewport.Info.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Command.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/AddObjectCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/RemoveObjectCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/MoveObjectCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetPositionCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetRotationCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetScaleCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetValueCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetUuidCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetColorCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetGeometryCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetGeometryValueCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/MultiCmdsCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/AddScriptCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/RemoveScriptCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetScriptValueCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetMaterialCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetMaterialValueCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetMaterialColorCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetMaterialMapCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/commands/SetSceneCommand.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/html2canvas.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/dat.gui.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/libs/three.html.js') }}"></script>
+		<!--snap stuff-->
+		<script src="{{ url_for('static', filename='js/Octree.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/object_hash.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/GridSnap.js') }}"></script>
+				
+		<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/light.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/monokai.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/dialog.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/show-hint.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/tern.css') }}">
+
+		<script>
+
+			window.URL = window.URL || window.webkitURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			Number.prototype.format = function (){
+				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			};
+
+			//
+
+			var editor = new Editor();
+
+			var viewport = new Viewport( editor );
+			document.body.appendChild( viewport.dom );
+
+			var toolbar = new Toolbar( editor );
+			document.body.appendChild( toolbar.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
+
+			var player = new Player( editor );
+			document.body.appendChild( player.dom );
+
+			var menubar = new Menubar( editor );
+			document.body.appendChild( menubar.dom );
+
+			var sidebar = new Sidebar( editor );
+			document.body.appendChild( sidebar.dom );
+
+			var modal = new UI.Modal();
+			document.body.appendChild( modal.dom );
+
+
+			//
+
+
+			editor.setTheme( editor.config.getKey( 'theme' ) );
+
+			editor.storage.init( function () {
+
+				editor.storage.get( function ( state ) {
+
+					if ( isLoadingFromHash ) return;
+
+					if ( state !== undefined ) {
+
+						editor.fromJSON( state );
+
+					}
+
+					var selected = editor.config.getKey( 'selected' );
+
+					if ( selected !== undefined ) {
+
+						editor.selectByUuid( selected );
+
+					}
+
+				} );
+
+				//
+
+				var timeout;
+
+				function saveState( scene ) {
+
+					if ( editor.config.getKey( 'autosave' ) === false ) {
+
+						return;
+
+					}
+
+					clearTimeout( timeout );
+
+					timeout = setTimeout( function () {
+
+						editor.signals.savingStarted.dispatch();
+
+						timeout = setTimeout( function () {
+
+							editor.storage.set( editor.toJSON() );
+
+							editor.signals.savingFinished.dispatch();
+
+						}, 100 );
+
+					}, 1000 );
+
+				};
+
+				var signals = editor.signals;
+
+				signals.geometryChanged.add( saveState );
+				signals.objectAdded.add( saveState );
+				signals.objectChanged.add( saveState );
+				signals.objectRemoved.add( saveState );
+				signals.materialChanged.add( saveState );
+				signals.sceneBackgroundChanged.add( saveState );
+				signals.sceneFogChanged.add( saveState );
+				signals.sceneGraphChanged.add( saveState );
+				signals.scriptChanged.add( saveState );
+				signals.historyChanged.add( saveState );
+
+				signals.showModal.add( function ( content ) {
+
+					modal.show( content );
+
+				} );
+
+			} );
+
+			//
+
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+
+			}, false );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				editor.loader.loadFiles( event.dataTransfer.files );
+
+			}, false );
+
+			function onWindowResize( event ) {
+
+				editor.signals.windowResize.dispatch();
+
+			}
+
+			window.addEventListener( 'resize', onWindowResize, false );
+			
+			onWindowResize();
+			
+			//
+
+			var isLoadingFromHash = false;
+			var hash = window.location.hash;
+
+			if ( hash.substr( 1, 5 ) === 'file=' ) {
+
+				var file = hash.substr( 6 );
+
+				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+
+					var loader = new THREE.FileLoader();
+					loader.crossOrigin = '';
+					loader.load( file, function ( text ) {
+
+						editor.clear();
+						editor.fromJSON( JSON.parse( text ) );
+
+					} );
+
+					isLoadingFromHash = true;
+
+				}
+
+			}
+
+			/*
+			window.addEventListener( 'message', function ( event ) {
+
+				editor.clear();
+				editor.fromJSON( event.data );
+
+			}, false );
+			*/
+			var material = new THREE.LineBasicMaterial({
+				color: 0x0000ff
+			});
+
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push(
+				new THREE.Vector3( -10, 0, 0 ),
+				new THREE.Vector3( 0, 10, 0 ),
+				new THREE.Vector3( 10, 0, 0 )
+			);
+			var container = new UI.Panel();
+			var line = new THREE.Line( geometry, material );
+			//editor.execute( new AddObjectCommand( line ) )
+
+
+
+
+
+		</script>
+	</body>
+
+</html>
