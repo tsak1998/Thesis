@@ -10,7 +10,7 @@ def parse_and_save(proj_code, data):
 	df_model = pd.DataFrame(columns=['en', 'nn' 'type', 'supportType', 'nodal_load', 'nodei', 'nodej',
 									 'coord_x', 'coord_y', 'coord_z', 'elem_type', 'length', 'section_id',
 									 'dof_dx', 'dof_dy', 'dof_dz', 'dof_rx', 'dof_ry', 'dof_rz'])
-
+	elem_cols = ['id', 'user_id', 'en', 'nodei', 'nodej', 'length', 'elem_type', 'section_id']
 	df_sections = pd.DataFrame(columns=['section_id', 'A', 'E', 'G',
 										  'Ix', 'Iy', 'Iz'])
 
@@ -78,16 +78,16 @@ def parse_and_save(proj_code, data):
 	nodes = nodes.dropna(axis=1, how='all')
 	elements = elements.dropna(axis=1, how='all')
 
-	nodes = nodes.sort_values('nn', axis=0)
-	elements = elements.sort_values('en', axis=0)
+	nodes = nodes.sort_values('nn', axis=0).reset_index(drop=True)
+	elements = elements.sort_values('en', axis=0).reset_index(drop=True)
 
 	del elements['type']
 	elements['user_id'] = 'cv13116'
 
 	elements['id'] = elements.index + 1
-
+	elements = elements[elem_cols]
 	df_point_loads['user_id'] = 'cv13116'
-
+	print(elements, nodes)
 
 	del nodes['type'], nodes['supportType']
 	nodes['user_id'] = 'cv13116'

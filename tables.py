@@ -11,12 +11,12 @@ class nodes(Base):
 	coord_x = Column('coord_x', Float)
 	coord_y = Column('coord_y', Float)
 	coord_z = Column('coord_z', Float)
-	dof_dx = Column('dof_dx', Integer(5))
-	dof_dy = Column('dof_dy', Integer(5))
-	dof_dz = Column('dof_dz', Integer(5))
-	dof_rx = Column('dof_rx', Integer(5))
-	dof_ry = Column('dof_ry', Integer(5))
-	dof_rz = Column('dof_rz', Integer(5))
+	dof_dx = Column('dof_dx', Integer)
+	dof_dy = Column('dof_dy', Integer)
+	dof_dz = Column('dof_dz', Integer)
+	dof_rx = Column('dof_rx', Integer)
+	dof_ry = Column('dof_ry', Integer)
+	dof_rz = Column('dof_rz', Integer)
 	
 	def __init__(self, user_id, nn, coord_x, coord_y, coord_z,
 				 dof_dx, dof_dy, dof_dz,
