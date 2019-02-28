@@ -68,7 +68,6 @@ def parse_and_save(proj_code, data):
 			sect['Iz'] = 0.149*10**-6
 
 
-	print(sect)
 	sect['user_id'] = 'cv13116'
 	df = pd.DataFrame([sect], columns=sect.keys())
 	df_sections = pd.concat([df_sections, df], axis =0).reset_index(drop=True)

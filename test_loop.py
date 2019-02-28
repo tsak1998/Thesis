@@ -2,6 +2,7 @@ import numpy as np
 import math
 import pandas as pd
 from sqlalchemy import create_engine
+from scipy.sparse import csr_matrix
 import time
 
 
@@ -18,11 +19,6 @@ def load_data(user_id):
     point_loads = point_loads.loc[point_loads['user_id'] == user_id]
     dist_loads = pd.read_sql('loads_nodal', engine)
     dist_loads = dist_loads.loc[dist_loads['user_id'] == user_id]
-
-    elements.to_csv('elements.csv')
-    truss_elements.to_csv('truss_elements.csv')
-    nodes.to_csv('nodes')
-    sections.to_csv('sections.csv')
 
     return elements, nodes, sections, point_loads, dist_loads, truss_elements
 
@@ -52,47 +48,62 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
     t1 = time.time()
     local_stifness = []
     transf_arrays = []
+
     step = len(nodes) * 6
     K_ol = np.zeros((step, step))
+
     for i in range(len(elements)):
+        # maybe separate functions for truss and beams so it will do the ifs once per loop
         elm = elements.iloc[i]
         nodei = nodes.loc[nodes.nn == elm.nodei]
         nodej = nodes.loc[nodes.nn == elm.nodej]
         sect = sections.loc[sections.section_id == elm.section_id]
         k = local_stif(elm, sect)
-        local_stifness.append(k)
         rot = transformation_array(elm, nodei, nodej)
+        local_stifness.append(k)
         transf_arrays.append(rot)
-        t = np.transpose(rot).dot(k).dot(rot)
-        i = nodei.nn.get_values()[0]
-        j = nodej.nn.get_values()[0]
         if elm.elem_type == 'beam':
-            dofs_i = node_dofs.loc[node_dofs.nn == i]
-            dofs_j = node_dofs.loc[node_dofs.nn == j]
-            dof_a, dof_b = dofs_i['dofx'].get_values()[0], \
-                           dofs_i['dofrz'].get_values()[0] + 1
-            dof_c, dof_d = dofs_j['dofx'].get_values()[0], \
-                           dofs_j['dofrz'].get_values()[0] + 1
+            t = np.transpose(rot).dot(k).dot(rot)
+            dof_a, dof_b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
+                           node_dofs.loc[node_dofs.nn == nodei]['dofz'].get_values()[0] + 1
+            dof_c, dof_d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
+                           node_dofs.loc[node_dofs.nn == nodej]['dofz'].get_values()[0] + 1
             K_ol[dof_a:dof_b, dof_a:dof_b] += t[:6, :6]
             K_ol[dof_a:dof_b, dof_c:dof_d] += t[:6, 6:]
             K_ol[dof_c:dof_d, dof_a:dof_b] += t[6:, :6]
             K_ol[dof_c:dof_d, dof_c:dof_d] += t[6:, 6:]
         else:
-            dof_a, dof_b = node_dofs.loc[node_dofs.nn == nodei.nn]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodei.nn]['dofz'].get_values()[0] + 1
-            dof_c, dof_d = node_dofs.loc[node_dofs.nn == nodej.nn]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodej.nn]['dofz'].get_values()[0] + 1
-            K_ol[dof_a:dof_b, dof_a:dof_b] += t[:3, :3]
-            K_ol[dof_a:dof_b, dof_c:dof_d] += t[:3, 3:]
-            K_ol[dof_c:dof_d, dof_a:dof_b] += t[3:, :3]
-            K_ol[dof_c:dof_d, dof_c:dof_d] += t[3:, 3:]
+            t = np.transpose(rot).dot(k).dot(rot)
+            dof_a, dof_b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
+                           node_dofs.loc[node_dofs.nn == nodei]['dofz'].get_values()[0] + 1
+            dof_c, dof_d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
+                           node_dofs.loc[node_dofs.nn == nodej]['dofz'].get_values()[0] + 1
+            K_ol[dof_a:dof_b, dof_a:dof_b] += k[:3, :3]
+            K_ol[dof_a:dof_b, dof_c:dof_d] += k[:3, 3:]
+            K_ol[dof_c:dof_d, dof_a:dof_b] += k[3:, :3]
+            K_ol[dof_c:dof_d, dof_c:dof_d] += k[3:, 3:]
 
 
-    i_uper = np.triu_indices(step, 0)
 
-    K_ol[i_uper] = K_ol.T[i_uper]
+
     print('arrays: ', time.time() - t1)
     return local_stifness, transf_arrays, K_ol
+
+
+'''
+if (r.elem_type == 'beam'):
+    a, b, c, d = int(dofs[i, 1]) - 1, int(dofs[i, 6]), int(dofs[i, 7]) - 1, int(dofs[i, 12])
+    K_ol[a:b, a:b] += k[:6, :6]
+    K_ol[a:b, c:d] += k[:6, 6:]
+    K_ol[c:d, a:b] += k[6:, :6]
+    K_ol[c:d, c:d] += k[6:, 6:]
+else:
+    a, b, c, d = int(dofs[i, 1]) - 1, int(dofs[i, 3]), int(dofs[i, 7]) - 1, int(dofs[i, 9])
+    K_ol[a:b, a:b] += k[:3, :3]
+    K_ol[a:b, c:d] += k[:3, 3:]
+    K_ol[c:d, a:b] += k[3:, :3]
+    K_ol[c:d, c:d] += k[3:, 3:]
+'''
 
 
 def local_stif(element, sect):
@@ -100,14 +111,8 @@ def local_stif(element, sect):
     elem_type = element.elem_type
 
     A, E = sect.A, sect.E
-    A = 0.2090318
-    E = 199948023.75
     if elem_type == 'beam':
         Iy, Iz, G, J = sect.Ix, sect.Iy, sect.G, sect.Iz
-        Iy = 0.00364
-        Iz = 0.00364
-        G = 76904146.79
-        J = 0.00614
         w1 = E * A / L
         w2 = 12 * E * Iz / (L * L * L)
         w3 = 6 * E * Iz / (L * L)
@@ -123,6 +128,7 @@ def local_stif(element, sect):
         # creates half the stifness matrix
         precision = 3
         y[0, 0] = w1
+        y[1, 0] = w2
         y[6, 0] = -w1
         y[1, 1] = w2
         y[5, 1] = w3
@@ -140,7 +146,6 @@ def local_stif(element, sect):
         y[5, 5] = w4
         y[11, 5] = w5
         y[6, 6] = w1
-        y[7, 5] = w7
         y[7, 7] = w2
         y[11, 7] = -w3
         y[8, 8] = w6
@@ -149,20 +154,7 @@ def local_stif(element, sect):
         y[10, 10] = w8
         y[11, 11] = w4
 
-
-        #y = np.round(y, precision)
-        y = np.array([[w1, 0, 0, 0, 0, 0, -w1, 0, 0, 0, 0, 0],
-                      [0, w2, 0, 0, 0, w3, 0, -w2, 0, 0, 0, w3],
-                      [0, 0, w6, 0, -w7, 0, 0, 0, -w6, 0, -w7, 0],
-                      [0, 0, 0, w10, 0, 0, 0, 0, 0, -w10, 0, 0],
-                      [0, 0, -w7, 0, w8, 0, 0, 0, w7, 0, w9, 0],
-                      [0, w3, 0, 0, 0, w4, 0, -w3, 0, 0, 0, w5],
-                      [-w1, 0, 0, 0, 0, 0, w1, 0, 0, 0, 0, 0],
-                      [0, -w2, 0, 0, 0, -w3, 0, w2, 0, 0, 0, -w3],
-                      [0, 0, -w6, 0, w7, 0, 0, 0, w6, 0, w7, 0],
-                      [0, 0, 0, -w10, 0, 0, 0, 0, 0, w10, 0, 0],
-                      [0, 0, -w7, 0, w9, 0, 0, 0, w7, 0, w8, 0],
-                      [0, w3, 0, 0, 0, w5, 0, -w3, 0, 0, 0, w4]])
+        y = np.round(y, precision)
 
 
     else:
@@ -185,14 +177,14 @@ def transformation_array(element, nodei, nodej):
     y1, y2 = nodei.coord_y.get_values(), nodej.coord_y.get_values()
     z1, z2 = nodei.coord_z.get_values(), nodej.coord_z.get_values()
 
-    xR, yR, zR = 63,432,4
+    xR, yR, zR = 0, 1, 0
 
     cx = (x2 - x1) / L
     cy = (y2 - y1) / L
     cz = (z2 - z1) / L
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
-        if (math.sqrt(cx ** 2 + cz ** 2) != 0):
+        if math.sqrt(cx ** 2 + cz ** 2) != 0:
             Lambda[0, 0] = cx
             Lambda[0, 1] = cy
             Lambda[0, 2] = cz
@@ -201,7 +193,7 @@ def transformation_array(element, nodei, nodej):
             Lambda[1, 2] = (-cy * cz) / math.sqrt(cx ** 2 + cz ** 2)
             Lambda[2, 0] = (-cz) / math.sqrt(cx ** 2 + cz ** 2)
             Lambda[2, 1] = 0
-            Lambda[2, 2] = (cx) / math.sqrt(cx ** 2 + cz ** 2)
+            Lambda[2, 2] = cx / math.sqrt(cx ** 2 + cz ** 2)
         else:
             Lambda[0, 0] = 0
             Lambda[0, 1] = cy
@@ -232,109 +224,12 @@ def transformation_array(element, nodei, nodej):
     return LAMDA
 
 
-def nodal_forces(point_loads, elem_loads, node_dofs, tranf_arrays, arranged_dofs):
-    P_nodal = np.zeros((len(arranged_dofs), 1))
-    # diaforopoiisi gia truss elements
-    for i in range(len(point_loads)):
-        node = point_loads.iloc[i].nn
-        a, b = node_dofs.loc[node_dofs.nn == node]['dofx'].get_values()[0], \
-               node_dofs.loc[node_dofs.nn == node]['dofrz'].get_values()[0] + 1
-        P_nodal[a:b] = [[point_loads.iloc[i].p_x], [point_loads.iloc[i].p_y], [point_loads.iloc[i].p_z],
-                        [point_loads.iloc[i].m_x], [point_loads.iloc[i].m_y], [point_loads.iloc[i].m_z]]
-
-    '''
-    for r in elem_loads:
-        a, b = int(dofs_element[r.en-1,1])-1, int(dofs_element[r.en-1,6])
-        c ,d = int(dofs_element[r.en-1,7])-1, int(dofs_element[r.en-1,12])
-        if r.p1==r.p2:
-            Ar = np.array([[0], [0], [r.p1*r.c/2], [0], [-r.p1*r.l**2/12], [0],
-                           [0], [0], [-r.p1*r.c/2], [0], [r.p1*r.l**2/12], [0]])
-
-            #Ar = np.transpose(transform[r.en-1]).dot(Ar)
-            P_nodal[a:b] += Ar[:6]
-            P_nodal[c:d] += Ar[6:]
-            '''
-    return P_nodal
-
-
-def solver(K, P_nodal, dofs, dofs_arranged, free):
-    # rearagment of the arrays
-    K_m = rearrangment(K, dofs_arranged)
-    P_m = rearrangment(P_nodal, dofs_arranged)
-
-    P_f = P_m[:free]
-
-    Kff = K_m[:free, :free]
-    Ksf = K_m[free:, :free]
-
-    D_f = np.linalg.inv(Kff).dot(P_f)
-    P_s = np.dot(Ksf, D_f)
-    P_s = np.round(P_s, decimals=2)
-
-    D = np.zeros((len(dofs), 1))
-    i = 0
-    for r in dofs_arranged[:free]:
-        D[r] = D_f[i]
-        i += 1
-
-    return P_s, D
-
-
-def rearrangment(array, dofs):
-    step = len(dofs)
-    anad = np.zeros((step, step))
-    for i in range(len(dofs)):
-        anad[i, dofs[i]] = 1
-    if array.shape[1] == 1:
-        a = anad.dot(array)
-    else:
-        a = anad.dot(array).dot(np.transpose(anad))
-
-    return a
-
-
-def nodal_mqn(K, Lamda, displacments, elements, node_dofs):
-    step = len(K)
-    mqn_element = np.zeros((step, 13))
-
-    for i in range(step):
-        mqn_element[i, 0] = i + 1
-        elm = elements.iloc[i]
-        if elm.elem_type == "beam":
-            nodei = elm.nodei
-            nodej = elm.nodej
-            a, b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
-            c, d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
-            d_elem = np.zeros((12, 1))
-            d_elem[:6], d_elem[6:] = displacments[a:b], displacments[c:d]
-            mqn_element[i, 1:] = np.reshape(K[i].dot(np.dot(Lamda[i], d_elem)), (1, 12))
-        else:
-            d_elem = np.zeros((6, 1))
-            a, b, c, d = int(dofs[i, 1]) - 1, int(dofs[i, 3]), int(dofs[i, 7]) - 1, int(dofs[i, 9])
-            d_elem[:3], d_elem[3:] = displacments[a:b], displacments[c:d]
-
-            mqn_element[i, 1:7] = np.reshape(K[i].dot(np.dot(Lamda[i], d_elem)), (1, 6))
-            mqn_element[i, 6:9] = copy.copy(mqn_element[i, 3:6])
-            mqn_element[i, 3:6] = [0, 0, 0]
-    mqn_element = np.round(mqn_element, 2)
-    return mqn_element
-
-
-def mqn_member():
-    pass
-
 def main(user_id):
     elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id)
     arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
     local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
-    P_nodal = nodal_forces(point_loads, dist_loads, node_dofs, transf_arrays, arranged_dofs)
-    P_s, D = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs))
-    MQN = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs)
-    print(P_s)
-    print(MQN)
 
-t1 = time.time()
+
+t_ol = time.time()
 main('cv13116')
-print('Run: ', time.time() - t1)
+print('Run: ', time.time() - t_ol)

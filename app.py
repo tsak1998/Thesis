@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import create_engine
 from parse_and_save import parse_and_save
 import pandas as pd
+import dxfgrabber
 import numpy as np
 
 app = Flask(__name__)

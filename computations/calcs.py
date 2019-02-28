@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float
 import time
 
-engine = create_engine("mysql+pymysql://root:pass@localhost:3306/_0000125")
+engine = create_engine("mysql+pymysql://root:password@localhost:3306/_0000125")
 #engine = create_engine("mysql+pymysql://bucketuser:dencopc@localhost:3306/bucketlist")
 db_session = scoped_session(sessionmaker(autocommit = False,
 										autoflush = False,
@@ -201,7 +201,7 @@ def dofs(nodes, elements, truss_nodes):
 
 			for j in range(6):
 				dof = j + count
-				if (int(constraints[j]) == 0):
+				if (int(constraints[j]) == 1):
 					dof_free.append(dof)
 				else:
 					dof_sup.append(dof)
@@ -209,7 +209,7 @@ def dofs(nodes, elements, truss_nodes):
 		else:
 			for j in range(3):
 				dof = j + count
-				if (int(constraints[j]) == 0):
+				if (int(constraints[j]) == 1):
 					dof_free.append(dof)
 				else:
 					dof_sup.append(dof)
@@ -506,5 +506,5 @@ reactions, displacments = solver(K_ol, P_nodal, dofs_all, dofs_arranged, free)
 mqn_element = nodal_mqn(local_arrays, transformation_arrays, displacments, element_data, dofs_element)
 mqn_element = np.round(mqn_element, decimals=2)
 
-print(reactions, displacments)
-print(P_nodal)
+print(reactions)
+#print(P_nodal)
