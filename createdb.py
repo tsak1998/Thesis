@@ -11,12 +11,12 @@ def init_db(projCode):
     
     #engine = create_engine("mysql+pymysql://bucketuser:dencopc@localhost:3306/bucketlist")
     try:
-        engine = create_engine("mysql+pymysql://root:password@localhost:3306/"+projCode)
+        engine = create_engine("mysql+pymysql://root:pass@localhost:3306/"+projCode)
         engine.connect()
 
         #need to clear tables
     except:
-        engine = create_engine("mysql+pymysql://root:password@localhost:3306/")
+        engine = create_engine("mysql+pymysql://root:pass@localhost:3306/")
         engine.execute("CREATE DATABASE "+projCode) #create db
         engine.execute("USE "+projCode) # select new db
         #tables, the ones in table.py

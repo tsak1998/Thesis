@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float
 import time
 
-engine = create_engine("mysql+pymysql://root:password@localhost:3306/_0000125")
+engine = create_engine("mysql+pymysql://root:pass@localhost:3306/_0000125")
 #engine = create_engine("mysql+pymysql://bucketuser:dencopc@localhost:3306/bucketlist")
 db_session = scoped_session(sessionmaker(autocommit = False,
 										autoflush = False,

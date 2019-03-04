@@ -56,11 +56,12 @@ class elements(Base):
 		self.section_id = section_id
 		
 #loads tables
-class loads_nodal(Base):
-	__tablename__ = 'loads_nodal'
+class point_loads(Base):
+	__tablename__ = 'point_loads'
 	id = Column('id', Integer, primary_key=True)
 	user_id =  Column('user_id', String(45), nullable = False)
 	nn = Column('nn', Integer)
+	c = Column('c', Float)
 	p_x = Column('p_x', Float)
 	p_y = Column('p_y', Float)
 	p_z = Column('p_z', Float)
@@ -68,9 +69,10 @@ class loads_nodal(Base):
 	m_y = Column('m_y', Float)
 	m_z = Column('m_z', Float)
 	
-	def __init__(self, user_id, nn, p_x, p_y, p_z, m_x, m_y, m_z):  # constructor
+	def __init__(self, user_id, nn, c, p_x, p_y, p_z, m_x, m_y, m_z):  # constructor
 		self.user_id = user_id
 		self.nn = nn
+		self.c = c
 		self.p_x = p_x
 		self.p_y = p_y
 		self.p_z = p_z

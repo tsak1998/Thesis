@@ -3,10 +3,11 @@ import math
 import pandas as pd
 from sqlalchemy import create_engine
 import time
+import copy
 
 
 def load_data(user_id):
-    engine = create_engine("mysql+pymysql://root:password@localhost:3306/_0000125")
+    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/_0000125")
     elements = pd.read_sql('elements', engine)
     elements = elements.loc[elements['user_id'] == user_id]
     truss_elements = elements.loc[elements['elem_type'] == 'truss']
@@ -14,7 +15,7 @@ def load_data(user_id):
     nodes = nodes.loc[nodes['user_id'] == user_id]
     sections = pd.read_sql('sections', engine)
     sections = sections.loc[sections['user_id'] == user_id]
-    point_loads = pd.read_sql('loads_nodal', engine)
+    point_loads = pd.read_sql('point_loads', engine)
     point_loads = point_loads.loc[point_loads['user_id'] == user_id]
     dist_loads = pd.read_sql('loads_nodal', engine)
     dist_loads = dist_loads.loc[dist_loads['user_id'] == user_id]
@@ -48,21 +49,20 @@ def dofs(nodes):
     return arranged_dofs, free_dofs, sup_dofs, node_dofs
 
 
-def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
+def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements, point_loads):
     t1 = time.time()
     local_stifness = []
     transf_arrays = []
     step = len(nodes) * 6
     K_ol = np.zeros((step, step))
-    for i in range(len(elements)):
-        elm = elements.iloc[i]
+    for index, elm in elements.iterrows():
         nodei = nodes.loc[nodes.nn == elm.nodei]
         nodej = nodes.loc[nodes.nn == elm.nodej]
         sect = sections.loc[sections.section_id == elm.section_id]
         k = local_stif(elm, sect)
-        local_stifness.append(k)
-        rot = transformation_array(elm, nodei, nodej)
-        transf_arrays.append(rot)
+        local_stifness.append(k.copy())
+        rot = transformation_array(elm, nodei, nodej, point_loads)
+        transf_arrays.append(rot.copy())
         t = np.transpose(rot).dot(k).dot(rot)
         i = nodei.nn.get_values()[0]
         j = nodej.nn.get_values()[0]
@@ -87,7 +87,6 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
             K_ol[dof_c:dof_d, dof_a:dof_b] += t[3:, :3]
             K_ol[dof_c:dof_d, dof_c:dof_d] += t[3:, 3:]
 
-
     i_uper = np.triu_indices(step, 0)
 
     K_ol[i_uper] = K_ol.T[i_uper]
@@ -99,11 +98,11 @@ def local_stif(element, sect):
     L = element.length
     elem_type = element.elem_type
 
-    A, E = sect.A, sect.E
+    # A, E = sect.A, sect.E
     A = 0.2090318
     E = 199948023.75
     if elem_type == 'beam':
-        Iy, Iz, G, J = sect.Ix, sect.Iy, sect.G, sect.Iz
+        # Iy, Iz, G, J = sect.Ix, sect.Iy, sect.G, sect.Iz
         Iy = 0.00364
         Iz = 0.00364
         G = 76904146.79
@@ -149,8 +148,6 @@ def local_stif(element, sect):
         y[10, 10] = w8
         y[11, 11] = w4
 
-
-        #y = np.round(y, precision)
         y = np.array([[w1, 0, 0, 0, 0, 0, -w1, 0, 0, 0, 0, 0],
                       [0, w2, 0, 0, 0, w3, 0, -w2, 0, 0, 0, w3],
                       [0, 0, w6, 0, -w7, 0, 0, 0, -w6, 0, -w7, 0],
@@ -164,6 +161,7 @@ def local_stif(element, sect):
                       [0, 0, -w7, 0, w9, 0, 0, 0, w7, 0, w8, 0],
                       [0, w3, 0, 0, 0, w5, 0, -w3, 0, 0, 0, w4]])
 
+        # y = np.round(y, precision)
 
     else:
         w1 = E * A / L
@@ -177,83 +175,115 @@ def local_stif(element, sect):
     return y
 
 
-def transformation_array(element, nodei, nodej):
+def transformation_array(element, nodei, nodej, point_loads):
     L = element.length
     i, j = element.nodei, element.nodej
 
-    x1, x2 = nodei.coord_x.get_values(), nodej.coord_x.get_values()
-    y1, y2 = nodei.coord_y.get_values(), nodej.coord_y.get_values()
-    z1, z2 = nodei.coord_z.get_values(), nodej.coord_z.get_values()
+    x1, x2 = nodei.coord_x.get_values()[0], nodej.coord_x.get_values()[0]
+    y1, y2 = nodei.coord_y.get_values()[0], nodej.coord_y.get_values()[0]
+    z1, z2 = nodei.coord_z.get_values()[0], nodej.coord_z.get_values()[0]
+    # need to find what works for the random case
 
-    xR, yR, zR = 63,432,4
+    #
+    # transform the loads here, its easier
+    p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c!=99999)]
 
-    cx = (x2 - x1) / L
-    cy = (y2 - y1) / L
-    cz = (z2 - z1) / L
+    CXx = (x2 - x1) / L
+    CYx = (y2 - y1) / L
+    CZx = (z2 - z1) / L
+
+    xR, yR, zR = 0, 1, 0
+
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
-        if (math.sqrt(cx ** 2 + cz ** 2) != 0):
-            Lambda[0, 0] = cx
-            Lambda[0, 1] = cy
-            Lambda[0, 2] = cz
-            Lambda[1, 0] = (-cx * cy) / math.sqrt(cx ** 2 + cz ** 2)
-            Lambda[1, 1] = math.sqrt(cx ** 2 + cz ** 2)
-            Lambda[1, 2] = (-cy * cz) / math.sqrt(cx ** 2 + cz ** 2)
-            Lambda[2, 0] = (-cz) / math.sqrt(cx ** 2 + cz ** 2)
-            Lambda[2, 1] = 0
-            Lambda[2, 2] = (cx) / math.sqrt(cx ** 2 + cz ** 2)
+        if CXx == 0 and CZx == 0:
+            Y = -xR + x1
+            Z = zR - z1
+            if y1 > y2:
+                Y = -Y
+
         else:
-            Lambda[0, 0] = 0
-            Lambda[0, 1] = cy
-            Lambda[0, 2] = 0
-            Lambda[1, 0] = -cy
-            Lambda[1, 1] = 0
-            Lambda[1, 2] = 0
-            Lambda[2, 0] = 0
+            SQ = math.sqrt(CXx * CXx + CZx * CZx)
+            Y = -CXx * CYx * (xR - x1) / SQ + SQ * (yR - y1) - CYx * CZx * (zR - z1) / SQ
+            Z = -CZx * (xR - x1) / SQ + CXx * (zR - z1) / SQ
+
+        SQyz = math.sqrt(Y * Y + Z * Z)
+        SINY = Z / SQyz
+        COSY = Y / SQyz
+
+        Lambda[0, 0] = CXx
+        Lambda[0, 1] = CYx
+        Lambda[0, 2] = CZx
+        if CXx == 0 and CZx == 0:
+
+            Lambda[2, 0] = -COSY
             Lambda[2, 1] = 0
-            Lambda[2, 2] = 1
+            Lambda[2, 2] = SINY
+            Lambda[1, 0] = SINY
+            Lambda[1, 1] = 0
+            Lambda[1, 2] = COSY
+            if y1 >= y2:
+                Lambda[1, 0] = COSY
+                Lambda[2, 0] = -SINY
+        else:
+            Lambda[2, 0] = -(CXx * CYx * COSY + CZx * SINY) / SQ
+            Lambda[2, 1] = SQ * COSY
+            Lambda[2, 2] = (-CYx * CZx * COSY + CXx * SINY) / SQ
+            Lambda[1, 0] = (CXx * CYx * SINY - CZx * COSY) / SQ
+            Lambda[1, 1] = -SQ * SINY
+            Lambda[1, 2] = (CYx * CZx * SINY + CXx * COSY) / SQ
 
-        LAMDA = np.zeros((12, 12))
-        zeroes = np.array([0, 0, 0])
-
-        LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
-        LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
-    else:
-        dx, dy, dz = x2 - x1, y2 - y1, z2 - z1
-        cosx, cosy, cosz = dx / L, dy / L, dz / L
-
-        LAMDA = np.array([[cosx, cosy, cosz, 0, 0, 0],
-                          [0, 0, 0, 0, 0, 0],
-                          [0, 0, 0, 0, 0, 0],
-                          [0, 0, 0, cosx, cosy, cosz],
-                          [0, 0, 0, 0, 0, 0],
-                          [0, 0, 0, 0, 0, 0]])
-
+    LAMDA = np.zeros((12, 12))
+    zeroes = np.array([0, 0, 0])
+    LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
+    LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
     return LAMDA
 
 
-def nodal_forces(point_loads, elem_loads, node_dofs, tranf_arrays, arranged_dofs):
+def nodal_forces(point_loads, elem_loads, node_dofs, tranf_arrays, arranged_dofs, elements):
     P_nodal = np.zeros((len(arranged_dofs), 1))
     # diaforopoiisi gia truss elements
-    for i in range(len(point_loads)):
-        node = point_loads.iloc[i].nn
-        a, b = node_dofs.loc[node_dofs.nn == node]['dofx'].get_values()[0], \
-               node_dofs.loc[node_dofs.nn == node]['dofrz'].get_values()[0] + 1
-        P_nodal[a:b] = [[point_loads.iloc[i].p_x], [point_loads.iloc[i].p_y], [point_loads.iloc[i].p_z],
-                        [point_loads.iloc[i].m_x], [point_loads.iloc[i].m_y], [point_loads.iloc[i].m_z]]
+    for index, load in point_loads.iterrows():
+        if load.c == 99999:
+            node = load.nn
+            a, b = node_dofs.loc[node_dofs.nn == node]['dofx'].get_values()[0], \
+                   node_dofs.loc[node_dofs.nn == node]['dofrz'].get_values()[0] + 1
+            P_nodal[a:b] += [[load.p_x], [load.p_y], [load.p_z],
+                            [load.m_x], [load.m_y], [load.m_z]]
+        else:
+            elm_id = load.nn
+            elm = elements.loc[elements.en == elm_id]
+            L = elm.length.get_values()[0]
+            nodei = elm.nodei.get_values()[0]
+            nodej = elm.nodej.get_values()[0]
+            dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
+                   node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
+            dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
+                   node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+            a = load.c*L
+            b = (1-load.c)*L
 
-    '''
-    for r in elem_loads:
-        a, b = int(dofs_element[r.en-1,1])-1, int(dofs_element[r.en-1,6])
-        c ,d = int(dofs_element[r.en-1,7])-1, int(dofs_element[r.en-1,12])
-        if r.p1==r.p2:
-            Ar = np.array([[0], [0], [r.p1*r.c/2], [0], [-r.p1*r.l**2/12], [0],
-                           [0], [0], [-r.p1*r.c/2], [0], [r.p1*r.l**2/12], [0]])
+            p = load.iloc[[4,5,6,7,8,9]].get_values()
+            A_i = np.zeros((6,1))
+            A_j = np.zeros((6, 1))
+            A_i[0] = -p[0]*(1-load.c)
+            A_j[0] = p[0]*load.c
+            A_i[1] = -p[1] * (a / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)
+            A_j[1] = p[1] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)
+            A_i[2] = -p[2] * (a / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)
+            A_j[2] = p[2] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)
+            A_i[3] = p[3]*(1-load.c)
+            A_j[3] = p[3]*load.c
+            A_i[4] = p[2] * a * b ** 2/L**2
+            A_j[4] = p[2] * a ** 2 * b/L**2
+            A_i[5] = -p[1] * a * b ** 2/L**2
+            A_j[5] = -p[1] * a ** 2 * b / L ** 2
 
-            #Ar = np.transpose(transform[r.en-1]).dot(Ar)
-            P_nodal[a:b] += Ar[:6]
-            P_nodal[c:d] += Ar[6:]
-            '''
+            # element forces from to local to global
+            rot = tranf_arrays[elm.index[0]][:6, :6]
+            P_nodal[dofa:dofb] += rot.dot(A_i)
+            P_nodal[dofc:dofd] += rot.dot(A_j)
+
     return P_nodal
 
 
@@ -293,47 +323,82 @@ def rearrangment(array, dofs):
     return a
 
 
-def nodal_mqn(K, Lamda, displacments, elements, node_dofs):
-    step = len(K)
-    mqn_element = np.zeros((step, 13))
+def nodal_mqn(K, Lamda, displacments, elements, node_dofs, K_ol, nodes, point_loads):
+    for index, elm in elements.iterrows():
+        i = index
 
-    for i in range(step):
-        mqn_element[i, 0] = i + 1
-        elm = elements.iloc[i]
-        if elm.elem_type == "beam":
-            nodei = elm.nodei
-            nodej = elm.nodej
-            a, b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
-            c, d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
-            d_elem = np.zeros((12, 1))
-            d_elem[:6], d_elem[6:] = displacments[a:b], displacments[c:d]
-            mqn_element[i, 1:] = np.reshape(K[i].dot(np.dot(Lamda[i], d_elem)), (1, 12))
-        else:
-            d_elem = np.zeros((6, 1))
-            a, b, c, d = int(dofs[i, 1]) - 1, int(dofs[i, 3]), int(dofs[i, 7]) - 1, int(dofs[i, 9])
-            d_elem[:3], d_elem[3:] = displacments[a:b], displacments[c:d]
+        sect = None
+        nodei = nodes.loc[nodes.nn == elm.nodei]
+        nodej = nodes.loc[nodes.nn == elm.nodej]
+        k = local_stif(elm, sect)
 
-            mqn_element[i, 1:7] = np.reshape(K[i].dot(np.dot(Lamda[i], d_elem)), (1, 6))
-            mqn_element[i, 6:9] = copy.copy(mqn_element[i, 3:6])
-            mqn_element[i, 3:6] = [0, 0, 0]
-    mqn_element = np.round(mqn_element, 2)
-    return mqn_element
+        rot = transformation_array(elm, nodei, nodej, point_loads)
 
+        nodei = elm.nodei
+        nodej = elm.nodej
+        k = local_stif(elm, sect)
+
+        a, b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
+               node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
+        c, d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
+               node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+        d_elem = np.zeros((12, 1))
+        d_elem[:6], d_elem[6:] = displacments[a:b], displacments[c:d]
+        # local displacments
+        d_local = rot.dot(d_elem)
+        MQN = k.dot(d_local)
+        MQN = np.round(MQN, 2)
+
+        return MQN
+
+
+def rotate_loads(elements, point_loads, transf_arrays):
+    for index, element in elements.iterrows():
+        L = element.length
+
+
+
+        # transform the loads here, its easier
+        p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
+        if p_load.empty==False:
+            #P_x = np.array([p_load.p_x.get_values()[0], 0, 0])
+            #P_y = np.array([0, p_load.p_y.get_values()[0], 0])
+            P_z = np.array([0, 0, p_load.p_z.get_values()[0]])
+
+            rot = transf_arrays[index][:3, :3]
+            #p = rot.dot(P_x) + rot.dot(P_y) +\
+            p = rot.dot(P_z)
+
+            # .p_x,  point_loads.iloc[p_load.index].p_y,  point_loads.iloc[p_load.index].p_z = p[0], p[1], p[2]
+            p_load['p_x'], p_load['p_y'], p_load['p_z'] = p[0], p[1], p[2]
+            point_loads.iloc[p_load.index, :] = p_load
+
+    return point_loads
 
 def mqn_member():
     pass
 
+
 def main(user_id):
     elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id)
+
     arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
-    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
-    P_nodal = nodal_forces(point_loads, dist_loads, node_dofs, transf_arrays, arranged_dofs)
+
+    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements, point_loads)
+
+    point_loads_tr = rotate_loads(elements, point_loads, transf_arrays)
+    print(point_loads_tr.to_string())
+
+    P_nodal = nodal_forces(point_loads, dist_loads, node_dofs, transf_arrays, arranged_dofs, elements)
+
     P_s, D = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs))
-    MQN = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs)
+
+    MQN = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, K_ol, nodes, point_loads)
+
     print(P_s)
     print(MQN)
+    print(D)
+
 
 t1 = time.time()
 main('cv13116')
