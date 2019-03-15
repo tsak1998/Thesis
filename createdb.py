@@ -45,3 +45,4 @@ def createDB(projCode,**kwargs):
     
     return(proj_id)
 
+init_db('_0000125')

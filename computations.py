@@ -17,7 +17,7 @@ def load_data(user_id):
     sections = sections.loc[sections['user_id'] == user_id]
     point_loads = pd.read_sql('point_loads', engine)
     point_loads = point_loads.loc[point_loads['user_id'] == user_id]
-    dist_loads = pd.read_sql('loads_nodal', engine)
+    dist_loads = pd.read_sql('dist_loads', engine)
     dist_loads = dist_loads.loc[dist_loads['user_id'] == user_id]
 
     elements.to_csv('elements.csv')
@@ -49,7 +49,7 @@ def dofs(nodes):
     return arranged_dofs, free_dofs, sup_dofs, node_dofs
 
 
-def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements, point_loads):
+def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
     t1 = time.time()
     local_stifness = []
     transf_arrays = []
@@ -61,7 +61,7 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements, p
         sect = sections.loc[sections.section_id == elm.section_id]
         k = local_stif(elm, sect)
         local_stifness.append(k.copy())
-        rot = transformation_array(elm, nodei, nodej, point_loads)
+        rot = transformation_array(elm, nodei, nodej)
         transf_arrays.append(rot.copy())
         t = np.transpose(rot).dot(k).dot(rot)
         i = nodei.nn.get_values()[0]
@@ -120,7 +120,6 @@ def local_stif(element, sect):
 
         y = np.zeros((12, 12))
         # creates half the stifness matrix
-        precision = 3
         y[0, 0] = w1
         y[6, 0] = -w1
         y[1, 1] = w2
@@ -175,7 +174,7 @@ def local_stif(element, sect):
     return y
 
 
-def transformation_array(element, nodei, nodej, point_loads):
+def transformation_array(element, nodei, nodej):
     L = element.length
     i, j = element.nodei, element.nodej
 
@@ -183,16 +182,13 @@ def transformation_array(element, nodei, nodej, point_loads):
     y1, y2 = nodei.coord_y.get_values()[0], nodej.coord_y.get_values()[0]
     z1, z2 = nodei.coord_z.get_values()[0], nodej.coord_z.get_values()[0]
     # need to find what works for the random case
-
     #
-    # transform the loads here, its easier
-    p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c!=99999)]
 
     CXx = (x2 - x1) / L
     CYx = (y2 - y1) / L
     CZx = (z2 - z1) / L
 
-    xR, yR, zR = 0, 1, 0
+    xR, yR, zR = 0, 0, 1
 
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
@@ -240,16 +236,20 @@ def transformation_array(element, nodei, nodej, point_loads):
     return LAMDA
 
 
-def nodal_forces(point_loads, elem_loads, node_dofs, tranf_arrays, arranged_dofs, elements):
+def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs, elements):
     P_nodal = np.zeros((len(arranged_dofs), 1))
+    S = np.zeros((len(arranged_dofs), 1))
+    fixed_forces = np.zeros((12, len(elements)))
     # diaforopoiisi gia truss elements
     for index, load in point_loads.iterrows():
+        A_i = np.zeros((6, 1))
+        A_j = np.zeros((6, 1))
         if load.c == 99999:
             node = load.nn
             a, b = node_dofs.loc[node_dofs.nn == node]['dofx'].get_values()[0], \
                    node_dofs.loc[node_dofs.nn == node]['dofrz'].get_values()[0] + 1
             P_nodal[a:b] += [[load.p_x], [load.p_y], [load.p_z],
-                            [load.m_x], [load.m_y], [load.m_z]]
+                             [load.m_x], [load.m_y], [load.m_z]]
         else:
             elm_id = load.nn
             elm = elements.loc[elements.en == elm_id]
@@ -257,48 +257,99 @@ def nodal_forces(point_loads, elem_loads, node_dofs, tranf_arrays, arranged_dofs
             nodei = elm.nodei.get_values()[0]
             nodej = elm.nodej.get_values()[0]
             dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
-                   node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
+                         node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
             dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
-                   node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
-            a = load.c*L
-            b = (1-load.c)*L
-
-            p = load.iloc[[4,5,6,7,8,9]].get_values()
-            A_i = np.zeros((6,1))
-            A_j = np.zeros((6, 1))
-            A_i[0] = -p[0]*(1-load.c)
-            A_j[0] = p[0]*load.c
-            A_i[1] = -p[1] * (a / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)
-            A_j[1] = p[1] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)
-            A_i[2] = -p[2] * (a / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)
-            A_j[2] = p[2] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)
-            A_i[3] = p[3]*(1-load.c)
-            A_j[3] = p[3]*load.c
-            A_i[4] = p[2] * a * b ** 2/L**2
-            A_j[4] = p[2] * a ** 2 * b/L**2
-            A_i[5] = -p[1] * a * b ** 2/L**2
-            A_j[5] = -p[1] * a ** 2 * b / L ** 2
+                         node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+            a = load.c * L
+            b = (1 - load.c) * L
+            # add the appropriate moment loads
+            p = load.iloc[[4, 5, 6, 7, 8, 9]].get_values()
+            A_i[0] = p[0] * (1 - load.c)  # Fx_i
+            A_j[0] = p[0] * load.c  # Fx_j
+            A_i[1] = -p[1] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fy_i
+            A_j[1] = -p[1] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fy_j
+            A_i[2] = -p[2] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fz_i
+            A_j[2] = -p[2] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fz_j
+            A_i[3] = -p[3] * (1 - load.c)  # Mx_i
+            A_j[3] = -p[3] * load.c  # Mx_j
+            A_i[4] = p[2] * a * b ** 2 / L ** 2  # My_i
+            A_j[4] = -p[2] * a ** 2 * b / L ** 2  # My_j
+            A_i[5] = p[1] * a * b ** 2 / L ** 2  # Mz_i
+            A_j[5] = -p[1] * a ** 2 * b / L ** 2  # Mz_j
 
             # element forces from to local to global
             rot = tranf_arrays[elm.index[0]][:6, :6]
-            P_nodal[dofa:dofb] += rot.dot(A_i)
-            P_nodal[dofc:dofd] += rot.dot(A_j)
+            S[dofa:dofb] -= np.transpose(rot).dot(A_i)
+            S[dofc:dofd] -= np.transpose(rot).dot(A_j)
+            fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
+            fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
 
-    return P_nodal
+    # approaching dist loads adding two triangle loads: (p1,0) + (0,p2)
+    for index, d_load in dist_loads.iterrows():
+        A_i = np.zeros((6, 1))
+        A_j = np.zeros((6, 1))
+        elm_id = d_load.en
+        elm = elements.loc[elements.en == elm_id]
+        L = elm.length.get_values()[0]
+        nodei = elm.nodei.get_values()[0]
+        nodej = elm.nodej.get_values()[0]
+        dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
+                     node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
+        dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
+                     node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+
+        p = d_load.iloc[[3, 4, 5, 6, 7, 8]].get_values()
+        a = d_load.c * L
+        b = d_load.l * L
+        c = b - a
+        d1 = L - a - 2 * c / 3
+        d2 = L - a - 1 * c / 3
+        f1 = 1 - d1 / L
+        f2 = 1 - d2 / L
+        A_i[0] = -p[0] * c / 2 * d1 / L - p[1] * c / 2 * d2 / L  # Fx_i
+        A_j[0] = p[0] * c / 2 * f1 + p[0] * c / 2 * f2  # Fx_j
+        A_i[1] = p[2] * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3 + p[3] * (
+                d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3  # Fy_i
+        A_j[1] = p[2] * c / 2 + p[3] * c / 2 + A_i[1]  # Fy_j
+        A_i[2] = -(p[4] * c * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3 + p[
+            5] * c * (
+                           d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3)  # Fz_i
+        A_j[2] = p[4] * c / 2 + p[5] * c / 2 + A_i[2]  # Fz_j
+        A_i[3] = 0  # Mx_i
+        A_j[3] = 0  # Mx_j
+        A_i[4] = -p[4] * c * (d1 ** 2 * (d1 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2 - p[
+            5] * c * (
+                         d2 ** 2 * (d2 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2  # My_i
+        A_j[4] = p[4] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 + p[5] * c * (
+                d2 * (d2 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2  # My_j
+        A_i[5] = -p[2] * c * (d1 ** 2 * (d1 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2 - p[
+            3] * c * (
+                         d2 ** 2 * (d2 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2  # Mz_i
+        A_j[5] = p[2] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 + p[3] * c * (
+                d2 * (d2 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2  # Mz_j
+
+        rot = tranf_arrays[elm.index[0]][:6, :6]
+        S[dofa:dofb] += np.transpose(rot).dot(A_i)
+        S[dofc:dofd] += np.transpose(rot).dot(A_j)
+        fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
+        fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
+
+    return P_nodal, S, fixed_forces
 
 
-def solver(K, P_nodal, dofs, dofs_arranged, free):
+def solver(K, P_nodal, dofs, dofs_arranged, free, S):
     # rearagment of the arrays
     K_m = rearrangment(K, dofs_arranged)
     P_m = rearrangment(P_nodal, dofs_arranged)
+    S_m = rearrangment(S, dofs_arranged)
 
-    P_f = P_m[:free]
+    P_f = P_m[:free] - S_m[:free]
 
     Kff = K_m[:free, :free]
     Ksf = K_m[free:, :free]
 
     D_f = np.linalg.inv(Kff).dot(P_f)
-    P_s = np.dot(Ksf, D_f)
+    P_s = np.dot(Ksf, D_f) - S_m[free:]
     P_s = np.round(P_s, decimals=2)
 
     D = np.zeros((len(dofs), 1))
@@ -323,7 +374,8 @@ def rearrangment(array, dofs):
     return a
 
 
-def nodal_mqn(K, Lamda, displacments, elements, node_dofs, K_ol, nodes, point_loads):
+def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads, fixed_forces):
+    mqn = []
     for index, elm in elements.iterrows():
         i = index
 
@@ -332,7 +384,7 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, K_ol, nodes, point_lo
         nodej = nodes.loc[nodes.nn == elm.nodej]
         k = local_stif(elm, sect)
 
-        rot = transformation_array(elm, nodei, nodej, point_loads)
+        rot = Lamda[index]
 
         nodei = elm.nodei
         nodej = elm.nodej
@@ -347,35 +399,87 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, K_ol, nodes, point_lo
         # local displacments
         d_local = rot.dot(d_elem)
         MQN = k.dot(d_local)
+        MQN[:6, 0] -= fixed_forces[:6, index]
+        MQN[6:, 0] += fixed_forces[6:, index]
         MQN = np.round(MQN, 2)
+        # need to add nodal forces from fixed elements
+        mqn.append(MQN)
+    return mqn
 
-        return MQN
 
-
-def rotate_loads(elements, point_loads, transf_arrays):
+def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
     for index, element in elements.iterrows():
         L = element.length
 
-
-
         # transform the loads here, its easier
         p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
-        if p_load.empty==False:
-            #P_x = np.array([p_load.p_x.get_values()[0], 0, 0])
-            #P_y = np.array([0, p_load.p_y.get_values()[0], 0])
+        d_load = dist_loads.loc[(dist_loads.en == element.en)]
+        if not p_load.empty:
+            P_x = np.array([p_load.p_x.get_values()[0], 0, 0])
+            P_y = np.array([0, p_load.p_y.get_values()[0], 0])
             P_z = np.array([0, 0, p_load.p_z.get_values()[0]])
 
             rot = transf_arrays[index][:3, :3]
-            #p = rot.dot(P_x) + rot.dot(P_y) +\
-            p = rot.dot(P_z)
+            p = rot.dot(P_x) + rot.dot(P_y) + rot.dot(P_z)
+            # p =
 
             # .p_x,  point_loads.iloc[p_load.index].p_y,  point_loads.iloc[p_load.index].p_z = p[0], p[1], p[2]
             p_load['p_x'], p_load['p_y'], p_load['p_z'] = p[0], p[1], p[2]
             point_loads.iloc[p_load.index, :] = p_load
+        if not d_load.empty:
+            rot = transf_arrays[index][:3, :3]
+            p_1_x = [d_load.p_1_x.get_values()[0], 0, 0]
+            p_2_x = [d_load.p_2_x.get_values()[0], 0, 0]
 
-    return point_loads
+            p_1_y = [0, d_load.p_1_y.get_values()[0], 0]
+            p_2_y = [0, d_load.p_2_y.get_values()[0], 0]
+            p_1_z = [0, 0, d_load.p_1_z.get_values()[0]]
+            p_2_z = [0, 0, d_load.p_2_z.get_values()[0]]
+            p_1 = rot.dot(p_1_x) + rot.dot(p_1_y) + rot.dot(p_1_z)
+            p_2 = rot.dot(p_2_x) + rot.dot(p_2_y) + rot.dot(p_2_z)
+            d_load['p_1_x'], d_load['p_1_y'], d_load['p_1_z'] = p_1[0], p_1[1], p_1[2]
+            d_load['p_2_x'], d_load['p_2_y'], d_load['p_2_z'] = p_2[0], p_2[1], p_2[2]
+            dist_loads.iloc[d_load.index, :] = d_load
 
-def mqn_member():
+    return point_loads, dist_loads
+
+
+def mqn_member(elements , MQN_nodes, point_loads, dist_loads):
+    mqn_values = np.zeros((20, 7))
+    for index, element in elements.iterrows():
+        mqn_nodes = MQN_nodes[index]
+        L = element.length
+        x = np.round(np.linspace(0, L, 20), 2)
+        p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
+        d_load = dist_loads.loc[(dist_loads.en == element.en)]
+        if not p_load.empty:
+            c = L*p_load.c.get_values()
+            # adding the load point in the range
+            temp = np.where(x < c)[0][-1]
+            x[temp-1] = c
+            x[temp] = c
+            mqn_values[:20, index] = element.en
+            # Fx
+            mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
+            mqn_values[temp:, 1].fill(mqn_nodes[6, 0])
+            # Fy
+            mqn_values[:temp, 2].fill(mqn_nodes[1, 0])
+            mqn_values[temp:, 2].fill(mqn_nodes[7, 0])
+            # Fz
+            mqn_values[:temp, 3].fill(mqn_nodes[2, 0])
+            mqn_values[temp:, 3].fill(mqn_nodes[8, 0])
+            # Mx
+            mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
+            mqn_values[temp:, 4].fill(mqn_nodes[9, 0])
+            # My
+            mqn_values[:temp, 5] = mqn_nodes[2, 0]*x[:temp]-mqn_nodes[4, 0]
+            #mqn_values[temp:, 5] = mqn_nodes[2, 0]*x[:temp]-mqn_nodes[4, 0] - p_load.p_z.get
+            # Mz
+            mqn_values[:temp, 6].fill(mqn_nodes[5, 0])
+            mqn_values[temp:, 6].fill(mqn_nodes[11, 0])
+    import matplotlib.pyplot as plt
+    plt.plot(x, mqn_values[:, 5])
+    #plt.show()
     pass
 
 
@@ -384,20 +488,22 @@ def main(user_id):
 
     arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
 
-    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements, point_loads)
+    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
 
-    point_loads_tr = rotate_loads(elements, point_loads, transf_arrays)
-    print(point_loads_tr.to_string())
+    point_loads_tr, dist_loads_tr = rotate_loads(elements, point_loads, dist_loads, transf_arrays)
 
-    P_nodal = nodal_forces(point_loads, dist_loads, node_dofs, transf_arrays, arranged_dofs, elements)
+    P_nodal, S, fixed_forces = nodal_forces(point_loads_tr, dist_loads_tr, node_dofs, transf_arrays, arranged_dofs,
+                                            elements)
 
-    P_s, D = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs))
+    P_s, D = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
 
-    MQN = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, K_ol, nodes, point_loads)
+    MQN_nodes = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, S, nodes, point_loads, fixed_forces)
+
+    mqn_member(elements ,MQN_nodes, point_loads_tr, dist_loads_tr)
 
     print(P_s)
-    print(MQN)
-    print(D)
+    print(MQN_nodes)
+    print(np.round(D, 6))
 
 
 t1 = time.time()
