@@ -16,7 +16,7 @@ def init_db(projCode):
 
         #need to clear tables
     except:
-        engine = create_engine("mysql+pymysql://root:pass@localhost:3306/")
+        engine = create_engine("mysql+pymysql://root:password@localhost:3306/")
         engine.execute("CREATE DATABASE "+projCode) #create db
         engine.execute("USE "+projCode) # select new db
         #tables, the ones in table.py
@@ -37,7 +37,7 @@ def createDB(projCode,**kwargs):
     proj_id += str(projCode)
 
     engine = init_db(proj_id)
-    
+
     for key in kwargs.keys():
         kwargs[key].to_sql(key, engine, schema=proj_id, if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
     
@@ -45,4 +45,4 @@ def createDB(projCode,**kwargs):
     
     return(proj_id)
 
-init_db('_0000125')
+#init_db('_0000125')

@@ -94,4 +94,3 @@ def parse_and_save(proj_code, data):
 
 	createDB(proj_code, elements=elements, nodes=nodes, loads_nodal=df_point_loads, sections=df_sections)
 
-	

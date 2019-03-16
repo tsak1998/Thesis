@@ -18,24 +18,6 @@ app.debug = True
 toolbar = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-# Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://bucketuser:dencopc@localhost/bucketlist'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-db = SQLAlchemy(app)
-
-
-class User(db.Model):
-    __tablename__ = 'tbl_user'
-    id = db.Column('user_id', db.Integer, primary_key=True)
-    name = db.Column('user_name', db.String(45), unique=True, nullable=False)
-    username = db.Column('user_username', db.String(45), unique=True, nullable=False)
-    password = db.Column('user_password', db.String(256), unique=True, nullable=False)
-
-    def __init__(self, name, username, password):
-        self.name = name
-        self.username = username
-        self.password = password
-
 
 @app.route('/')
 @app.route('/index')
@@ -190,7 +172,7 @@ def post_req():
         print('yellooooow')
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
-        proj_code = 125
+        proj_code = 'bucketlist'
         parse_and_save(proj_code, data)
 
     return render_template('editor.html')

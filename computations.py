@@ -7,7 +7,7 @@ import copy
 
 
 def load_data(user_id):
-    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/_0000125")
+    engine = create_engine("mysql+pymysql://root:password@localhost:3306/_bucketlist")
     elements = pd.read_sql('elements', engine)
     elements = elements.loc[elements['user_id'] == user_id]
     truss_elements = elements.loc[elements['elem_type'] == 'truss']
@@ -188,7 +188,8 @@ def transformation_array(element, nodei, nodej):
     CYx = (y2 - y1) / L
     CZx = (z2 - z1) / L
 
-    xR, yR, zR = 0, 0, 1
+    xR, yR, zR = CXx, 0, CZx
+
 
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
@@ -264,8 +265,8 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             b = (1 - load.c) * L
             # add the appropriate moment loads
             p = load.iloc[[4, 5, 6, 7, 8, 9]].get_values()
-            A_i[0] = p[0] * (1 - load.c)  # Fx_i
-            A_j[0] = p[0] * load.c  # Fx_j
+            A_i[0] = -p[0] * (1 - load.c)  # Fx_i
+            A_j[0] = -p[0] * load.c  # Fx_j
             A_i[1] = -p[1] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fy_i
             A_j[1] = -p[1] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fy_j
             A_i[2] = -p[2] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fz_i
@@ -274,13 +275,14 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             A_j[3] = -p[3] * load.c  # Mx_j
             A_i[4] = p[2] * a * b ** 2 / L ** 2  # My_i
             A_j[4] = -p[2] * a ** 2 * b / L ** 2  # My_j
-            A_i[5] = p[1] * a * b ** 2 / L ** 2  # Mz_i
-            A_j[5] = -p[1] * a ** 2 * b / L ** 2  # Mz_j
+            A_i[5] = -p[1] * a * b ** 2 / L ** 2  # Mz_i
+            A_j[5] = p[1] * a ** 2 * b / L ** 2  # Mz_j
 
             # element forces from to local to global
+
             rot = tranf_arrays[elm.index[0]][:6, :6]
-            S[dofa:dofb] -= np.transpose(rot).dot(A_i)
-            S[dofc:dofd] -= np.transpose(rot).dot(A_j)
+            S[dofa:dofb] += np.transpose(rot).dot(A_i)
+            S[dofc:dofd] += np.transpose(rot).dot(A_j)
             fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
             fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
 
@@ -349,8 +351,9 @@ def solver(K, P_nodal, dofs, dofs_arranged, free, S):
     Ksf = K_m[free:, :free]
 
     D_f = np.linalg.inv(Kff).dot(P_f)
-    P_s = np.dot(Ksf, D_f) - S_m[free:]
-    P_s = np.round(P_s, decimals=2)
+    P_s = np.dot(Ksf, D_f) + S_m[free:]
+    print(S_m[free:])
+    P_s = np.round(P_s, decimals=3)
 
     D = np.zeros((len(dofs), 1))
     i = 0
@@ -477,10 +480,30 @@ def mqn_member(elements , MQN_nodes, point_loads, dist_loads):
             # Mz
             mqn_values[:temp, 6].fill(mqn_nodes[5, 0])
             mqn_values[temp:, 6].fill(mqn_nodes[11, 0])
-    import matplotlib.pyplot as plt
-    plt.plot(x, mqn_values[:, 5])
+    #import matplotlib.pyplot as plt
+    #plt.plot(x, mqn_values[:, 5])
     #plt.show()
     pass
+
+def draw(nodes):
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d import Axes3D
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    mpl.rcParams['legend.fontsize'] = 10
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
+    z = nodes.coord_z
+    r = z ** 2 + 1
+    x = nodes.coord_z
+    y = nodes.coord_y
+    ax.plot(x, y, z, label='parametric curve')
+    ax.legend()
+
+    plt.show()
 
 
 def main(user_id):
@@ -502,8 +525,9 @@ def main(user_id):
     mqn_member(elements ,MQN_nodes, point_loads_tr, dist_loads_tr)
 
     print(P_s)
-    print(MQN_nodes)
-    print(np.round(D, 6))
+    draw(nodes)
+    # print(MQN_nodes)
+    #print(np.round(D, 6))
 
 
 t1 = time.time()
