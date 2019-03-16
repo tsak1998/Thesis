@@ -7,7 +7,9 @@ import copy
 
 
 def load_data(user_id):
+    '''
     engine = create_engine("mysql+pymysql://root:password@localhost:3306/_bucketlist")
+
     elements = pd.read_sql('elements', engine)
     elements = elements.loc[elements['user_id'] == user_id]
     truss_elements = elements.loc[elements['elem_type'] == 'truss']
@@ -20,10 +22,20 @@ def load_data(user_id):
     dist_loads = pd.read_sql('dist_loads', engine)
     dist_loads = dist_loads.loc[dist_loads['user_id'] == user_id]
 
-    elements.to_csv('elements.csv')
-    truss_elements.to_csv('truss_elements.csv')
-    nodes.to_csv('nodes')
-    sections.to_csv('sections.csv')
+    elements.to_csv('model_test/elements.csv', index=False)
+    truss_elements.to_csv('model_test/truss_elements.csv', index=False)
+    nodes.to_csv('model_test/nodes.csv', index=False)
+    sections.to_csv('model_test/sections.csv', index=False)
+    point_loads.to_csv('model_test/point_loads.csv', index=False)
+    dist_loads = dist_loads.to_csv('model_test/dist_loads.csv', index=False)
+    '''
+
+    elements = pd.read_csv('model_test/elements.csv')
+    truss_elements = pd.read_csv('model_test/truss_elements.csv')
+    nodes = pd.read_csv('model_test/nodes.csv')
+    sections = pd.read_csv('model_test/sections.csv')
+    point_loads = pd.read_csv('model_test/point_loads.csv')
+    dist_loads = pd.read_csv('model_test/dist_loads.csv')
 
     return elements, nodes, sections, point_loads, dist_loads, truss_elements
 
@@ -190,7 +202,6 @@ def transformation_array(element, nodei, nodej):
 
     xR, yR, zR = CXx, 0, CZx
 
-
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
         if CXx == 0 and CZx == 0:
@@ -352,7 +363,7 @@ def solver(K, P_nodal, dofs, dofs_arranged, free, S):
 
     D_f = np.linalg.inv(Kff).dot(P_f)
     P_s = np.dot(Ksf, D_f) + S_m[free:]
-    print(S_m[free:])
+    
     P_s = np.round(P_s, decimals=3)
 
     D = np.zeros((len(dofs), 1))
@@ -447,7 +458,7 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
     return point_loads, dist_loads
 
 
-def mqn_member(elements , MQN_nodes, point_loads, dist_loads):
+def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
     mqn_values = np.zeros((20, 7))
     for index, element in elements.iterrows():
         mqn_nodes = MQN_nodes[index]
@@ -456,10 +467,10 @@ def mqn_member(elements , MQN_nodes, point_loads, dist_loads):
         p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
         d_load = dist_loads.loc[(dist_loads.en == element.en)]
         if not p_load.empty:
-            c = L*p_load.c.get_values()
+            c = L * p_load.c.get_values()
             # adding the load point in the range
             temp = np.where(x < c)[0][-1]
-            x[temp-1] = c
+            x[temp - 1] = c
             x[temp] = c
             mqn_values[:20, index] = element.en
             # Fx
@@ -475,15 +486,16 @@ def mqn_member(elements , MQN_nodes, point_loads, dist_loads):
             mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
             mqn_values[temp:, 4].fill(mqn_nodes[9, 0])
             # My
-            mqn_values[:temp, 5] = mqn_nodes[2, 0]*x[:temp]-mqn_nodes[4, 0]
-            #mqn_values[temp:, 5] = mqn_nodes[2, 0]*x[:temp]-mqn_nodes[4, 0] - p_load.p_z.get
+            mqn_values[:temp, 5] = mqn_nodes[2, 0] * x[:temp] - mqn_nodes[4, 0]
+            # mqn_values[temp:, 5] = mqn_nodes[2, 0]*x[:temp]-mqn_nodes[4, 0] - p_load.p_z.get
             # Mz
             mqn_values[:temp, 6].fill(mqn_nodes[5, 0])
             mqn_values[temp:, 6].fill(mqn_nodes[11, 0])
-    #import matplotlib.pyplot as plt
-    #plt.plot(x, mqn_values[:, 5])
-    #plt.show()
+    import matplotlib.pyplot as plt
+    plt.plot(x, mqn_values[:, 5])
+    plt.show()
     pass
+
 
 def draw(nodes):
     import matplotlib as mpl
@@ -522,12 +534,12 @@ def main(user_id):
 
     MQN_nodes = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, S, nodes, point_loads, fixed_forces)
 
-    mqn_member(elements ,MQN_nodes, point_loads_tr, dist_loads_tr)
+    mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr)
 
     print(P_s)
     draw(nodes)
     # print(MQN_nodes)
-    #print(np.round(D, 6))
+    # print(np.round(D, 6))
 
 
 t1 = time.time()
