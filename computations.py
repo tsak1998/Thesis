@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import pandas as pd
-from sqlalchemy import create_engine
+#from sqlalchemy import create_engine
 import time
 import copy
 
@@ -363,7 +363,7 @@ def solver(K, P_nodal, dofs, dofs_arranged, free, S):
 
     D_f = np.linalg.inv(Kff).dot(P_f)
     P_s = np.dot(Ksf, D_f) + S_m[free:]
-    
+
     P_s = np.round(P_s, decimals=3)
 
     D = np.zeros((len(dofs), 1))
