@@ -30,12 +30,12 @@ def load_data(user_id):
     dist_loads = dist_loads.to_csv('model_test/dist_loads.csv', index=False)
     '''
 
-    elements = pd.read_csv('model_test/elements.csv')
-    truss_elements = pd.read_csv('model_test/truss_elements.csv')
-    nodes = pd.read_csv('model_test/nodes.csv')
-    sections = pd.read_csv('model_test/sections.csv')
-    point_loads = pd.read_csv('model_test/point_loads.csv')
-    dist_loads = pd.read_csv('model_test/dist_loads.csv')
+    elements = pd.read_csv('model_test/test_1/elements.csv')
+    truss_elements = pd.read_csv('model_test/test_1/truss_elements.csv')
+    nodes = pd.read_csv('model_test/test_1/nodes.csv')
+    sections = pd.read_csv('model_test/test_1/sections.csv')
+    point_loads = pd.read_csv('model_test/test_1/point_loads.csv')
+    dist_loads = pd.read_csv('model_test/test_1/dist_loads.csv')
 
     return elements, nodes, sections, point_loads, dist_loads, truss_elements
 
@@ -99,9 +99,9 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
             K_ol[dof_c:dof_d, dof_a:dof_b] += t[3:, :3]
             K_ol[dof_c:dof_d, dof_c:dof_d] += t[3:, 3:]
 
-    i_uper = np.triu_indices(step, 0)
+    #i_uper = np.triu_indices(step, 0)
 
-    K_ol[i_uper] = K_ol.T[i_uper]
+    #K_ol[i_uper] = K_ol.T[i_uper]
     print('arrays: ', time.time() - t1)
     return local_stifness, transf_arrays, K_ol
 
@@ -111,14 +111,14 @@ def local_stif(element, sect):
     elem_type = element.elem_type
 
     # A, E = sect.A, sect.E
-    A = 0.2090318
-    E = 199948023.75
+    A = 0.027777777777777773  # 0.2090318
+    E = 200000000  # 199948023.75
     if elem_type == 'beam':
         # Iy, Iz, G, J = sect.Ix, sect.Iy, sect.G, sect.Iz
-        Iy = 0.00364
-        Iz = 0.00364
-        G = 76904146.79
-        J = 0.00614
+        Iy = 64300411.522633724*10**-12  # 0.00364
+        Iz = 64300411.522633724*10**-12  # 0.00364
+        G = E/2/1.27  # 76904146.79
+        J = 108506944.4444444*10**-12  # 0.00614
         w1 = E * A / L
         w2 = 12 * E * Iz / (L * L * L)
         w3 = 6 * E * Iz / (L * L)
@@ -200,7 +200,10 @@ def transformation_array(element, nodei, nodej):
     CYx = (y2 - y1) / L
     CZx = (z2 - z1) / L
 
-    xR, yR, zR = CXx, 0, CZx
+    if CZx == 0:
+        xR, yR, zR = 0, 110000, 0
+    else:
+        xR, yR, zR = 0, 110000, 0
 
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
@@ -224,25 +227,26 @@ def transformation_array(element, nodei, nodej):
         Lambda[0, 2] = CZx
         if CXx == 0 and CZx == 0:
 
-            Lambda[2, 0] = -COSY
-            Lambda[2, 1] = 0
-            Lambda[2, 2] = SINY
-            Lambda[1, 0] = SINY
+            Lambda[1, 0] = -COSY
             Lambda[1, 1] = 0
-            Lambda[1, 2] = COSY
+            Lambda[1, 2] = SINY
+            Lambda[2, 0] = SINY
+            Lambda[2, 1] = 0
+            Lambda[2, 2] = COSY
             if y1 >= y2:
                 Lambda[1, 0] = COSY
                 Lambda[2, 0] = -SINY
         else:
-            Lambda[2, 0] = -(CXx * CYx * COSY + CZx * SINY) / SQ
-            Lambda[2, 1] = SQ * COSY
-            Lambda[2, 2] = (-CYx * CZx * COSY + CXx * SINY) / SQ
-            Lambda[1, 0] = (CXx * CYx * SINY - CZx * COSY) / SQ
-            Lambda[1, 1] = -SQ * SINY
-            Lambda[1, 2] = (CYx * CZx * SINY + CXx * COSY) / SQ
+            Lambda[1, 0] = -(CXx * CYx * COSY + CZx * SINY) / SQ
+            Lambda[1, 1] = SQ * COSY
+            Lambda[1, 2] = -(CYx * CZx * COSY - CXx * SINY) / SQ
+            Lambda[2, 0] = (CXx * CYx * SINY - CZx * COSY) / SQ
+            Lambda[2, 1] = -SQ * SINY
+            Lambda[2, 2] = (CYx * CZx * SINY + CXx * COSY) / SQ
 
     LAMDA = np.zeros((12, 12))
     zeroes = np.array([0, 0, 0])
+
     LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
     LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
     return LAMDA
@@ -396,13 +400,13 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
         sect = None
         nodei = nodes.loc[nodes.nn == elm.nodei]
         nodej = nodes.loc[nodes.nn == elm.nodej]
-        k = local_stif(elm, sect)
+        k = K[index]
 
         rot = Lamda[index]
 
         nodei = elm.nodei
         nodej = elm.nodej
-        k = local_stif(elm, sect)
+
 
         a, b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
                node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
@@ -413,7 +417,7 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
         # local displacments
         d_local = rot.dot(d_elem)
         MQN = k.dot(d_local)
-        MQN[:6, 0] -= fixed_forces[:6, index]
+        MQN[:6, 0] += fixed_forces[:6, index]
         MQN[6:, 0] += fixed_forces[6:, index]
         MQN = np.round(MQN, 2)
         # need to add nodal forces from fixed elements
@@ -459,60 +463,87 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
 
 
 def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
-    mqn_values = np.zeros((20, 7))
+    mqn_values = np.zeros((20, 8))
     for index, element in elements.iterrows():
         mqn_nodes = MQN_nodes[index]
         L = element.length
-        x = np.round(np.linspace(0, L, 20), 2)
+
         p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
         d_load = dist_loads.loc[(dist_loads.en == element.en)]
         if not p_load.empty:
             c = L * p_load.c.get_values()
-            # adding the load point in the range
-            temp = np.where(x < c)[0][-1]
-            x[temp - 1] = c
-            x[temp] = c
+            # length
+            # separate x around c
+
+            x1 = np.round(np.linspace(0, c, 10), 2)
+            x2 = np.round(np.linspace(c, L, 10), 2)
+            x = np.zeros((20))
+            x[:10] = x1
+            x[10:] = x2
             mqn_values[:20, index] = element.en
+            mqn_values[:20, -1] = x
+            temp = 10
             # Fx
             mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
-            mqn_values[temp:, 1].fill(mqn_nodes[6, 0])
+            mqn_values[temp:, 1].fill(-mqn_nodes[6, 0])
             # Fy
             mqn_values[:temp, 2].fill(mqn_nodes[1, 0])
-            mqn_values[temp:, 2].fill(mqn_nodes[7, 0])
+            mqn_values[temp:, 2].fill(-mqn_nodes[7, 0])
             # Fz
             mqn_values[:temp, 3].fill(mqn_nodes[2, 0])
-            mqn_values[temp:, 3].fill(mqn_nodes[8, 0])
+            mqn_values[temp:, 3].fill(-mqn_nodes[8, 0])
             # Mx
             mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
-            mqn_values[temp:, 4].fill(mqn_nodes[9, 0])
+            mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
             # My
-            mqn_values[:temp, 5] = mqn_nodes[2, 0] * x[:temp] - mqn_nodes[4, 0]
-            # mqn_values[temp:, 5] = mqn_nodes[2, 0]*x[:temp]-mqn_nodes[4, 0] - p_load.p_z.get
+            mqn_values[:temp, 5] = mqn_nodes[2, 0] * x1 + mqn_nodes[4, 0] #- p_load.p_z.get_values()*c*(1-c)**2/L**2
+            mqn_values[temp:, 5] = -mqn_nodes[2, 0] * x2 + mqn_nodes[4, 0] - p_load.p_z.get_values()*c - p_load.p_z.get_values() * x2
             # Mz
-            mqn_values[:temp, 6].fill(mqn_nodes[5, 0])
+            mqn_values[:temp, 6] = mqn_nodes[3, 0] * x1 + mqn_nodes[5, 0]
+
             mqn_values[temp:, 6].fill(mqn_nodes[11, 0])
-    import matplotlib.pyplot as plt
-    plt.plot(x, mqn_values[:, 5])
-    plt.show()
-    pass
+            import matplotlib.pyplot as plt
+            #plt.plot(x, mqn_values[:, 1], label='Fx')
+            #plt.legend()
+            #plt.plot(x, mqn_values[:, 2], label='Fy')
+            #plt.legend()
+            #plt.plot(x, mqn_values[:, 3], label='Fz')
+            #plt.legend()
+            #plt.plot(x, mqn_values[:, 4], label='Mx')
+            #plt.legend()
+            plt.plot(x, mqn_values[:, 5], label='My')
+            plt.legend()
+            plt.plot(x, mqn_values[:, 6], label='Mz')
+            plt.legend()
+            # plt.show()
 
 
-def draw(nodes):
+
+def draw(nodes, D):
     import matplotlib as mpl
     from mpl_toolkits.mplot3d import Axes3D
     import numpy as np
     import matplotlib.pyplot as plt
+    import copy
 
     mpl.rcParams['legend.fontsize'] = 10
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
-    z = nodes.coord_z
+    z = nodes.coord_z.get_values()
+    z_def = z.copy()
+    z_def[1] += D[8]*1
     r = z ** 2 + 1
-    x = nodes.coord_z
-    y = nodes.coord_y
+    x = nodes.coord_z.get_values()
+    x_def = x.copy()
+    x_def[1] += D[6]*1
+    y = nodes.coord_y.get_values()
+    y_def = y.copy()
+    y_def[1] += D[7]*1
     ax.plot(x, y, z, label='parametric curve')
+    ax.legend()
+    ax.plot(x_def, y_def, z_def, label='deformed')
     ax.legend()
 
     plt.show()
@@ -536,10 +567,10 @@ def main(user_id):
 
     mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr)
 
-    print(P_s)
-    draw(nodes)
-    # print(MQN_nodes)
-    # print(np.round(D, 6))
+    print('Reactions: ', P_s)
+    # draw(nodes, D)
+    print(MQN_nodes)
+    print('Displasments: ', np.round(D, 6))
 
 
 t1 = time.time()
