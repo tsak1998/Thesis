@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Untitled.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Untitled.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/elements.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/elements.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/nodes.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/nodes.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/point_loads.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/point_loads.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/elements.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/elements.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/nodes.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/nodes.csv" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,8 +22,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/computations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="257">
-              <caret line="505" column="54" lean-forward="true" selection-start-line="505" selection-start-column="54" selection-end-line="505" selection-end-column="54" />
+            <state relative-caret-position="453">
+              <caret line="572" column="17" selection-start-line="572" selection-start-column="17" selection-end-line="572" selection-end-column="17" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -75,7 +75,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="4">
     <option name="x" value="67" />
     <option name="y" value="27" />
     <option name="width" value="927" />
@@ -247,10 +247,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="67" y="27" width="1853" height="1053" extended-state="6" />
+    <frame x="67" y="27" width="927" height="1053" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.08797814" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17809735" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -321,11 +321,6 @@
           <line>293</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>518</line>
-          <option name="timeStamp" value="73" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -344,52 +339,52 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
+        <expression-string>mqn_nodes[1, 0]*0.9</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mqn_nodes[1, 0]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mqn_nodes[1, 0] * x1</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mqn_nodes[1, 0] * x1 + mqn_nodes[5, 0]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>p_load.p_y.get_values() * c</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mqn_nodes[1, 0] * x2 + mqn_nodes[5, 0]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>p_load.p_y.get_values() * x2</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mqn_nodes[3, 0]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mqn_nodes[3, 0] * x1</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>(p_load.p_z.get_values()+mqn_nodes[2, 0]) * x2 mqn_nodes[4, 0]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>(p_load.p_z.get_values()+mqn_nodes[2, 0]) * x2 - mqn_nodes[4, 0]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>(p_load.p_z.get_values()+mqn_nodes[2, 0]) * x2 +mqn_nodes[4, 0]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>(p_load.p_z.get_values()+mqn_nodes[2, 0]) * x2</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>(p_load.p_z.get_values()+mqn_nodes[2, 0]) * x2 +mqn_nodes[4, 0] + p_load.p_z.get_values()*c</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>mqn_values[:temp, 5]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>mqn_nodes[2, 0] * x1 + mqn_nodes[4, 0]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>mqn_nodes[4, 0]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>p_load.p_z.get_values()+mqn_nodes[2, 0]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>mqn_nodes[2,0]*c</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -568,8 +563,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/computations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="505" column="54" lean-forward="true" selection-start-line="505" selection-start-column="54" selection-end-line="505" selection-end-column="54" />
+        <state relative-caret-position="453">
+          <caret line="572" column="17" selection-start-line="572" selection-start-column="17" selection-end-line="572" selection-end-column="17" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

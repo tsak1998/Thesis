@@ -463,6 +463,7 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
 
 
 def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
+    MQN_values = []
     mqn_values = np.zeros((20, 8))
     for index, element in elements.iterrows():
         mqn_nodes = MQN_nodes[index]
@@ -474,15 +475,14 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             c = L * p_load.c.get_values()
             # length
             # separate x around c
+            temp = 10
+            x1 = np.round(np.linspace(0, c, temp, endpoint=False), 2)
+            x2 = np.round(np.linspace(c, L, temp), 2)
+            x = np.unique(np.concatenate((x1, x2), axis=0))
 
-            x1 = np.round(np.linspace(0, c, 10), 2)
-            x2 = np.round(np.linspace(c, L, 10), 2)
-            x = np.zeros((20))
-            x[:10] = x1
-            x[10:] = x2
             mqn_values[:20, index] = element.en
             mqn_values[:20, -1] = x
-            temp = 10
+
             # Fx
             mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
             mqn_values[temp:, 1].fill(-mqn_nodes[6, 0])
@@ -497,27 +497,32 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
             # My
             mqn_values[:temp, 5] = mqn_nodes[2, 0] * x1 + mqn_nodes[4, 0] #- p_load.p_z.get_values()*c*(1-c)**2/L**2
-            mqn_values[temp:, 5] = -mqn_nodes[2, 0] * x2 + mqn_nodes[4, 0] - p_load.p_z.get_values()*c - p_load.p_z.get_values() * x2
+            mqn_values[temp:, 5] = mqn_nodes[2, 0] * x2 + mqn_nodes[4, 0] - p_load.p_z.get_values()*c + p_load.p_z.get_values() * x2
             # Mz
-            mqn_values[:temp, 6] = mqn_nodes[3, 0] * x1 + mqn_nodes[5, 0]
+            mqn_values[:temp, 6] = mqn_nodes[1, 0] * x1 - mqn_nodes[5, 0]  # - p_load.p_z.get_values()*c*(1-c)**2/L**2
+            mqn_values[temp:, 6] = mqn_nodes[1, 0] * x2 - mqn_nodes[5, 0] - p_load.p_y.get_values() * c + p_load.p_y.get_values() * x2
 
-            mqn_values[temp:, 6].fill(mqn_nodes[11, 0])
             import matplotlib.pyplot as plt
-            #plt.plot(x, mqn_values[:, 1], label='Fx')
-            #plt.legend()
-            #plt.plot(x, mqn_values[:, 2], label='Fy')
-            #plt.legend()
-            #plt.plot(x, mqn_values[:, 3], label='Fz')
-            #plt.legend()
-            #plt.plot(x, mqn_values[:, 4], label='Mx')
-            #plt.legend()
+            plt.plot(x, mqn_values[:, 1], label='Fx')
+            plt.legend()
+            plt.show()
+            plt.plot(x, mqn_values[:, 2], label='Fy')
+            plt.legend()
+            plt.show()
+            plt.plot(x, mqn_values[:, 3], label='Fz')
+            plt.legend()
+            plt.show()
+            plt.plot(x, mqn_values[:, 4], label='Mx')
+            plt.legend()
+            plt.show()
             plt.plot(x, mqn_values[:, 5], label='My')
             plt.legend()
+            plt.show()
             plt.plot(x, mqn_values[:, 6], label='Mz')
             plt.legend()
-            # plt.show()
-
-
+            plt.show()
+        MQN_values.append(mqn_values)
+    return MQN_values
 
 def draw(nodes, D):
     import matplotlib as mpl
@@ -565,7 +570,7 @@ def main(user_id):
 
     MQN_nodes = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, S, nodes, point_loads, fixed_forces)
 
-    mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr)
+    MQN_values = mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr)
 
     print('Reactions: ', P_s)
     # draw(nodes, D)
