@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import pandas as pd
-#from sqlalchemy import create_engine
+# from sqlalchemy import create_engine
 import time
 import copy
 
@@ -99,9 +99,9 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
             K_ol[dof_c:dof_d, dof_a:dof_b] += t[3:, :3]
             K_ol[dof_c:dof_d, dof_c:dof_d] += t[3:, 3:]
 
-    #i_uper = np.triu_indices(step, 0)
+    # i_uper = np.triu_indices(step, 0)
 
-    #K_ol[i_uper] = K_ol.T[i_uper]
+    # K_ol[i_uper] = K_ol.T[i_uper]
     print('arrays: ', time.time() - t1)
     return local_stifness, transf_arrays, K_ol
 
@@ -115,10 +115,10 @@ def local_stif(element, sect):
     E = 200000000  # 199948023.75
     if elem_type == 'beam':
         # Iy, Iz, G, J = sect.Ix, sect.Iy, sect.G, sect.Iz
-        Iy = 64300411.522633724*10**-12  # 0.00364
-        Iz = 64300411.522633724*10**-12  # 0.00364
-        G = E/2/1.27  # 76904146.79
-        J = 108506944.4444444*10**-12  # 0.00614
+        Iy = 64300411.522633724 * 10 ** -12  # 0.00364
+        Iz = 64300411.522633724 * 10 ** -12  # 0.00364
+        G = E / 2 / 1.27  # 76904146.79
+        J = 108506944.4444444 * 10 ** -12  # 0.00614
         w1 = E * A / L
         w2 = 12 * E * Iz / (L * L * L)
         w3 = 6 * E * Iz / (L * L)
@@ -301,7 +301,7 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
             fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
 
-    # approaching dist loads adding two triangle loads: (p1,0) + (0,p2)
+    # approaching dist loads adding two triangle loads: (p1,0) + (0,p2)0
     for index, d_load in dist_loads.iterrows():
         A_i = np.zeros((6, 1))
         A_j = np.zeros((6, 1))
@@ -320,36 +320,53 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         b = d_load.l * L
         c = b - a
         d1 = L - a - 2 * c / 3
-        d2 = L - a - 1 * c / 3
+        d2 = L - a - c / 3
         f1 = 1 - d1 / L
         f2 = 1 - d2 / L
+        # Fx
+        # Fxi
+        F1_i = p[0] * c / 2 * d1 / L
+        F2_i = p[1] * c / 2 * d2 / L
+        A_i[0] = -(F1_i + F2_i)
+        # Fxj
+        F1_j = p[0] * c / 2 * (1 - d1 / L)
+        F2_j = p[1] * c / 2 * (1 - d2 / L)
+        A_j[0] = -(F1_j + F2_j)
+        # Fy
+        # Fyi
+        F1_i = p[2] * c / 2 / L ** 3 * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c))
+        F2_i = p[3] * c / 2 - F1_i
+        A_i[1] = -(F1_i + F2_i)
+        # Fyj
+        F2_j = p[2] * c / 2 / L ** 3 * (d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c))
+        F1_j = p[3] * c / 2 - F2_j
+        A_j[1] = -(F1_j + F2_j)
+
         A_i[0] = -p[0] * c / 2 * d1 / L - p[1] * c / 2 * d2 / L  # Fx_i
-        A_j[0] = p[0] * c / 2 * f1 + p[0] * c / 2 * f2  # Fx_j
-        A_i[1] = p[2] * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3 + p[3] * (
-                d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3  # Fy_i
-        A_j[1] = p[2] * c / 2 + p[3] * c / 2 + A_i[1]  # Fy_j
-        A_i[2] = -(p[4] * c * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3 + p[
-            5] * c * (
-                           d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3)  # Fz_i
-        A_j[2] = p[4] * c / 2 + p[5] * c / 2 + A_i[2]  # Fz_j
+        A_j[0] = -p[0] * c / 2 * f1 - p[1] * c / 2 * f2  # Fx_j
+        A_i[1] = -p[2] * c / 2 / L ** 3 * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) + p[
+            3] * c / 2 - p[3] * c / 2 / L ** 3 * (
+                             d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c))  # Fy_i
+        A_j[1] = -p[2] * c / 2 - p[3] * c / 2 - A_i[1]  # Fy_j
+        A_i[2] = -p[4] * c * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3 - p[
+            5] * c * (d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3  # Fz_i
+        A_j[2] = -p[4] * c / 2 - p[5] * c / 2 - A_i[2]  # Fz_j
         A_i[3] = 0  # Mx_i
         A_j[3] = 0  # Mx_j
         A_i[4] = -p[4] * c * (d1 ** 2 * (d1 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2 - p[
-            5] * c * (
-                         d2 ** 2 * (d2 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2  # My_i
-        A_j[4] = p[4] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 + p[5] * c * (
+            5] * c * (d2 ** 2 * (d2 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2  # My_i
+        A_j[4] = -p[4] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 - p[5] * c * (
                 d2 * (d2 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2  # My_j
         A_i[5] = -p[2] * c * (d1 ** 2 * (d1 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2 - p[
-            3] * c * (
-                         d2 ** 2 * (d2 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2  # Mz_i
-        A_j[5] = p[2] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 + p[3] * c * (
+            3] * c * (d2 ** 2 * (d2 - L) + c ** 2 * (L / 3 + 17 * c / 90 - b / 2) / 3) / 2 / L ** 2  # Mz_i
+        A_j[5] = -p[2] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 - p[3] * c * (
                 d2 * (d2 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2  # Mz_j
 
-        rot = tranf_arrays[elm.index[0]][:6, :6]
-        S[dofa:dofb] += np.transpose(rot).dot(A_i)
-        S[dofc:dofd] += np.transpose(rot).dot(A_j)
-        fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
-        fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
+        #rot = tranf_arrays[elm.index[0]][:6, :6]
+        #S[dofa:dofb] += np.transpose(rot).dot(A_i)
+        #S[dofc:dofd] += np.transpose(rot).dot(A_j)
+        #fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
+        #fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
 
     return P_nodal, S, fixed_forces
 
@@ -407,7 +424,6 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
         nodei = elm.nodei
         nodej = elm.nodej
 
-
         a, b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
                node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
         c, d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
@@ -464,9 +480,11 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
 
 def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
     MQN_values = []
-    mqn_values = np.zeros((20, 8))
+    points = 20
+
     for index, element in elements.iterrows():
         mqn_nodes = MQN_nodes[index]
+        mqn_values = np.zeros((points, 8))
         L = element.length
 
         p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
@@ -476,12 +494,12 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             # length
             # separate x around c
             temp = 10
-            x1 = np.round(np.linspace(0, c, temp, endpoint=False), 2)
-            x2 = np.round(np.linspace(c, L, temp), 2)
+            x1 = np.round(np.linspace(0, c, temp, endpoint=False), 3)
+            x2 = np.round(np.linspace(c, L, temp), 3)
             x = np.unique(np.concatenate((x1, x2), axis=0))
 
-            mqn_values[:20, index] = element.en
-            mqn_values[:20, -1] = x
+            mqn_values[:points, 0] = element.en
+            mqn_values[:points, -1] = x
 
             # Fx
             mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
@@ -496,12 +514,14 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
             mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
             # My
-            mqn_values[:temp, 5] = mqn_nodes[2, 0] * x1 + mqn_nodes[4, 0] #- p_load.p_z.get_values()*c*(1-c)**2/L**2
-            mqn_values[temp:, 5] = mqn_nodes[2, 0] * x2 + mqn_nodes[4, 0] - p_load.p_z.get_values()*c + p_load.p_z.get_values() * x2
+            mqn_values[:temp, 5] = mqn_nodes[2, 0] * x1 + mqn_nodes[4, 0]  # - p_load.p_z.get_values()*c*(1-c)**2/L**2
+            mqn_values[temp:, 5] = mqn_nodes[2, 0] * x2 + mqn_nodes[
+                4, 0] - p_load.p_z.get_values() * c + p_load.p_z.get_values() * x2
             # Mz
             mqn_values[:temp, 6] = mqn_nodes[1, 0] * x1 - mqn_nodes[5, 0]  # - p_load.p_z.get_values()*c*(1-c)**2/L**2
-            mqn_values[temp:, 6] = mqn_nodes[1, 0] * x2 - mqn_nodes[5, 0] - p_load.p_y.get_values() * c + p_load.p_y.get_values() * x2
-
+            mqn_values[temp:, 6] = mqn_nodes[1, 0] * x2 - mqn_nodes[
+                5, 0] - p_load.p_y.get_values() * c + p_load.p_y.get_values() * x2
+            '''
             import matplotlib.pyplot as plt
             plt.plot(x, mqn_values[:, 1], label='Fx')
             plt.legend()
@@ -521,8 +541,34 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             plt.plot(x, mqn_values[:, 6], label='Mz')
             plt.legend()
             plt.show()
+            '''
+        else:
+            mqn_values[:points, 0] = element.en
+            x = np.round(np.linspace(0, L, points), )
+            mqn_values[:points, -1] = x
+            temp = 10
+
+            # Fx
+            mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
+            mqn_values[temp:, 1].fill(-mqn_nodes[6, 0])
+            # Fy
+            mqn_values[:temp, 2].fill(mqn_nodes[1, 0])
+            mqn_values[temp:, 2].fill(-mqn_nodes[7, 0])
+            # Fz
+            mqn_values[:temp, 3].fill(mqn_nodes[2, 0])
+            mqn_values[temp:, 3].fill(-mqn_nodes[8, 0])
+            # Mx
+            mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
+            mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
+            # My
+            mqn_values[:, 5] = mqn_nodes[2, 0]*x + mqn_nodes[4, 0]
+            # mqn_values[temp:, 5] = mqn_nodes[10, 0]
+            # Mz
+            mqn_values[:, 6] = mqn_nodes[1, 0]*x - mqn_nodes[5, 0]
+
         MQN_values.append(mqn_values)
     return MQN_values
+
 
 def draw(nodes, D):
     import matplotlib as mpl
@@ -538,14 +584,14 @@ def draw(nodes, D):
     theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
     z = nodes.coord_z.get_values()
     z_def = z.copy()
-    z_def[1] += D[8]*1
+    z_def[1] += D[8] * 1
     r = z ** 2 + 1
     x = nodes.coord_z.get_values()
     x_def = x.copy()
-    x_def[1] += D[6]*1
+    x_def[1] += D[6] * 1
     y = nodes.coord_y.get_values()
     y_def = y.copy()
-    y_def[1] += D[7]*1
+    y_def[1] += D[7] * 1
     ax.plot(x, y, z, label='parametric curve')
     ax.legend()
     ax.plot(x_def, y_def, z_def, label='deformed')
