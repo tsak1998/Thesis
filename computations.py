@@ -8,7 +8,7 @@ import copy
 
 def load_data(user_id):
     '''
-    engine = create_engine("mysql+pymysql://root:password@localhost:3306/_bucketlist")
+
 
     elements = pd.read_sql('elements', engine)
     elements = elements.loc[elements['user_id'] == user_id]
@@ -112,13 +112,13 @@ def local_stif(element, sect):
 
     # A, E = sect.A, sect.E
     A = 0.027777777777777773  # 0.2090318
-    E = 200000000  # 199948023.75
+    E = sect.E.get_values()[0]  # 200000000  # 199948023.75
     if elem_type == 'beam':
-        # Iy, Iz, G, J = sect.Ix, sect.Iy, sect.G, sect.Iz
-        Iy = 64300411.522633724 * 10 ** -12  # 0.00364
-        Iz = 64300411.522633724 * 10 ** -12  # 0.00364
+        Iy, Iz, G, J = sect.Ix.get_values()[0], sect.Iy.get_values()[0], sect.G.get_values()[0], sect.Iz.get_values()[0]
+        # Iy = 64300411.522633724e-12  # 0.00364
+        # Iz = 64300411.522633724 * 10 ** -12  # 0.00364
         G = E / 2 / 1.27  # 76904146.79
-        J = 108506944.4444444 * 10 ** -12  # 0.00614
+        # J = 108506944.4444444 * 10 ** -12  # 0.00614
         w1 = E * A / L
         w2 = 12 * E * Iz / (L * L * L)
         w3 = 6 * E * Iz / (L * L)
@@ -346,7 +346,7 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         A_j[0] = -p[0] * c / 2 * f1 - p[1] * c / 2 * f2  # Fx_j
         A_i[1] = -p[2] * c / 2 / L ** 3 * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) + p[
             3] * c / 2 - p[3] * c / 2 / L ** 3 * (
-                             d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c))  # Fy_i
+                         d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c))  # Fy_i
         A_j[1] = -p[2] * c / 2 - p[3] * c / 2 - A_i[1]  # Fy_j
         A_i[2] = -p[4] * c * (d1 ** 2 * (3 * L - 2 * d1) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3 - p[
             5] * c * (d2 ** 2 * (3 * L - 2 * d2) - c ** 2 / 3 * (L / 2 - b + 17 / 45 * c)) / 2 / L ** 3  # Fz_i
@@ -362,11 +362,11 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         A_j[5] = -p[2] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 - p[3] * c * (
                 d2 * (d2 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2  # Mz_j
 
-        #rot = tranf_arrays[elm.index[0]][:6, :6]
-        #S[dofa:dofb] += np.transpose(rot).dot(A_i)
-        #S[dofc:dofd] += np.transpose(rot).dot(A_j)
-        #fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
-        #fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
+        # rot = tranf_arrays[elm.index[0]][:6, :6]
+        # S[dofa:dofb] += np.transpose(rot).dot(A_i)
+        # S[dofc:dofd] += np.transpose(rot).dot(A_j)
+        # fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
+        # fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
 
     return P_nodal, S, fixed_forces
 
@@ -384,8 +384,6 @@ def solver(K, P_nodal, dofs, dofs_arranged, free, S):
 
     D_f = np.linalg.inv(Kff).dot(P_f)
     P_s = np.dot(Ksf, D_f) + S_m[free:]
-
-    P_s = np.round(P_s, decimals=3)
 
     D = np.zeros((len(dofs), 1))
     i = 0
@@ -411,6 +409,7 @@ def rearrangment(array, dofs):
 
 def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads, fixed_forces):
     mqn = []
+    disp_local = []
     for index, elm in elements.iterrows():
         i = index
 
@@ -435,10 +434,10 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
         MQN = k.dot(d_local)
         MQN[:6, 0] += fixed_forces[:6, index]
         MQN[6:, 0] += fixed_forces[6:, index]
-        MQN = np.round(MQN, 2)
         # need to add nodal forces from fixed elements
         mqn.append(MQN)
-    return mqn
+        disp_local.append(d_local)
+    return mqn, disp_local
 
 
 def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
@@ -478,24 +477,28 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
     return point_loads, dist_loads
 
 
-def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
-    MQN_values = []
+def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
+    # MQN_values = []
+    MQN_values = pd.DataFrame([], columns=['en', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz', 'x'])
     points = 20
 
     for index, element in elements.iterrows():
         mqn_nodes = MQN_nodes[index]
+        disp = d_local[index]
         mqn_values = np.zeros((points, 8))
+        disp_member_local = np.zeros((8, points))
         L = element.length
 
         p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
         d_load = dist_loads.loc[(dist_loads.en == element.en)]
+        # MQN for Point Loads
         if not p_load.empty:
             c = L * p_load.c.get_values()
             # length
             # separate x around c
             temp = 10
-            x1 = np.round(np.linspace(0, c, temp, endpoint=False), 3)
-            x2 = np.round(np.linspace(c, L, temp), 3)
+            x1 = np.linspace(0, c, temp, endpoint=False)
+            x2 = np.linspace(c, L, temp)
             x = np.unique(np.concatenate((x1, x2), axis=0))
 
             mqn_values[:points, 0] = element.en
@@ -521,30 +524,10 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             mqn_values[:temp, 6] = mqn_nodes[1, 0] * x1 - mqn_nodes[5, 0]  # - p_load.p_z.get_values()*c*(1-c)**2/L**2
             mqn_values[temp:, 6] = mqn_nodes[1, 0] * x2 - mqn_nodes[
                 5, 0] - p_load.p_y.get_values() * c + p_load.p_y.get_values() * x2
-            '''
-            import matplotlib.pyplot as plt
-            plt.plot(x, mqn_values[:, 1], label='Fx')
-            plt.legend()
-            plt.show()
-            plt.plot(x, mqn_values[:, 2], label='Fy')
-            plt.legend()
-            plt.show()
-            plt.plot(x, mqn_values[:, 3], label='Fz')
-            plt.legend()
-            plt.show()
-            plt.plot(x, mqn_values[:, 4], label='Mx')
-            plt.legend()
-            plt.show()
-            plt.plot(x, mqn_values[:, 5], label='My')
-            plt.legend()
-            plt.show()
-            plt.plot(x, mqn_values[:, 6], label='Mz')
-            plt.legend()
-            plt.show()
-            '''
+
         else:
             mqn_values[:points, 0] = element.en
-            x = np.round(np.linspace(0, L, points), )
+            x = np.linspace(0, L, points)
             mqn_values[:points, -1] = x
             temp = 10
 
@@ -561,12 +544,42 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads):
             mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
             mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
             # My
-            mqn_values[:, 5] = mqn_nodes[2, 0]*x + mqn_nodes[4, 0]
+            mqn_values[:, 5] = mqn_nodes[2, 0] * x + mqn_nodes[4, 0]
             # mqn_values[temp:, 5] = mqn_nodes[10, 0]
             # Mz
-            mqn_values[:, 6] = mqn_nodes[1, 0]*x - mqn_nodes[5, 0]
+            mqn_values[:, 6] = mqn_nodes[1, 0] * x - mqn_nodes[5, 0]
 
-        MQN_values.append(mqn_values)
+        # Displacements for point Loads
+        if not p_load.empty:
+            sect = sections.loc[sections.section_id == element.section_id]
+            E, Iy, Iz, G, J = sect.E.get_values()[0], sect.Ix.get_values()[0], sect.Iy.get_values()[0], \
+                              sect.G.get_values()[0], \
+                              sect.Iz.get_values()[0]
+            G = E / 2 / 1.27
+            # Rx
+
+            # Ry
+
+            # Rz
+            disp_member_local[4, :temp] = disp[5] + mqn_nodes[4, 0] * x1 / E / Iz - mqn_nodes[1, 0]  * x1 ** 2 / 2 / E / Iz
+            disp_member_local[4, temp:] = disp[5]+ mqn_nodes[4, 0] * x2 / E / Iz - mqn_nodes[1, 0]  * x2 ** 2 / 2 / E / Iz
+
+            # Dx
+
+            # Dy
+            disp_member_local[2, :temp] = disp[1] + disp_member_local[4, :temp]*x1 + mqn_values[:temp, 6] * x1**2 /2/ E / Iz + mqn_values[:temp, 2] * x1 ** 3 / 6 / E / Iz
+            disp_member_local[2, temp:] = disp[1] + disp_member_local[4, temp:]*x2 #+ mqn_values[temp:, 6] * x2**2 /2/ E / Iz - mqn_values[temp:, 2] * x2 ** 3 / 6 / E / Iz
+
+            import matplotlib.pyplot as plt
+            plt.plot(x1, disp_member_local[2, :temp])
+            plt.plot(x2, disp_member_local[2, temp:])
+            plt.show()
+            # Dz
+            print()
+
+        df = pd.DataFrame(mqn_values, columns=['en', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz', 'x'])
+        MQN_values = pd.concat([MQN_values, df], axis=0).reset_index(drop=True)
+        # MQN_values.append(mqn_values)
     return MQN_values
 
 
@@ -600,6 +613,10 @@ def draw(nodes, D):
     plt.show()
 
 
+def pretty_print(elements, nodes, D, P_s, node_dofs):
+    displacements = np.zeros((len(nodes), 7))
+
+
 def main(user_id):
     elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id)
 
@@ -614,9 +631,11 @@ def main(user_id):
 
     P_s, D = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
 
-    MQN_nodes = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, S, nodes, point_loads, fixed_forces)
+    MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, S, nodes,
+                                               point_loads, fixed_forces)
 
-    MQN_values = mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr)
+    MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
+    MQN_values.to_csv('model_test/test_1/mqn.csv')
 
     print('Reactions: ', P_s)
     # draw(nodes, D)
