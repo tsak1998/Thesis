@@ -182,7 +182,14 @@ Sidebar.Project = function ( editor ) {
 		//txt_sprt.position.set(coords.coord_x, coords.coord_y, coords.coord_z);
 		//mesh.extra.push( txt_sprt );
 		
+		
+		let sprite = new SpriteText(mesh.userData.nn, 0.025);
+		sprite.color = 'red';
+
+		sprite.position.set( parseFloat(coords.coord_x)+0.1, parseFloat(coords.coord_y)+0.2, parseFloat(coords.coord_z)+0.1);
+		sprite.updateMatrix();
 		editor.execute( new AddObjectCommand( mesh ) );
+		editor.sceneHelpers.add( sprite );
 
 		//editor.execute( new AddObjectCommand( txt_sprt ) );
 		
@@ -283,28 +290,14 @@ Sidebar.Project = function ( editor ) {
 		var line = new MeshLine();
 		line.setGeometry (geometry);
 
-		/*
-		var xm = (geometry.vertices[0].x + geometry.vertices[1].x) / 2;
-		var ym = (geometry.vertices[0].y + geometry.vertices[1].y) / 2;
-		var zm = (geometry.vertices[0].z + geometry.vertices[1].z) / 2;
-		if (elements.data[i].elem_type == 'column') {
-			xm += 0.125;
-			zm -= 0.125;
-		}
-		
-		var elemDiv = document.createElement( 'div' );
-		elemDiv.className = 'label';
-		elemDiv.textContent = elements.data[i].en;
-		elemDiv.style.marginTop = '-1em';
-		elemDiv.style.color = (elements.data[i].elem_type === 'beam' ?  '#0000ff' :  '#00aaaa');
-		var elemLabel = new THREE.CSS2DObject( elemDiv );           
-		*/
-
 		var mesh = new THREE.Mesh( line.geometry, matLine );
 		mesh.name = 'Element ' + elemCount;
 		//mesh.something = 'abc';
-	
-		editor.execute( new AddObjectCommand( mesh ) )
+		
+		editor.execute( new AddObjectCommand( mesh ) );
+		console.log('gamwww')
+		console.log(sprite.position)
+		editor.sceneHelpers.add( sprite );
 		
 		
 

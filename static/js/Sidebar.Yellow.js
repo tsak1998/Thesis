@@ -177,12 +177,18 @@ Sidebar.Yellow = function ( editor ) {
 						  'elem_type': elemType.getValue(),
 						  'length' : length ,
 						  'section_id' : editor.userData.sections[elemSect.getValue()-1].section_id }
-
 		
+				
+		let sprite = new SpriteText(line.userData.en, 0.05);
+		sprite.color = 'red';
+		sprite.position.set((nodes[0].position.x+nodes[1].position.x)/2, (nodes[0].position.y+nodes[1].position.y)/2, (nodes[0].position.z+nodes[1].position.z)/2)
+		
+		console.log(sprite)
+		line.label = sprite
 		editor.execute( new AddObjectCommand( line ) );
-		
+		editor.sceneHelpers.add( sprite )
 		render();
-
+		console.log(line)
 		elemCount+=1
 		
 		

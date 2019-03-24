@@ -8,10 +8,17 @@ from sqlalchemy import create_engine
 from parse_and_save import parse_and_save
 import pandas as pd
 import dxfgrabber
+import models
+
 import numpy as np
 
 app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
+
+# Config MySQL-SQLAchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/_bucketlist'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app)
 
 # Config Debug
 app.debug = True
@@ -39,7 +46,8 @@ def editor():
 @app.route('/readDB', methods=['GET', 'POST'])
 def readDB():
     if request.method == 'POST':
-        user = request.form['user']
+        user = session['username']
+        print(user)
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
 
         connection = mysql.connector.connect(host='192.168.1.10',
@@ -99,7 +107,7 @@ def register():
         username = form.username.data
         password = sha256_crypt.encrypt(str(form.password.data))
 
-        usr = User(name=name, username=username, password=password)
+        usr = models.User(username=username, password=password)
         db.session.add(usr)
         db.session.commit()
 
@@ -118,17 +126,18 @@ def login():
         password_candidate = request.form['password']
 
         # Get user by username
-        result = User.query.filter_by(username=username).first()
+        result = models.User.query.filter_by(username=username).first()
 
         if result is not None:
             # Get stored hash
             password = result.password
+
             # Compare Passwords
             if sha256_crypt.verify(password_candidate, password):
                 # Passed
                 session['logged_in'] = True
                 session['username'] = username
-                flash('You are now looged in', 'success')
+                flash('You are now logged in', 'success')
                 return redirect(url_for('about'))
             else:
                 error = 'Invalid login'
@@ -172,6 +181,8 @@ def post_req():
         print('yellooooow')
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
+        user_id = session['username']
+        print(user_id)
         proj_code = 'bucketlist'
         parse_and_save(proj_code, data)
 
