@@ -13,11 +13,11 @@ var Sidebar = function ( editor ) {
 	var sceneTab = new UI.Text( strings.getKey( 'sidebar/scene' ) ).setTextTransform( 'uppercase' );
 	sceneTab.onClick( function () { select( 'SCENE' ) } );
 
-	var projectTab = new UI.Text( strings.getKey( 'sidebar/project' ) ).setTextTransform( 'uppercase' );
-	projectTab.onClick( function () { select( 'PROJECT' ) } );
+	var nodesTab = new UI.Text( strings.getKey( 'sidebar/project' ) ).setTextTransform( 'uppercase' );
+	nodesTab.onClick( function () { select( 'NODES' ) } );
 	
-	var projectTab2 = new UI.Text( strings.getKey( 'sidebar/createElement' ) ).setTextTransform( 'uppercase' );
-	projectTab2.onClick( function () { select( 'ELEMENTS' ) } );
+	var elementsTab = new UI.Text( strings.getKey( 'sidebar/createElement' ) ).setTextTransform( 'uppercase' );
+	elementsTab.onClick( function () { select( 'ELEMENTS' ) } );
 
 
 	var supportsTab = new UI.Text( 'supports' ).setTextTransform( 'uppercase' );
@@ -34,7 +34,7 @@ var Sidebar = function ( editor ) {
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( sceneTab, projectTab, sectionsTab, projectTab2, supportsTab, pointLoadsTab, settingsTab );
+	tabs.add( sceneTab, nodesTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, settingsTab );
 	container.add( tabs );
 
 	//
@@ -47,20 +47,20 @@ var Sidebar = function ( editor ) {
 	container.add( scene );
 
 
-	var project = new UI.Span().add(
-		new Sidebar.Project( editor )
+	var nodes = new UI.Span().add(
+		new Sidebar.Nodes( editor )
 	);
-	container.add( project );
+	container.add( nodes );
 
 	var sections = new UI.Span().add(
 		new Sidebar.Sections( editor )
 	);
 	container.add( sections );
 	
-	var project2 = new UI.Span().add(
-		new Sidebar.Yellow( editor )
+	var elements = new UI.Span().add(
+		new Sidebar.Elements( editor )
 	);
-	container.add( project2 );
+	container.add( elements );
 	
 	var supports = new UI.Span().add(
 		new Sidebar.Supports( editor )
@@ -88,16 +88,16 @@ var Sidebar = function ( editor ) {
 	function select( section ) {
 
 		sceneTab.setClass( '' );
-		projectTab.setClass( '' );
-		projectTab2.setClass( '' );
+		nodes.setClass( '' );
+		elements.setClass( '' );
 		supportsTab.setClass( '' );
 		sectionsTab.setClass( '' );
 		pointLoadsTab.setClass( '' );
 		settingsTab.setClass( '' );
 
 		scene.setDisplay( 'none' );
-		project.setDisplay( 'none' );
-		project2.setDisplay( 'none' );
+		nodes.setDisplay( 'none' );
+		elements.setDisplay( 'none' );
 		supports.setDisplay( 'none' );
 		sections.setDisplay( 'none' );
 		pointLoads.setDisplay( 'none' );
@@ -108,17 +108,17 @@ var Sidebar = function ( editor ) {
 				sceneTab.setClass( 'selected' );
 				scene.setDisplay( '' );
 				break;
-			case 'PROJECT':
-				projectTab.setClass( 'selected' );
-				project.setDisplay( '' );
+			case 'NODES':
+				nodes.setClass( 'selected' );
+				nodes.setDisplay( '' );
 				break;
 			case 'SECTIONS':
 				sectionsTab.setClass( 'selected' );
 				sections.setDisplay( '' );
 				break;
 			case 'ELEMENTS':
-				projectTab2.setClass( 'selected' );
-				project2.setDisplay( '' );
+				elements.setClass( 'selected' );
+				elements.setDisplay( '' );
 				break;
 			case 'SUPPORTS':
 				supportsTab.setClass( 'selected' );

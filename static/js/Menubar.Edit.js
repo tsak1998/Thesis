@@ -116,9 +116,10 @@ Menubar.Edit = function ( editor ) {
 	
 		editor.sceneHelpers.remove( object.children ) ;
 		
+		
+		
 		//editor.execute( new RemoveObjectCommand( object ) );
 		editor.execute(  new RemoveObjectCommand( object ) )
-		
 		
 
 	} );

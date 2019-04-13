@@ -86,8 +86,8 @@
 		<script src="{{ url_for('static', filename='js/Menubar.Status.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Scene.js') }}"></script>	
-		<script src="{{ url_for('static', filename='js/Sidebar.Project.js') }}"></script>
-		<script src="{{ url_for('static', filename='js/Sidebar.Yellow.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Nodes.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Elements.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Supports.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Sections.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Pointloads.js') }}"></script>
@@ -211,6 +211,7 @@
 					if ( state !== undefined ) {
 
 						editor.fromJSON( state );
+					
 
 					}
 
@@ -349,7 +350,7 @@
 			var container = new UI.Panel();
 			var line = new THREE.Line( geometry, material );
 			//editor.execute( new AddObjectCommand( line ) )
-
+			console.log(editor)
 		</script>
 	</div>
 {% endblock %}

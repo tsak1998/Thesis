@@ -468,11 +468,7 @@ Editor.prototype = {
 		}
 
 		var hobjects = this.sceneHelpers.children;
-		/*while ( hobjects.length > 0 ) {
-			console.log( hobjects[0].name);
-			this.removeObject( hobjects[ 0 ] );
-		}*/
-		//console.log ('count:', hobjects.length);
+		
 		for (var i = 0; i < hobjects.length; i++) {
 			if (hobjects[i].name == 'nelabels') {
 				this.removeObject(hobjects[i]);

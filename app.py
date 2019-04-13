@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
-from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import create_engine
 from parse_and_save import parse_and_save
 import pandas as pd
@@ -16,13 +15,12 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/_bucketlist'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 # Config Debug
 app.debug = True
-toolbar = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 
@@ -39,7 +37,12 @@ def about():
 
 @app.route('/editor')
 def editor():
-    return render_template('editor.html')
+    if 'logged_in' in session:
+        return render_template('editor.html')
+    else:
+        flash('Unauthorized, Please login', 'danger')
+        return redirect(url_for('login'))
+
 
 
 # import mysql.connector
@@ -47,15 +50,10 @@ def editor():
 def readDB():
     if request.method == 'POST':
         user = session['username']
-        print(user)
-        # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
+        engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
 
-        connection = mysql.connector.connect(host='192.168.1.10',
-                                             database='bucketlist',
-                                             user='bucketuser',
-                                             password='dencopc')
-        nod = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", connection)
-        elm = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", connection)
+        nod = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
+        elm = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
         return nod.to_json(orient='table') + '|' + elm.to_json(orient='table')
 
 
@@ -63,25 +61,16 @@ def readDB():
 def readDXF():
     from dxfin import DXFin
     from io import StringIO
-    from createdb import createDB
     if request.method == 'POST':
         fl = (request.get_data()).decode('UTF-8')
         stream = StringIO(fl)
         dxf = dxfgrabber.read(stream)
         nod, elm = DXFin(dxf)
-        proj_code = 125  # TEMP
-        proj_id = createDB(proj_code, nodes=nod, elements=elm)
-        # print (proj_id)
-        connection = mysql.connector.connect(host='192.168.1.10'
-                                             , database='proj_id'
-                                             , user='root'
-                                             , password='password')
-        user = 'akosmop'  # CAUTION!!!
-        nod = pd.read_sql("SELECT * from nodes" + str(proj_id) + " WHERE user_id='" + user + "'", connection)
-        elm = pd.read_sql("SELECT * from elements" + str(proj_id) + " WHERE user_id='" + user + "'", connection)
+        user = session['username']
+        engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+        nod = pd.read_sql("SELECT * from nodes" + str(proj_id) + " WHERE user_id='" + user + "'", engine)
+        elm = pd.read_sql("SELECT * from elements" + str(proj_id) + " WHERE user_id='" + user + "'", engine)
         return nod.to_json(orient='table') + '|' + elm.to_json(orient='table')
-    # rsp =(nod.to_json(orient='values')+ '|' + elm.to_json(orient='values'))
-    # return rsp
     else:
         return 'Could not read DXF file'
 

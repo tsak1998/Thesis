@@ -113,8 +113,12 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 					for (i = 0; i<object.extra.length; i++){
 						editor.sceneHelpers.remove( object.extra[i] );
 					}
-			 	*/
+				 */
+				
 				editor.execute( new RemoveObjectCommand( object ) );
+				
+				
+				
 
 				break;
 
@@ -144,7 +148,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 					if ( event.shiftKey ) {
 
-						editor.redo();
+						// editor.redo();
 
 					} else {
 

@@ -13,7 +13,8 @@ function drawFromDB(editor, nodes, elements) {
     var geometry = new THREE.SphereBufferGeometry( 0.035, 8, 8, 0, Math.PI * 2, 0, Math.PI );
     var sphereMat = new THREE.MeshBasicMaterial({color: 0xff0000});
     model.name = 'New Structure from DXF';
-
+    console.log(nodes)
+    console.log(elements)
     for (i = 0; i < nodes.data.length; i++) {
         //console.log(nodes.data[i].nn, nodes.data[i].coord_x,nodes.data[i].coord_y,nodes.data[i].coord_z);
         

@@ -44,29 +44,20 @@ AddObjectCommand.prototype = {
 	execute: function () {
 	
 		this.editor.addObject( this.object );
-		//to add the label and loads 
 		
-		/*
-		console.log( this.object )
-		for (i = 0; i<this.object.extra.length; i++){
-			this.editor.sceneHelpers.add( this.object.extra[i] );
-			console.log( this.object.extra[i] )
-		}
-	*/
-		//this.editor.select( this.object );
 		
 
 	},
 
 	undo: function () {
-
+		label = this.editor.sceneHelpers.getObjectByName( this.object.name )
 		this.editor.removeObject( this.object );
-		for (i = 0; i<this.object.extra.length; i++){
-			this.editor.sceneHelpers.add( this.object.extra[i] );
-			console.log( this.object.extra[i] )
-		}
+		// the label does whatever the object does
+		
+		
+		this.editor.sceneHelpers.remove( label) ;
 	
-		render();
+		// render();
 		this.editor.deselect();
 
 	},

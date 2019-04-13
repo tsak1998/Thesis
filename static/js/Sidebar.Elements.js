@@ -3,7 +3,7 @@
  */
 
 
-Sidebar.Yellow = function ( editor ) {
+Sidebar.Elements = function ( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
@@ -128,10 +128,10 @@ Sidebar.Yellow = function ( editor ) {
 			}else{
 				nodes.push(editor.selected)
 				if (nodes.length ==1){
-					node_i.dom.value = nodes[0].userData.id}
+					node_i.dom.value = nodes[0].userData.nn}
 				else {
-					node_j.dom.value = nodes[1].userData.id}
-				console.log(node_i.dom.value)
+					node_j.dom.value = nodes[1].userData.nn}
+				
 				}
 				
 			}
@@ -179,16 +179,18 @@ Sidebar.Yellow = function ( editor ) {
 						  'section_id' : editor.userData.sections[elemSect.getValue()-1].section_id }
 		
 				
-		let sprite = new SpriteText(line.userData.en, 0.05);
-		sprite.color = 'red';
-		sprite.position.set((nodes[0].position.x+nodes[1].position.x)/2, (nodes[0].position.y+nodes[1].position.y)/2, (nodes[0].position.z+nodes[1].position.z)/2)
+		let label = new SpriteText(line.userData.en, 0.025);
+		label.color = 'red';
+		label.name = line.name
+		x_lbl = (parseFloat(nodes[0].position.x)+parseFloat(nodes[1].position.x))/2+0.1
+		y_lbl = (parseFloat(nodes[0].position.y)+parseFloat(nodes[1].position.y))/2+0.2
+		z_lbl = (parseFloat(nodes[0].position.z)+parseFloat(nodes[1].position.z))/2+0.1
+		label.position.set( x_lbl, y_lbl, z_lbl)
 		
-		console.log(sprite)
-		line.label = sprite
 		editor.execute( new AddObjectCommand( line ) );
-		editor.sceneHelpers.add( sprite )
+		editor.sceneHelpers.add( label )
 		render();
-		console.log(line)
+	
 		elemCount+=1
 		
 		

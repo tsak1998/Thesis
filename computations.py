@@ -431,6 +431,8 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
         d_elem[:6], d_elem[6:] = displacments[a:b], displacments[c:d]
         # local displacments
         d_local = rot.dot(d_elem)
+        print(d_local)
+
         MQN = k.dot(d_local)
         MQN[:6, 0] += fixed_forces[:6, index]
         MQN[6:, 0] += fixed_forces[6:, index]
@@ -636,6 +638,7 @@ def main(user_id):
 
     MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
     MQN_values.to_csv('model_test/test_1/mqn.csv')
+    pd.DataFrame(D).to_csv('model_test/test_1/displacements.csv')
 
     print('Reactions: ', P_s)
     # draw(nodes, D)

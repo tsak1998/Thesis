@@ -3,8 +3,8 @@
  */
 
 
-Sidebar.Project = function ( editor ) {
-	console.log(editor);
+Sidebar.Nodes = function ( editor ) {
+	
 
 	var config = editor.config;
 	var signals = editor.signals;
@@ -32,6 +32,7 @@ Sidebar.Project = function ( editor ) {
 			}else if (arr[i].type=='Line'){
 				elemCount+=1;
 			}
+		}
 	}
 	
 	
@@ -52,43 +53,7 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	makeTextSprite = function ( message, parameters ){
-		if ( parameters === undefined ) parameters = {};
-		var fontface = parameters.hasOwnProperty("fontface") ? parameters["font.face"] : "Arial";
-		var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["font.size"] : 30;
-		var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["border.Thickness"] : 0;
-		var borderColor = parameters.hasOwnProperty("borderColor") ?parameters["border.Color"] : { r:0, g:0, b:0, a:0 };
-		var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["background.Color"] : { r:255, g:255, b:255, a:1.0 };
-		var textColor = parameters.hasOwnProperty("textColor") ?parameters["text.Color"] : { r:0, g:0, b:0, a:1.0 };
 
-		var canvas = document.createElement('canvas');
-		//canvas.id = 'myCanvas';
-		var context = canvas.getContext('2d');
-		context.font = "Bold " + fontsize + "px " + fontface;
-		var metrics = context.measureText( message );
-		var textWidth = metrics.width;
-
-		context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
-		context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
-
-		context.lineWidth = 0;
-		//roundRect(context, borderThickness/2, borderThickness/2, (textWidth + borderThickness) * 1.1, fontsize * 1.4 + borderThickness, 8);
-
-		context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
-		context.fillText( message, borderThickness, fontsize + borderThickness);
-
-		/*
-		var texture = new THREE.Texture(canvas);
-		texture.needsUpdate = true;
-		texture.magFilter = THREE.NearestFilter;
-		texture.minFilter = THREE.LinearMipMapLinearFilter;
-		*/
-
-		var spriteMaterial = new THREE.SpriteMaterial( { color: rgba(255,255,255,1), sizeAttenuation: true } );
-		var sprite = new THREE.Sprite( spriteMaterial );
-		sprite.scale.set(1, 1, 1);
-		return sprite;  
-	};
 
 
 	// materials
@@ -147,8 +112,8 @@ Sidebar.Project = function ( editor ) {
 		var coords = {
 
 			coord_x  : x.getValue(),
-			coord_y : y.getValue(),
-			coord_z  : z.getValue()
+			coord_y : z.getValue(),
+			coord_z  : y.getValue()
 
 
 
@@ -158,7 +123,7 @@ Sidebar.Project = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, node_material );
 		mesh.extra = [];
 		//mesh.matrixAutoUpdate = false;
-		mesh.name = 'Node_' + String(nodeCount);
+		mesh.name = 'Node ' + String(nodeCount);
 		mesh.userData = {'nn' : nodeCount,
 						 'type': 'node',
 						 'coord_x': coords.coord_x,
@@ -173,16 +138,19 @@ Sidebar.Project = function ( editor ) {
 		mesh.userData.dof_rz = 1;
 
 		mesh.position.set(coords.coord_x, coords.coord_y, coords.coord_z);
-		mesh.updateMatrix();
-
-		//var txt_sprt = makeTextSprite( String(nodeCount) );
-		//txt_sprt.parent = mesh;
-		//txt_sprt.name = 'yellow';
-		//txt_sprt.position.set(coords.coord_x, coords.coord_y, coords.coord_z);
-		//mesh.extra.push( txt_sprt );
+		//mesh.updateMatrix();
 		
-		editor.execute( new AddObjectCommand( mesh ) );
+		let label = new SpriteText(mesh.userData.nn, 0.025);
+		label.color = 'red';
+		label.name = mesh.name
 
+		label.position.set( parseFloat(coords.coord_x)+0.1, parseFloat(coords.coord_y)+0.2, parseFloat(coords.coord_z)+0.1);
+
+		editor.execute( new AddObjectCommand( mesh ) );
+	
+		editor.sceneHelpers.add( label );
+		
+		
 		//editor.execute( new AddObjectCommand( txt_sprt ) );
 		
 		//editor.sceneHelpers.add( txt_sprt );
@@ -196,23 +164,19 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 	
-
-	//console.log(Viewport.transformControls.object)
 	
 	nodes = [];
 
 	buttonRow.add( btn );
 
 	container.add( buttonRow );
-/*
-	
+
+	/*
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Pick Nodes' ).onClick( function () {
 		nodes=[]
 
 		{
-
-		//document.addEventListener( "mousedown", onMouseDown, false );
 		
 		document.addEventListener( "click", onMouseUp, false );
 		
@@ -258,34 +222,39 @@ Sidebar.Project = function ( editor ) {
 		positions.push(nodes[0].position.x, nodes[0].position.y, nodes[0].position.z,
 		nodes[1].position.x, nodes[1].position.y, nodes[1].position.z)
 
-		// itemSize = 3 because there are 3 values (components) per vertex
+		var line_width = 4.0;
+		
+		var resolution = new THREE.Vector2(viewport.clientWidth, viewport.clientHeight);
+		var matLine = new MeshLineMaterial({
+			color: (elements.data[i].elem_type === 'beam' ?  0x0000ff :  0x00aaaa),
+			lineWidth: line_width,
+			sizeAttenuation: false,
+			useMap: false,
+			resolution: resolution,
+			near: 0.1,
+			far: 200.0
+		 });
+	
+		
+				
+		var geometry = new THREE.Geometry();     
+		geometry.vertices.push(new THREE.Vector3( nodes[0].position.x, nodes[0].position.y,  nodes[0].position.z));
+		geometry.vertices.push(new THREE.Vector3( nodes[1].position.x, nodes[1].position.y,  nodes[1].position.z));
+		var line = new MeshLine();
+		line.setGeometry (geometry);
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-		geometry.computeBoundingSphere();
+		var mesh = new THREE.Mesh( line.geometry, matLine );
+		mesh.name = 'Element ' + elemCount;
 
-		line.extra = [];
+		editor.execute( new AddObjectCommand( mesh ) );
+		console.log('gamwww')
+		console.log(sprite.position)
+		editor.sceneHelpers.add( sprite );
 		
-		line = new THREE.Line( geometry, member_material );
 		
-		line.material.linewidth = 3
-		line.name = 'Element_' + String(elemCount);
-		
-		var txt_sprt = makeTextSprite( String(elemCount) )
-		
-		txt_sprt.position.set((nodes[0].position.x+nodes[1].position.x)/2, (nodes[0].position.y+nodes[1].position.y)/2, (nodes[0].position.z+nodes[1].position.z)/2)
-		line.position.set((nodes[0].position.x+nodes[1].position.x)/2, (nodes[0].position.y+nodes[1].position.y)/2, (nodes[0].position.z+nodes[1].position.z)/2)
-
-		//line.children.add( txt_sprt )
-		line.extra.push( txt_sprt )
-
-		editor.execute( new AddObjectCommand( line ) );
-		
-		render();
 
 		elemCount+=1
-		
-		
-	
+
 		
 	} );
 	
@@ -370,7 +339,7 @@ Sidebar.Project = function ( editor ) {
 	buttonRow.add( btn );
 
 	container.add( buttonRow );
-	*/
+*/
 	
 
 

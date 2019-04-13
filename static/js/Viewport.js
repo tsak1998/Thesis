@@ -99,9 +99,9 @@ var Viewport = function ( editor ) {
 		var object = transformControls.object;
 
 		if ( object !== undefined ) {
-
+			
 			selectionBox.setFromObject( object );
-
+			
 			if ( editor.helpers[ object.id ] !== undefined ) {
 
 				editor.helpers[ object.id ].update();
@@ -112,7 +112,8 @@ var Viewport = function ( editor ) {
 
 		}
 
-		render();
+		
+		
 
 	} );
 	transformControls.addEventListener( 'mouseDown', function () {
@@ -168,11 +169,11 @@ var Viewport = function ( editor ) {
 
 		}
 
-		controls.enabled = true;
+		controls.enabled = false;
 
 	} );
 
-	sceneHelpers.add( transformControls );
+	//sceneHelpers.add( transformControls );
 
 	// object picking
 
