@@ -211,7 +211,35 @@ Menubar.File = function ( editor ) {
 
 
 
+	// periodically save to the database 
+	var intervalID = setInterval(function(){
+		data1 = []
+		var model = editor.scene.children;
 
+		//model = JSON.stringify( model );
+
+		var sections = editor.userData.sections;
+
+		var pointloads = editor.userData.point_loads;
+
+		//sections = JSON.stringify( sections );
+
+		data1.push( model )
+		data1.push( sections )
+		data1.push( pointloads )
+
+		data1 = JSON.stringify( data1 );
+
+		$.ajax({
+			type: "POST",
+			url: '/autosave',
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			data: data1,
+
+		});
+
+	}, 120000);
 
 
 

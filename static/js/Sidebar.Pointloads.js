@@ -246,11 +246,21 @@ Sidebar.PointLoads = function ( editor ) {
     
     }
     
-    
+    /*
 
+    var dir = new THREE.Vector3( 0, -1, 0);
 
+    //normalize the direction vector (convert to vector of length 1)
+    dir.normalize();
 
-    
+    var origin = new THREE.Vector3( 1, 1, 1 );
+    var length = 1;
+    var hex = 0xffff00;
+
+    var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+    editor.execute( new AddObjectCommand( arrowHelper ) );
+
+    */
 
 	return container;
 

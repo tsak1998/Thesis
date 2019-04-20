@@ -151,7 +151,7 @@ Sidebar.Elements = function ( editor ) {
 
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Create Element' ).onClick( function () {
-		console.log(editor.userData.sections)
+		
 		positions = []
 
 		var geometry = new THREE.BufferGeometry();

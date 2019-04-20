@@ -4,7 +4,7 @@ from createdb import createDB
 
 def parse_and_save(proj_code, data):
 	#engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
-	engine = create_engine("mysql+pymysql://root:password@localhost:3306/_0000125")
+	engine = create_engine("mysql+pymysql://root:pass@localhost:3306/_0000125")
 
 
 	df_model = pd.DataFrame(columns=['en', 'nn' 'type', 'supportType', 'nodal_load', 'nodei', 'nodej',
@@ -15,7 +15,7 @@ def parse_and_save(proj_code, data):
 										  'Ix', 'Iy', 'Iz'])
 
 	df_point_loads = pd.DataFrame(columns=['nn', 'p_x', 'p_y', 'p_z', 'm_x', 'm_y', 'm_z'])
-
+	
 	for d in data[0]:
 		df = pd.DataFrame([d['object']['userData']], columns=d['object']['userData'].keys())
 		df_model = pd.concat([df_model, df], axis =0).reset_index(drop=True)
@@ -92,5 +92,5 @@ def parse_and_save(proj_code, data):
 	nodes['user_id'] = 'cv13116'
 	nodes['id'] = nodes.index+1
 
-	createDB(proj_code, elements=elements, nodes=nodes, loads_nodal=df_point_loads, sections=df_sections)
+	createDB(proj_code, elements=elements, nodes=nodes, point_loads=df_point_loads, sections=df_sections)
 

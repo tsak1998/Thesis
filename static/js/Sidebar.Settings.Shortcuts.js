@@ -117,7 +117,8 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 				
 				editor.execute( new RemoveObjectCommand( object ) );
 				
-				
+				editor.sceneHelpers.getObjectByName( object.name ).visible = false;
+		
 				
 
 				break;
@@ -148,7 +149,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 					if ( event.shiftKey ) {
 
-						// editor.redo();
+						editor.redo();
 
 					} else {
 

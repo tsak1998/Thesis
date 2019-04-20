@@ -162,22 +162,32 @@ def logout():
     return redirect(url_for('login'))
 
 
-# yellow run
+# yellow save
 
 @app.route('/save', methods=["GET", "POST"])
-def post_req():
+def save():
+    if request.method == 'POST':
+        
+        # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
+        data = request.get_json()
+        user_id = session['username']
+        
+        parse_and_save(user_id, data)
+
+    return render_template('editor.html')
+
+# yellow save
+
+@app.route('/autosave', methods=["GET", "POST"])
+def autosave():
     if request.method == 'POST':
         print('yellooooow')
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        print(user_id)
-        proj_code = 'bucketlist'
-        parse_and_save(proj_code, data)
+        parse_and_save(user_id, data)
 
     return render_template('editor.html')
-
-
 if __name__ == '__main__':
     app.secret_key = "^A%DJAJU^JJ123"
     app.run(debug=True)

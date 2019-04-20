@@ -82,6 +82,7 @@ var Editor = function () {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal()
 
+
 	};
 
 	this.config = new Config();
@@ -107,6 +108,12 @@ var Editor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+
+	// create the new objects (for loads and sections)
+	//look  if the object is created
+	// create THREE.Object3D and add it to the scene
+	
+	
 	
 
 };
@@ -122,7 +129,7 @@ Editor.prototype = {
 	},
 
 	//
-
+	
 	setScene: function ( scene ) {
 
 		this.scene.uuid = scene.uuid;

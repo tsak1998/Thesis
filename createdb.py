@@ -16,7 +16,7 @@ def init_db(projCode):
 
         #need to clear tables
     except:
-        engine = create_engine("mysql+pymysql://root:password@localhost:3306/")
+        engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
         engine.execute("CREATE DATABASE "+projCode) #create db
         engine.execute("USE "+projCode) # select new db
         #tables, the ones in table.py
@@ -25,24 +25,21 @@ def init_db(projCode):
     return engine
 
 
-def createDB(projCode,**kwargs):
+def createDB(user_id, **kwargs):
     time1 = time.time()
-    #print(nod.head())
-    #print(elm.head())
-    proj_id = '_'
-    l = len(str(projCode))
-    print('lenght=',l)
-    for x in range(7 - l):
-        proj_id += '0'
-    proj_id += str(projCode)
-
-    engine = init_db(proj_id)
-
+    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
+    
     for key in kwargs.keys():
-        kwargs[key].to_sql(key, engine, schema=proj_id, if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
+        #sql_stmt = "DELETE FROM `yellow`.`"+ key +"` WHERE (`user_id`=`"+user_id+"`);"
+        sql_stmt = "DELETE FROM "+ key + " WHERE user_id='"+user_id+"'"
+        # s FROM `yellow`.`elements` WHERE (`id` = '3');
+
+        with engine.connect() as con:
+            rs = con.execute(sql_stmt)
+        print(rs)
+        kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
     
     print('database: ', time.time()-time1)
     
-    return(proj_id)
-
+   
 #init_db('_0000125')
