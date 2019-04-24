@@ -71,7 +71,7 @@ var Strings = function ( config ) {
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/about': 'About',
 
-			'sidebar/scene': 'Scene',
+			'sidebar/model': 'Model',
 			'sidebar/scene/background': 'Background',
 			'sidebar/scene/fog': 'Fog',
 

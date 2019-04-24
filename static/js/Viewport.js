@@ -212,17 +212,18 @@ var Viewport = function ( editor ) {
 			if ( intersects.length > 0 ) {
 
 				var object = intersects[ 0 ].object;
+				if (object.parent.type!="Group"){
+					if ( object.userData.object !== undefined ) {
 
-				if ( object.userData.object !== undefined ) {
+						// helper
 
-					// helper
+						editor.select( object.userData.object );
+						
+					} else {
 
-					editor.select( object.userData.object );
-					
-				} else {
+						editor.select( object );
 
-					editor.select( object );
-
+					}
 				}
 
 			} else {

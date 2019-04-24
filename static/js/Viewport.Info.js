@@ -18,14 +18,14 @@ Viewport.Info = function ( editor ) {
 	var objectsText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var verticesText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var trianglesText = new UI.Text( '0' ).setMarginLeft( '6px' );
-
+	/*
 	container.add( new UI.Text( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
 	container.add( objectsText, new UI.Break() );
 	container.add( new UI.Text( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
 	container.add( verticesText, new UI.Break() );
 	container.add( new UI.Text( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
 	container.add( trianglesText, new UI.Break() );
-
+	*/
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
 	signals.geometryChanged.add( update );

@@ -117,9 +117,11 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 				
 				editor.execute( new RemoveObjectCommand( object ) );
 				
-				editor.sceneHelpers.getObjectByName( object.name ).visible = false;
+				label = editor.sceneHelpers.getObjectByName( object.name )
+				if (label!=undefined){
+					label.visible = false;
 		
-				
+				};
 
 				break;
 

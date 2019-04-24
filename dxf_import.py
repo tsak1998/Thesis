@@ -1,4 +1,4 @@
-def DXFin(dxf):
+def dxf_import(dxf):
 
     import pandas as pd
     

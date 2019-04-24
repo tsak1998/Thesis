@@ -51,7 +51,7 @@ Sidebar.Nodes = function ( editor ) {
 
 		}
 
-	}
+	};
 
 
 
@@ -117,7 +117,7 @@ Sidebar.Nodes = function ( editor ) {
 
 
 
-};	
+		};	
 		
 		var geometry = new THREE.SphereGeometry( 0.1, 12, 12, 0, Math.PI * 2, 0, Math.PI );
 		var mesh = new THREE.Mesh( geometry, node_material );
@@ -136,8 +136,10 @@ Sidebar.Nodes = function ( editor ) {
 		mesh.userData.dof_rx = 1;
 		mesh.userData.dof_ry = 1;
 		mesh.userData.dof_rz = 1;
+		mesh.userData.load = 0;
 
 		mesh.position.set(coords.coord_x, coords.coord_y, coords.coord_z);
+		geometry.computeBoundingSphere();
 		//mesh.updateMatrix();
 		
 		let label = new SpriteText(mesh.userData.nn, 0.025);
@@ -150,10 +152,6 @@ Sidebar.Nodes = function ( editor ) {
 	
 		editor.sceneHelpers.add( label );
 		
-		
-		//editor.execute( new AddObjectCommand( txt_sprt ) );
-		
-		//editor.sceneHelpers.add( txt_sprt );
 		render();
 		nodeCount +=1;
 		

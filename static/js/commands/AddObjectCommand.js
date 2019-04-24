@@ -62,8 +62,12 @@ AddObjectCommand.prototype = {
 
         this.editor.removeObject( this.object );
 		// this.editor.sceneHelpers.remove( this.editor.sceneHelpers.getObjectByName( this.object.name ) );
-		this.editor.sceneHelpers.getObjectByName( this.object.name ).visible = false;
-        // render();
+		label = this.editor.sceneHelpers.getObjectByName( object.name )
+        if (label!=undefined){
+            label.visible = false;
+            render();
+
+        };
         this.editor.deselect();
 
     },

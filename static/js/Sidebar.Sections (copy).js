@@ -4,7 +4,7 @@
 
 
 Sidebar.Sections = function ( editor ) {
-	
+
 	var config = editor.config;
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -252,7 +252,7 @@ Sidebar.Sections = function ( editor ) {
 		( function addObjects( objects ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
-				console.log(objects[i])
+
 				var object = '  ' + String(objects[ i ].section_id) + '  ' + String(objects[ i ].sect_mat) + '  ' + String(objects[ i ].sect_type);
 				var option = buildOption( object );
 				option.innerHTML = '&nbsp;' + object;
@@ -271,6 +271,8 @@ Sidebar.Sections = function ( editor ) {
 
 	refreshUI();
 
+
+	refreshUI();
 
 	// events
 

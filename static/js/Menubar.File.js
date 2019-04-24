@@ -166,30 +166,30 @@ Menubar.File = function ( editor ) {
 		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
 			editor.clear();
-	
+		
+			$.ajax({
+				type: 'POST',
+				timeout: 20000,
+				url: '/readDXF',
+				data: fileInput.files[0],
+				processData: false,
+				contentType: 'application/dxf',
+				dataType: 'text',
+				success: function(e) {
+					var nodelm = e.split("|");
+					//console.log(nodelm[0]);
+					//console.log(nodelm[1]);
+					var nod = JSON.parse(nodelm[0]);
+					var elm = JSON.parse(nodelm[1]);
+					//console.log(nod);
+					//console.log(elm);
+					drawFromDB(editor, nod, elm);
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
 		}
-		$.ajax({
-			type: 'POST',
-			timeout: 20000,
-			url: '/readDXF',
-			data: fileInput.files[0],
-			processData: false,
-			contentType: 'application/dxf',
-			dataType: 'text',
-			success: function(e) {
-				var nodelm = e.split("|");
-				//console.log(nodelm[0]);
-				//console.log(nodelm[1]);
-				var nod = JSON.parse(nodelm[0]);
-				var elm = JSON.parse(nodelm[1]);
-				//console.log(nod);
-				//console.log(elm);
-				drawFromDB(editor, nod, elm);
-			},
-			error: function(xhr, status, error) {
-				console.log(xhr, status, error);
-			}
-		});
 		form.reset();
 	});
 	form.appendChild( fileInput );

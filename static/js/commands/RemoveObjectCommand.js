@@ -79,8 +79,13 @@ RemoveObjectCommand.prototype = {
         this.editor.signals.objectAdded.dispatch( this.object );
         this.editor.signals.sceneGraphChanged.dispatch();
 
-		this.editor.sceneHelpers.getObjectByName( this.object.name ).visible = true;
-		render();
+		label = this.editor.sceneHelpers.getObjectByName( this.object.name )
+        if (label!=undefined){
+            label.visible = true;
+            render();
+
+        };
+		
     },
 
     toJSON: function () {

@@ -11,9 +11,6 @@ Sidebar.Elements = function ( editor ) {
 	var nodeCount = 1;
 	var elemCount = 1;
 	
-
-
-
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
@@ -169,7 +166,7 @@ Sidebar.Elements = function ( editor ) {
 		length = Math.sqrt((nodes[0].position.x-nodes[1].position.x)**2 + (nodes[0].position.y-nodes[1].position.y)**2 + (nodes[0].position.z-nodes[1].position.z)**2)
 		
 		line.material.linewidth = 3
-		line.name = 'Element_' + String(elemCount);
+		line.name = 'Element ' + String(elemCount);
 		line.userData = {'en' : elemCount,
 						 'type':  'element',
 						 'nodei' : nodes[0].userData.nn,
@@ -178,7 +175,8 @@ Sidebar.Elements = function ( editor ) {
 						  'length' : length ,
 						  'section_id' : editor.userData.sections[elemSect.getValue()-1].section_id }
 		
-				
+		//line.position.set((parseFloat(nodes[0].position.x)+parseFloat(nodes[1].position.x))/2, (parseFloat(nodes[0].position.y)+parseFloat(nodes[1].position.y))/2, (parseFloat(nodes[0].position.z)+parseFloat(nodes[1].position.z))/2)
+		
 		let label = new SpriteText(line.userData.en, 0.025);
 		label.color = 'red';
 		label.name = line.name

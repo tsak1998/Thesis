@@ -10,8 +10,8 @@ var Sidebar = function ( editor ) {
 	container.setId( 'sidebar' );
 	//
 
-	var sceneTab = new UI.Text( strings.getKey( 'sidebar/scene' ) ).setTextTransform( 'uppercase' );
-	sceneTab.onClick( function () { select( 'SCENE' ) } );
+	var modelTab = new UI.Text( strings.getKey( 'sidebar/model' ) ).setTextTransform( 'uppercase' );
+	modelTab.onClick( function () { select( 'MODEL' ) } );
 
 	var nodesTab = new UI.Text( strings.getKey( 'sidebar/project' ) ).setTextTransform( 'uppercase' );
 	nodesTab.onClick( function () { select( 'NODES' ) } );
@@ -34,17 +34,17 @@ var Sidebar = function ( editor ) {
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( sceneTab, nodesTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, settingsTab );
+	tabs.add( modelTab, nodesTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, settingsTab );
 	container.add( tabs );
 
 	//
 
-	var scene = new UI.Span().add(
+	var model = new UI.Span().add(
 		new Sidebar.Scene( editor ),
 		new Sidebar.Properties( editor ),
 	
 	);
-	container.add( scene );
+	container.add( model );
 
 
 	var nodes = new UI.Span().add(
@@ -68,8 +68,6 @@ var Sidebar = function ( editor ) {
 	container.add( supports );
 
 	
-
-
 	var pointLoads = new UI.Span().add(
 		new Sidebar.PointLoads( editor )
 	);
@@ -87,15 +85,15 @@ var Sidebar = function ( editor ) {
 
 	function select( section ) {
 
-		sceneTab.setClass( '' );
-		nodes.setClass( '' );
-		elements.setClass( '' );
+		modelTab.setClass( '' );
+		nodesTab.setClass( '' );
+		elementsTab.setClass( '' );
 		supportsTab.setClass( '' );
 		sectionsTab.setClass( '' );
 		pointLoadsTab.setClass( '' );
 		settingsTab.setClass( '' );
 
-		scene.setDisplay( 'none' );
+		model.setDisplay( 'none' );
 		nodes.setDisplay( 'none' );
 		elements.setDisplay( 'none' );
 		supports.setDisplay( 'none' );
@@ -104,12 +102,12 @@ var Sidebar = function ( editor ) {
 		settings.setDisplay( 'none' );
 
 		switch ( section ) {
-			case 'SCENE':
-				sceneTab.setClass( 'selected' );
-				scene.setDisplay( '' );
+			case 'MODEL':
+				modelTab.setClass( 'selected' );
+				model.setDisplay( '' );
 				break;
 			case 'NODES':
-				nodes.setClass( 'selected' );
+				nodesTab.setClass( 'selected' );
 				nodes.setDisplay( '' );
 				break;
 			case 'SECTIONS':
@@ -117,7 +115,7 @@ var Sidebar = function ( editor ) {
 				sections.setDisplay( '' );
 				break;
 			case 'ELEMENTS':
-				elements.setClass( 'selected' );
+				elementsTab.setClass( 'selected' );
 				elements.setDisplay( '' );
 				break;
 			case 'SUPPORTS':

@@ -15,7 +15,8 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -59,13 +60,13 @@ def readDB():
 
 @app.route('/readDXF', methods=['GET', 'POST'])
 def readDXF():
-    from dxfin import DXFin
+    from dxf_import import dxf_import
     from io import StringIO
     if request.method == 'POST':
         fl = (request.get_data()).decode('UTF-8')
         stream = StringIO(fl)
         dxf = dxfgrabber.read(stream)
-        nod, elm = DXFin(dxf)
+        nod, elm = dxf_import(dxf)
         user = session['username']
         engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
         nod = pd.read_sql("SELECT * from nodes" + str(proj_id) + " WHERE user_id='" + user + "'", engine)

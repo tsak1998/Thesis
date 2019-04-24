@@ -157,6 +157,24 @@ Editor.prototype = {
 
 	//
 
+	countObjects: function ( scene ) {
+
+		this.scene.uuid = scene.uuid;
+		this.scene.name = scene.name;
+		// avoid render per object
+
+		this.signals.sceneGraphChanged.active = false;
+		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+		
+
+			console.log( scene.children[ i ] );
+
+		}
+
+
+	},
+	
+
 	addObject: function ( object ) {
 
 		var scope = this;

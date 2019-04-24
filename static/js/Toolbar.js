@@ -22,7 +22,7 @@ var Toolbar = function ( editor ) {
 		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
-	buttons.add( translate );
+	// buttons.add( translate );
 
 	var rotate = new UI.Button( 'rotate' );
 	rotate.dom.title = 'E';
@@ -31,7 +31,7 @@ var Toolbar = function ( editor ) {
 		signals.transformModeChanged.dispatch( 'rotate' );
 
 	} );
-	buttons.add( rotate );
+	// buttons.add( rotate );
 
 	var scale = new UI.Button( 'scale' );
 	scale.dom.title = 'R';
@@ -40,7 +40,7 @@ var Toolbar = function ( editor ) {
 		signals.transformModeChanged.dispatch( 'scale' );
 
 	} );
-	buttons.add( scale );
+	// buttons.add( scale );
 
 	var local = new UI.THREE.Boolean( false, 'local' )
 	local.onChange( function () {
@@ -48,7 +48,7 @@ var Toolbar = function ( editor ) {
 		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
 
 	} );
-	buttons.add( local );
+	// buttons.add( local );
 
 	signals.transformModeChanged.add( function ( mode ) {
 
