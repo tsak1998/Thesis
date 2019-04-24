@@ -15,8 +15,8 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -187,6 +187,17 @@ def autosave():
         data = request.get_json()
         user_id = session['username']
         parse_and_save(user_id, data)
+
+
+@app.route('/loadsections', methods=['POST'])
+def load_sections():
+
+    engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+    user_id = session['username']
+    sect = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
+
+    return sect.to_json(orient='table')
+
 
     return render_template('editor.html')
 if __name__ == '__main__':

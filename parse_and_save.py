@@ -2,10 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from createdb import createDB
 
-def parse_and_save(proj_code, data):
-	#engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
-	engine = create_engine("mysql+pymysql://root:pass@localhost:3306/_0000125")
-
+def parse_and_save(user_id, data):
 
 	df_model = pd.DataFrame(columns=['en', 'nn' 'type', 'supportType', 'nodal_load', 'nodei', 'nodej',
 									 'coord_x', 'coord_y', 'coord_z', 'elem_type', 'length', 'section_id',
@@ -15,12 +12,12 @@ def parse_and_save(proj_code, data):
 										  'Ix', 'Iy', 'Iz'])
 
 	df_point_loads = pd.DataFrame(columns=['nn', 'p_x', 'p_y', 'p_z', 'm_x', 'm_y', 'm_z'])
-	
+	print(data[1]['sections'])
 	for d in data[0]:
 		df = pd.DataFrame([d['object']['userData']], columns=d['object']['userData'].keys())
 		df_model = pd.concat([df_model, df], axis =0).reset_index(drop=True)
 
-	for d in data[1]:
+	for d in data[1]['sections']:
 		#df_dict = pd.DataFrame([d], columns=d.keys())
 		#moment of inertia for the RC sections
 		sect = {}
@@ -68,7 +65,7 @@ def parse_and_save(proj_code, data):
 			sect['Iz'] = 0.149*10**-6
 
 
-	sect['user_id'] = 'cv13116'
+	sect['user_id'] = user_id 
 	df = pd.DataFrame([sect], columns=sect.keys())
 	df_sections = pd.concat([df_sections, df], axis =0).reset_index(drop=True)
 
@@ -81,16 +78,16 @@ def parse_and_save(proj_code, data):
 	elements = elements.sort_values('en', axis=0).reset_index(drop=True)
 
 	del elements['type']
-	elements['user_id'] = 'cv13116'
+	elements['user_id'] = user_id
 
 	elements['id'] = elements.index + 1
 	elements = elements[elem_cols]
-	df_point_loads['user_id'] = 'cv13116'
-	print(elements, nodes)
+	df_point_loads['user_id'] = user_id
+	del elements['id']
 
 	del nodes['type'], nodes['supportType']
-	nodes['user_id'] = 'cv13116'
-	nodes['id'] = nodes.index+1
+	nodes['user_id'] = user_id
+	# nodes['id'] = nodes.index+1
 
-	createDB(proj_code, elements=elements, nodes=nodes, point_loads=df_point_loads, sections=df_sections)
+	createDB(user_id, elements=elements, nodes=nodes, point_loads=df_point_loads, sections=df_sections)
 

@@ -276,7 +276,7 @@ Sidebar.PointLoads = function ( editor ) {
 
             
             //mesh.updateMatrix();
-            
+           
             editor.execute( new AddObjectCommand( point_load ) );
             
             render();

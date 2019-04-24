@@ -9,9 +9,9 @@ Sidebar.Sections = function ( editor ) {
 	var signals = editor.signals;
 	var strings = editor.strings;
 	
-	var sections = [];
 	sectCount = 0;
-    
+	
+	var sections = [];
     var history = editor.history;
 
 
@@ -191,7 +191,7 @@ Sidebar.Sections = function ( editor ) {
 
 		}
 		sections.push(section)
-		editor.userData = {'sections': sections}
+		editor.sections = {'sections': sections}
 		refreshUI();
 	});
 
@@ -261,7 +261,7 @@ Sidebar.Sections = function ( editor ) {
 
 			}
 
-		} )( sections );
+		} )( editor.sections.sections );
 
 
 

@@ -112,7 +112,20 @@ var Editor = function () {
 	// create the new objects (for loads and sections)
 	//look  if the object is created
 	// create THREE.Object3D and add it to the scene
-	
+	// query the database for the sections
+	this.sections = {'sections': ''};
+	$.ajax({
+		type: "POST",
+		url: "/loadsections",
+		dataType: 'text',
+		success: function (e) {
+			console.log(JSON.parse(e))
+			console.log(e.split(''))							
+		},
+		error: function(xhr, status, error) {
+			console.log(xhr, status, error);	
+		}
+	});
 	
 	
 

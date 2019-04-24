@@ -136,7 +136,7 @@ Sidebar.Nodes = function ( editor ) {
 		mesh.userData.dof_rx = 1;
 		mesh.userData.dof_ry = 1;
 		mesh.userData.dof_rz = 1;
-		mesh.userData.load = 0;
+		
 
 		mesh.position.set(coords.coord_x, coords.coord_y, coords.coord_z);
 		geometry.computeBoundingSphere();

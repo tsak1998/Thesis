@@ -125,15 +125,13 @@ Menubar.File = function ( editor ) {
 
 		//model = JSON.stringify( model );
 
-		var sections = editor.userData.sections;
-
-		var pointloads = editor.userData.point_loads;
+		var sections = editor.sections;
 
 		//sections = JSON.stringify( sections );
 
 		data1.push( model )
 		data1.push( sections )
-		data1.push( pointloads )
+
 
 		data1 = JSON.stringify( data1 );
 

@@ -173,7 +173,7 @@ Sidebar.Elements = function ( editor ) {
 						  'nodej' : nodes[1].userData.nn,
 						  'elem_type': elemType.getValue(),
 						  'length' : length ,
-						  'section_id' : editor.userData.sections[elemSect.getValue()-1].section_id }
+						  'section_id' : parseInt(elemSect.getValue()) }
 		
 		//line.position.set((parseFloat(nodes[0].position.x)+parseFloat(nodes[1].position.x))/2, (parseFloat(nodes[0].position.y)+parseFloat(nodes[1].position.y))/2, (parseFloat(nodes[0].position.z)+parseFloat(nodes[1].position.z))/2)
 		
