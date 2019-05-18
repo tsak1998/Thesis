@@ -4,11 +4,13 @@ import pandas as pd
 # from sqlalchemy import create_engine
 import time
 import copy
+from sqlalchemy import create_engine
 
 
 def load_data(user_id):
     '''
-
+    nod = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
+    elm = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
 
     elements = pd.read_sql('elements', engine)
     elements = elements.loc[elements['user_id'] == user_id]
@@ -532,7 +534,6 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
             x = np.linspace(0, L, points)
             mqn_values[:points, -1] = x
             temp = 10
-
             # Fx
             mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
             mqn_values[temp:, 1].fill(-mqn_nodes[6, 0])
@@ -637,9 +638,15 @@ def main(user_id):
                                                point_loads, fixed_forces)
 
     MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
+    MQN_values['user_id'] = user_id
+    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
+    
+    
+    # MQN_values.to_sql('mqn', engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
+    print(MQN_values)
     MQN_values.to_csv('model_test/test_1/mqn.csv')
-    pd.DataFrame(D).to_csv('model_test/test_1/displacements.csv')
-
+    D = pd.DataFrame(D)# .to_csv('model_test/test_1/displacements.csv')
+    
     print('Reactions: ', P_s)
     # draw(nodes, D)
     print(MQN_nodes)

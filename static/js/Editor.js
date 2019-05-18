@@ -119,8 +119,7 @@ var Editor = function () {
 		url: "/loadsections",
 		dataType: 'text',
 		success: function (e) {
-			console.log(JSON.parse(e))
-			console.log(e.split(''))							
+			console.log(JSON.parse(e).data)							
 		},
 		error: function(xhr, status, error) {
 			console.log(xhr, status, error);	

@@ -27,19 +27,12 @@ def init_db(projCode):
 
 def createDB(user_id, **kwargs):
     time1 = time.time()
-    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
-    
+    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")   
     for key in kwargs.keys():
-        #sql_stmt = "DELETE FROM `yellow`.`"+ key +"` WHERE (`user_id`=`"+user_id+"`);"
         sql_stmt = "DELETE FROM "+ key + " WHERE user_id='"+user_id+"'"
-        # s FROM `yellow`.`elements` WHERE (`id` = '3');
-
         with engine.connect() as con:
             rs = con.execute(sql_stmt)
-        print(rs)
         kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
     
     print('database: ', time.time()-time1)
     
-   
-#init_db('_0000125')

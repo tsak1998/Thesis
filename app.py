@@ -6,9 +6,10 @@ from functools import wraps
 from sqlalchemy import create_engine
 from parse_and_save import parse_and_save
 import pandas as pd
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
 import dxfgrabber
 import models
-
 import numpy as np
 
 app = Flask(__name__)

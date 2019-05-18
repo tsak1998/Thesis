@@ -3,8 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from app import db
 from sqlalchemy import create_engine
 
-Base = declarative_base()
-
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -12,16 +10,17 @@ class User(db.Model):
     username = Column(String(255), unique=True)
     password = Column(String(255))
 
-    # Custom User Payload
+
     def get_security_payload(self):
         return {
             'id': self.id,
             'name': self.username,
         }
 
-    # __str__ is required by Flask-Admin, so we can have human-readable values for the email when editing a User.
+
     def __str__(self):
         return self.email
+
 
 class Nodes(db.Model):
     __tablename__ = 'nodes'
@@ -39,20 +38,6 @@ class Nodes(db.Model):
     dof_rz = Column('dof_rz', Integer)
 
 
-# elements table
-class Elements(db.Model):
-    __tablename__ = 'elements'
-    id = Column('id', Integer, primary_key=True)
-    user_id = Column('user_id', String(45), nullable=False)
-    en = Column('en', Integer)
-    nodei = Column('nodei', Float)
-    nodej = Column('nodej', Float)
-    length = Column('length', Float)
-    elem_type = Column('elem_type', String(5))
-    section_id = Column('section_id', Integer)
-
-
-# loads tables
 class PointLoads(db.Model):
     __tablename__ = 'point_loads'
     id = Column('id', Integer, primary_key=True)
@@ -87,6 +72,8 @@ class Sections(db.Model):
     id = Column('id', Integer, primary_key=True)
     user_id = Column('user_id', String(45), nullable=False)
     section_id = Column('section_id', Integer)
+    material = Column('material', String(10))
+    sect_type = Column('sect_type', String(10))
     E = Column('E', Float)
     G = Column('G', Float)
     A = Column('A', Float)
@@ -94,6 +81,32 @@ class Sections(db.Model):
     Iy = Column('Iy', Float)
     Iz = Column('Iz', Float)
 
-# engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
-# Base.metadata.create_all(bind=engine)
 
+class Mqn(db.Model):
+    __tablename__ = 'mqn'
+    id = Column('id', Integer, primary_key=True)
+    user_id = Column('user_id', String(45), nullable=False)
+    en = Column('en', Integer)
+    Fx = Column('Fx', Float)
+    Fy = Column('Fy', Float)
+    Fz = Column('Fz', Float)
+    Mx = Column('Mx', Float)
+    My = Column('My', Float)
+    Mz = Column('Mz', Float)
+
+class Displacements(db.Model):
+    __tablename__ = 'displacements'
+    id = Column('id', Integer, primary_key=True)
+    user_id = Column('user_id', String(45), nullable=False)
+    en = Column('en', Integer)
+    ux = Column('ux', Float)
+    uy = Column('uy', Float)
+    uz = Column('uz', Float)
+
+
+def create_table():
+    Base = declarative_base()
+    engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+    db.Model.metadata.create_all(bind=engine)
+
+create_table()
