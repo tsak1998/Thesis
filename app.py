@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 import dxfgrabber
 import models
 import numpy as np
+from computations import main
 
 app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
@@ -44,7 +45,6 @@ def editor():
     else:
         flash('Unauthorized, Please login', 'danger')
         return redirect(url_for('login'))
-
 
 
 # import mysql.connector
@@ -195,12 +195,25 @@ def load_sections():
 
     engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
     user_id = session['username']
-    sect = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
+    sect = pd.read_sql("SELECT material, sect_type, section_id from sections WHERE user_id='" + user_id + "'", engine)
 
-    return sect.to_json(orient='table')
+    return sect.to_json(orient='table', index=False)
+
+@app.route('/yellow', methods=["GET", "POST"])
+def run_analysis():
+    if request.method == 'POST':
+        
+        # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
+        data = request.get_json()
+        user_id = session['username']
+        parse_and_save(user_id, data)
+        
+        user_id = session['username']
 
 
     return render_template('editor.html')
+
+
 if __name__ == '__main__':
     app.secret_key = "^A%DJAJU^JJ123"
     app.run(debug=True)

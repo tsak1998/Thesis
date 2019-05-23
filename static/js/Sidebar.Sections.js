@@ -162,7 +162,7 @@ Sidebar.Sections = function ( editor ) {
 				sectCount += 1
 				section = {
 					'section_id' : sectCount,
-					'sect_mat' : 'C20/25',
+					'material' : 'C20/25',
 					'sect_type' : sectType.getValue(),
 					'h' : h.getValue(),
 					'b' : b.getValue()
@@ -171,7 +171,7 @@ Sidebar.Sections = function ( editor ) {
 				sectCount += 1
 				section = {
 					'section_id' : sectCount,
-					'sect_mat' : 'C20/25',
+					'material' : 'C20/25',
 					'sect_type' : sectType.getValue(),
 					'h' : h.getValue(),
 					'b' : b.getValue(),
@@ -184,14 +184,14 @@ Sidebar.Sections = function ( editor ) {
 			sectCount += 1
 			section = {
 				'section_id' : sectCount,
-				'sect_mat' : 'S255',
+				'material' : 'S255',
 				'sect_type' : sectType.getValue(),
 
 			}
 
 		}
-		sections.push(section)
-		editor.sections = {'sections': sections}
+		editor.sections.sections.push(section)
+		
 		refreshUI();
 	});
 
@@ -253,7 +253,7 @@ Sidebar.Sections = function ( editor ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 				console.log(objects[i])
-				var object = '  ' + String(objects[ i ].section_id) + '  ' + String(objects[ i ].sect_mat) + '  ' + String(objects[ i ].sect_type);
+				var object = '  ' + String(objects[ i ].section_id) + '  ' + String(objects[ i ].material) + '  ' + String(objects[ i ].sect_type);
 				var option = buildOption( object );
 				option.innerHTML = '&nbsp;' + object;
 
@@ -268,9 +268,25 @@ Sidebar.Sections = function ( editor ) {
 		outliner.setOptions( options );
 
 	};
-
-	refreshUI();
-
+	
+	window.setTimeout( function(){
+		$.ajax({
+			type: "POST",
+			url: "/loadsections",
+			dataType: 'text',
+			success: function (e) {
+				console.log(JSON.parse(e).data)
+				editor.sections.sections = JSON.parse(e).data
+				refreshUI()						
+			},
+			error: function(xhr, status, error) {
+				console.log(xhr, status, error);	
+			}
+		});
+	}
+		, 1500);
+	
+	
 
 	// events
 

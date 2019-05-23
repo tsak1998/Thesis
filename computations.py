@@ -620,6 +620,9 @@ def pretty_print(elements, nodes, D, P_s, node_dofs):
     displacements = np.zeros((len(nodes), 7))
 
 
+def save_results():
+
+
 def main(user_id):
     elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id)
 
