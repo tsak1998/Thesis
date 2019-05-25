@@ -23,15 +23,18 @@
 		{% endblock %}
 
 {% block body %}
-<!--	<body ontouchstart="">-->	
+
+
+		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+		<script src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>	
 
 		<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
 		<link id="theme" href="{{ url_for('static', filename='css/light.css') }}" rel="stylesheet" />
 		
 		
-		<script src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
 		<!--<script src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>-->
-
 		<script src="{{ url_for('static', filename='js/build/three.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/examples/js/libs/system.min.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/examples/js/controls/EditorControls.js') }}"></script>
@@ -89,6 +92,7 @@
 		<script src="{{ url_for('static', filename='js/Sidebar.Nodes.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Elements.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Supports.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Results.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Sections.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Pointloads.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Settings.js') }}"></script>
@@ -161,7 +165,8 @@
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/dialog.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/show-hint.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/tern.css') }}">
-				
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+		
 		<script>
 			
 			window.URL = window.URL || window.webkitURL;
@@ -329,5 +334,62 @@
 
 			}
 		</script>
+		
 	</div>
-{% endblock %}
+	<script>
+		$.ajax({
+				type: "POST",
+				url: "/getUsername",
+				data: 'user',
+				dataType: 'text',
+				success: function (e) {
+					user = e.replace(/"/g,"")						
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);	
+				}
+			});	
+	</script>
+	
+	<script>
+		$(function () {
+			$( "#mqn" ).dialog({
+				autoOpen: false,
+				resizable: false,
+				height: 570,
+				width: 780
+			});
+			
+			$("#openerMqn").click(function() {
+				var file = 'static/js/results/mqn_'.concat(user, '.js')
+				$.getScript(file)
+				$("#mqn").dialog('open')
+				
+					
+			});
+		});
+
+		$(function () {
+			$( "#displacements" ).dialog({
+				autoOpen: false,
+				resizable: false,
+				height: 420,
+				width: 780
+			});
+			
+			$("#openerDisplacements").click(function() {
+				var file = 'static/js/results/displacements_'.concat(user, '.js')
+				$.getScript(file)
+				$("#displacements").dialog('open');
+				
+				
+			});
+		});
+	</script>
+	
+	
+	<div id="mqn" title="MQN"></div>
+	<div id="displacements" title="Displacements"></div>
+	
+	
+{% endblock %} 

@@ -920,7 +920,7 @@ UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
 
 // Button
 
-UI.Button = function ( value ) {
+UI.Button = function ( value, id ) {
 
 	UI.Element.call( this );
 
@@ -928,6 +928,7 @@ UI.Button = function ( value ) {
 	dom.className = 'Button';
 
 	this.dom = dom;
+	this.dom.id = id
 	this.dom.textContent = value;
 
 	return this;
@@ -963,7 +964,7 @@ UI.Modal = function ( value ) {
 	dom.style.justifyContent = 'center';
 	dom.addEventListener( 'click', function ( event ) {
 
-		scope.hide();
+		
 
 	} );
 

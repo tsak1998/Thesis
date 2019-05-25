@@ -29,12 +29,15 @@ var Sidebar = function ( editor ) {
 	var pointLoadsTab = new UI.Text( 'point loads' ).setTextTransform( 'uppercase' );
 	pointLoadsTab.onClick( function () { select( 'POINT LOADS' ) } );
 
+	var resultsTab = new UI.Text( 'results' ).setTextTransform( 'uppercase' );
+	resultsTab.onClick( function () { select( 'RESULTS' ) } );
+
 	var settingsTab = new UI.Text( strings.getKey( 'sidebar/settings' ) ).setTextTransform( 'uppercase' );
 	settingsTab.onClick( function () { select( 'SETTINGS' ) } );
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( modelTab, nodesTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, settingsTab );
+	tabs.add( modelTab, nodesTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, resultsTab, settingsTab );
 	container.add( tabs );
 
 	//
@@ -73,7 +76,10 @@ var Sidebar = function ( editor ) {
 	);
 	container.add( pointLoads );
 	
-	
+	var results = new UI.Span().add(
+		new Sidebar.Results( editor ),
+	);
+	container.add( results );
 
 	var settings = new UI.Span().add(
 		new Sidebar.Settings( editor ),
@@ -91,6 +97,7 @@ var Sidebar = function ( editor ) {
 		supportsTab.setClass( '' );
 		sectionsTab.setClass( '' );
 		pointLoadsTab.setClass( '' );
+		resultsTab.setClass( '' );
 		settingsTab.setClass( '' );
 
 		model.setDisplay( 'none' );
@@ -99,6 +106,7 @@ var Sidebar = function ( editor ) {
 		supports.setDisplay( 'none' );
 		sections.setDisplay( 'none' );
 		pointLoads.setDisplay( 'none' );
+		results.setDisplay( 'none' );
 		settings.setDisplay( 'none' );
 
 		switch ( section ) {
@@ -126,6 +134,10 @@ var Sidebar = function ( editor ) {
 			case 'POINT LOADS':
 				pointLoadsTab.setClass( 'selected' );
 				pointLoads.setDisplay( '' );
+				break;
+			case 'RESULTS':
+				resultsTab.setClass( 'selected' );
+				results.setDisplay( '' );
 				break;
 			case 'SETTINGS':
 				settingsTab.setClass( 'selected' );

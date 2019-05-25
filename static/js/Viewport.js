@@ -212,7 +212,7 @@ var Viewport = function ( editor ) {
 			if ( intersects.length > 0 ) {
 
 				var object = intersects[ 0 ].object;
-				if (object.parent.type!="Group"){
+				if (object.type!="Sprite"){
 					if ( object.userData.object !== undefined ) {
 
 						// helper

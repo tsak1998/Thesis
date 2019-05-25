@@ -7,10 +7,12 @@ import copy
 from sqlalchemy import create_engine
 
 
-def load_data(user_id):
+def load_data(user_id, engine):
     '''
-    nod = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
-    elm = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
+    nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user_id + "'", engine)
+    elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user_id + "'", engine)
+    sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
+    point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
 
     elements = pd.read_sql('elements', engine)
     elements = elements.loc[elements['user_id'] == user_id]
@@ -573,89 +575,231 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
             disp_member_local[2, :temp] = disp[1] + disp_member_local[4, :temp]*x1 + mqn_values[:temp, 6] * x1**2 /2/ E / Iz + mqn_values[:temp, 2] * x1 ** 3 / 6 / E / Iz
             disp_member_local[2, temp:] = disp[1] + disp_member_local[4, temp:]*x2 #+ mqn_values[temp:, 6] * x2**2 /2/ E / Iz - mqn_values[temp:, 2] * x2 ** 3 / 6 / E / Iz
 
-            import matplotlib.pyplot as plt
-            plt.plot(x1, disp_member_local[2, :temp])
-            plt.plot(x2, disp_member_local[2, temp:])
-            plt.show()
-            # Dz
-            print()
-
+        
         df = pd.DataFrame(mqn_values, columns=['en', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz', 'x'])
         MQN_values = pd.concat([MQN_values, df], axis=0).reset_index(drop=True)
         # MQN_values.append(mqn_values)
     return MQN_values
 
 
-def draw(nodes, D):
-    import matplotlib as mpl
-    from mpl_toolkits.mplot3d import Axes3D
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import copy
+def displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays):
+    n = 50
+    D_LOCAL = pd.DataFrame([], columns=['en', 'x', 'u_y', 'u_z'])
+    D_GLOBAL = pd.DataFrame([], columns=['en', 'x', 'u_y', 'u_z'])
+    for index, element in elements.iterrows():
+        #local displacements
+        
+        node_i = nodes.loc[nodes.nn == int(element.nodei)]
+        node_j = nodes.loc[nodes.nn == int(element.nodej)]
+        rot = transf_arrays[index][:3]
+        d_local = np.zeros((n, 4))
+        L = element.length
+        x = np.linspace(0, L, n)
+        
+        # z
+        d = local_displacements[index]
+        m2_A = np.transpose(d[:6])[0]
+        m2_B = np.transpose(d[6:])[0]
+        
+        # test sto z
+        dx = 0.1
+        xA = 0
+        yA = m2_A[2]
+        xA_ = dx
+        yA_ = dx*math.tan(m2_A[4])
+        xB = L
+        yB = m2_B[2]
+        xB_ = L-dx
+        yB_ = yB + dx*math.tan(m2_B[4])
+        # fit me 3rd order polyonimial
+        coef = np.polyfit([xA, xA_, xB, xB_], [yA, yA_, yB, yB_], 3)
+        d_z = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
+                      
+        # y
+        dx = 0.08
+        xA = 0
+        yA = m2_A[1]
+        xA_ = dx
+        yA_ = yA + dx*math.tan(m2_A[5])
+        xB = L
+        yB = m2_B[1]
+        xB_ = L-dx
+        yB_ = yB - dx*math.tan(m2_B[5])
+        # fit me 3rd order polyonimial
+        coef = np.polyfit([xA, xA_, xB_, xB ], [yA, yA_, yB_, yB], 3)
+        d_y= x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
+        
+        d_local[:, 0] = index+1
+        d_local[:, 1] = x
+        d_local[:, 2] = 10*d_y
+        d_local[:, 3] = 10*d_z
+        
+        temp = np.transpose(rot).dot(np.transpose(d_local[:,1:]))
+        
+        theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
+        if index>0:
+            z = temp[2]+L
+            x = x+L
+            y = temp[1]+L
+        else:
+            z = temp[2]
+            x = x
+            y = temp[1]
+        #x, y, z = global_displacements['x'], global_displacements['u_y'], global_displacements['u_z']
+       
+        #plt.show()
 
-    mpl.rcParams['legend.fontsize'] = 10
+        df = pd.DataFrame(d_local, columns=['en', 'x', 'u_y', 'u_z'])
+        D_LOCAL = pd.concat([D_LOCAL, df], axis=0).reset_index(drop=True)
+        
+        #
+        # global dispalecements
+        #
+        nn_i = int(node_i.nn.get_values())
+        nn_j = int(node_j.nn.get_values())
+        # find the line coordinates x
+        # direction vector
+        x1, x2 = node_i.coord_x.get_values()[0], node_j.coord_x.get_values()[0]
+        y1, y2 = node_i.coord_y.get_values()[0], node_j.coord_y.get_values()[0]
+        z1, z2 = node_i.coord_z.get_values()[0], node_j.coord_z.get_values()[0]
+  
+        CXx = (x2 - x1) / L
+        CYx = (y2 - y1) / L
+        CZx = (z2 - z1) / L
+        # print(1.3730472000000004e-05*rot[:,0])
+        dof_a = (nn_i-1)*6
+        dof_b = nn_i*6
+        dof_c = (nn_j-1)*6
+        dof_d = nn_j*6
+        
+        d_global = np.zeros((n, 4))
+        
+        x = np.linspace(0,L,n)
+        # z
+        print(d)
+        d = global_dispalecements
+        
+        m2_A = d[dof_a:dof_b]
+        m2_B = d[dof_c:dof_d]
+        
+        #
+        # test sto z
+        if index>0:
+            dx = 0.2
+            xA = 100*m2_A[0][0]
+            yA = 0 # m2_A[2][0]
+            xA_ = dx
+            yA_ = dx*math.tan(m2_A[4][0])
+            xB = L# +100*m2_B[0][0]
+            yB = m2_B[2][0]
+            xB_ = xB-dx
+            yB_ = yB + dx*math.tan(m2_B[4][0])
+            # fit me 3rd order polyonimial
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
-    z = nodes.coord_z.get_values()
-    z_def = z.copy()
-    z_def[1] += D[8] * 1
-    r = z ** 2 + 1
-    x = nodes.coord_z.get_values()
-    x_def = x.copy()
-    x_def[1] += D[6] * 1
-    y = nodes.coord_y.get_values()
-    y_def = y.copy()
-    y_def[1] += D[7] * 1
-    ax.plot(x, y, z, label='parametric curve')
-    ax.legend()
-    ax.plot(x_def, y_def, z_def, label='deformed')
-    ax.legend()
+            coef = np.polyfit([xA, xA_, xB_, xB],[yA, yA_, yB_, yB], 3)
+            d_z = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
+            print(m2_A[4][0], m2_B[4][0])
+            # y
+            dx = 0.2
+            xA = 0# +100*m2_A[0][0]
+            yA = m2_A[1]
+            xA_ = dx
+            yA_ = yA+dx*math.tan(m2_A[5])
+            xB = L# +100*m2_B[0][0]
+            yB = m2_B[1]
+            xB_ = xB-dx
+            yB_ = yB - dx*math.tan(m2_B[5])
+            # fit me 3rd order polyonimial
+            coef = np.polyfit([xA, xA_, xB_, xB ],[yA, yA_, yB_, yB], 3)
+            d_y = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
+        else:
+            dx = 0.2
+            xA = 100*m2_A[0][0]
+            yA = m2_A[2][0]
+            xA_ = dx
+            yA_ = dx*math.tan(m2_A[4][0])
+            xB = L+100*m2_B[0][0]
+            yB = m2_B[2][0]
+            xB_ = xB-dx
+            yB_ = yB - dx*math.tan(m2_B[4][0])
+            # fit me 3rd order polyonimial
 
-    plt.show()
+            coef = np.polyfit([xA, xA_, xB_, xB],[yA, yA_, yB_, yB], 3)
+            d_z = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
+            
+            # y
+            dx = 0.2
+            xA = 0+100*m2_A[0][0]
+            yA = m2_A[1]
+            xA_ = dx
+            yA_ = yA+dx*math.tan(m2_A[5])
+            xB = L+100*m2_B[0][0]
+            yB = m2_B[1]
+            xB_ = xB-dx
+            yB_ = yB - dx*math.tan(m2_B[5])
+            # fit me 3rd order polyonimial
+            coef = np.polyfit([xA, xA_, xB_, xB ],[yA, yA_, yB_, yB], 3)
+            d_y = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
+            
+        
+        x_real = x1+CXx*x
+        # x_real[n-1] +=100*m2_B[0][0]
+        # x_real[0] +=100*m2_A[0][0]
+        y_real = y1+CYx*x+100*d_y
+        z_real = z1+CZx*x+100*d_z
+    
+        d_global[:, 0] = index+1
+        d_global[:, 1] = x_real
+        d_global[:, 2] = y_real
+        d_global[:, 3] = z_real
+        
+        df = pd.DataFrame(d_global, columns=['en', 'x', 'u_y', 'u_z'])
+        D_GLOBAL = pd.concat([D_GLOBAL, df], axis=0).reset_index(drop=True)
+   
+    return D_LOCAL, D_GLOBAL
 
 
 def pretty_print(elements, nodes, D, P_s, node_dofs):
     displacements = np.zeros((len(nodes), 7))
 
 
-def save_results():
+def save_results(user_id, engine, **kwargs): 
+    for key in kwargs.keys():
+        sql_stmt = "DELETE FROM "+ key + " WHERE user_id='"+user_id+"'"
+        with engine.connect() as con:
+            rs = con.execute(sql_stmt)
+        kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
+
+
+def plot_results(user_id, mqn, displacements):
+    from plots import plot_mqn, plot_displacements
+    plot_mqn(user_id, mqn)
+    plot_displacements(user_id, displacements)
 
 
 def main(user_id):
-    elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id)
-
+    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
+    elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id, engine)
     arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
-
     local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
-
     point_loads_tr, dist_loads_tr = rotate_loads(elements, point_loads, dist_loads, transf_arrays)
-
     P_nodal, S, fixed_forces = nodal_forces(point_loads_tr, dist_loads_tr, node_dofs, transf_arrays, arranged_dofs,
                                             elements)
-
-    P_s, D = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
-
-    MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, D, elements, node_dofs, S, nodes,
+    P_s, global_dispalecements = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
+    MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, global_dispalecements, elements, node_dofs, S, nodes,
                                                point_loads, fixed_forces)
-
     MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
+    d_local, d_global =  displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays)
     MQN_values['user_id'] = user_id
-    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
-    
-    
+    d_local['user_id'] = user_id
+
+    save_results(user_id, engine, mqn=MQN_values, displacements=d_local)
     # MQN_values.to_sql('mqn', engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
-    print(MQN_values)
-    MQN_values.to_csv('model_test/test_1/mqn.csv')
-    D = pd.DataFrame(D)# .to_csv('model_test/test_1/displacements.csv')
+    plot_results(user_id, MQN_values, d_local)
+    # MQN_values.to_csv('model_test/test_1/mqn.csv')
+    global_dispalecements = pd.DataFrame(global_dispalecements)# .to_csv('model_test/test_1/displacements.csv')
     
-    print('Reactions: ', P_s)
-    # draw(nodes, D)
-    print(MQN_nodes)
-    print('Displasments: ', np.round(D, 6))
 
-
-t1 = time.time()
-main('cv13116')
-print('Run: ', time.time() - t1)
+# t1 = time.time()
+# main('cv13116')
+# print('Run: ', time.time() - t1)

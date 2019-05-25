@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, json
+from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, json, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -46,6 +46,12 @@ def editor():
         flash('Unauthorized, Please login', 'danger')
         return redirect(url_for('login'))
 
+
+@app.route('/getUsername', methods=['POST'])
+def get_username():
+    if 'logged_in' in session:
+        data = {'user': session['username']}
+        return jsonify(session['username'])
 
 # import mysql.connector
 @app.route('/readDB', methods=['GET', 'POST'])
@@ -199,6 +205,7 @@ def load_sections():
 
     return sect.to_json(orient='table', index=False)
 
+
 @app.route('/yellow', methods=["GET", "POST"])
 def run_analysis():
     if request.method == 'POST':
@@ -206,12 +213,13 @@ def run_analysis():
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        parse_and_save(user_id, data)
+        #parse_and_save(user_id, data)
         
         user_id = session['username']
-
+        main(user_id)
 
     return render_template('editor.html')
+
 
 
 if __name__ == '__main__':
