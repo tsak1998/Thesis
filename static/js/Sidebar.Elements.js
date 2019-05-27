@@ -44,6 +44,38 @@ Sidebar.Elements = function ( editor ) {
 
 	}
 
+	function makeTextSprite( message, parameters )
+    {
+        if ( parameters === undefined ) parameters = {};
+        var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Arial";
+        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 70;
+        var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
+        var borderColor = parameters.hasOwnProperty("borderColor") ?parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["backgroundColor"] : { r:0, g:0, b:200, a:0.5 };
+        var textColor = parameters.hasOwnProperty("textColor") ?parameters["textColor"] : { r:0, g:0, b:0, a:1.0 };
+
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = "Bold " + fontsize + "px " + fontface;
+        var metrics = context.measureText( message );
+        var textWidth = metrics.width;
+
+        context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
+        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
+
+        context.lineWidth = borderThickness;
+
+        context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
+        context.fillText( message, borderThickness, fontsize + borderThickness);
+
+        var texture = new THREE.Texture(canvas) 
+        texture.needsUpdate = true;
+
+        var spriteMaterial = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: false } );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprite.scale.set(0.4, 0.4,0.4);
+        return sprite;  
+    }
 	// materials
 
 	node_material = new THREE.MeshStandardMaterial() 
@@ -148,24 +180,43 @@ Sidebar.Elements = function ( editor ) {
 
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Create Element' ).onClick( function () {
-		
-		positions = []
+		xi = nodes[0].position.x
+		yi = nodes[0].position.y
+		zi = nodes[0].position.z
+		xj = nodes[1].position.x
+		yj = nodes[1].position.y
+		zj = nodes[1].position.z
 
+		xHelp = xi
+		yHelp = 0
+		zHelp = zi
+
+		// dummy line for calculations
+		helpLine = new THREE.Line3(new THREE.Vector3(xi, yi, zi), new THREE.Vector3(xj, yj, zj))
+		length = helpLine.distance()
+		dirVector = new THREE.Vector3()
+		helpLine.delta( dirVector )
+		dirVector.normalize()
+		middle = new THREE.Vector3()
+		helpLine.delta( middle )
+		// helper vector
+		helpVector = new THREE.Vector3(xHelp, yHelp, zHelp)
+		//calculate the desired axis
+		zLocal = new THREE.Vector3()
+		zLocal.crossVectors(dirVector, helpVector)
+		yLocal = new THREE.Vector3()
+		yLocal.crossVectors(dirVector, zLocal)
+		transformMatrix = new THREE.Matrix4()
+		transformMatrix.makeBasis(dirVector, yLocal, zLocal)	
+		transformMatrix.setPosition(new THREE.Vector3(xi, yi, zi)) 
+		
+		var positions = [];
+		positions.push(0, 0, 0, length, 0, 0)
 		var geometry = new THREE.BufferGeometry();
-		
-		positions.push(nodes[0].position.x, nodes[0].position.y, nodes[0].position.z,
-		nodes[1].position.x, nodes[1].position.y, nodes[1].position.z)
-
-		// itemSize = 3 because there are 3 values (components) per vertex
-
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-		geometry.computeBoundingSphere();
 		
 		line = new THREE.Line( geometry, member_material );
-		line.extra = [];
-		length = Math.sqrt((nodes[0].position.x-nodes[1].position.x)**2 + (nodes[0].position.y-nodes[1].position.y)**2 + (nodes[0].position.z-nodes[1].position.z)**2)
-		
-		line.material.linewidth = 3
+		line.material.linewidth = 6
 		line.name = 'Element ' + String(elemCount);
 		line.userData = {'en' : elemCount,
 						 'type':  'element',
@@ -177,17 +228,27 @@ Sidebar.Elements = function ( editor ) {
 		
 		//line.position.set((parseFloat(nodes[0].position.x)+parseFloat(nodes[1].position.x))/2, (parseFloat(nodes[0].position.y)+parseFloat(nodes[1].position.y))/2, (parseFloat(nodes[0].position.z)+parseFloat(nodes[1].position.z))/2)
 		
-		let label = new SpriteText(line.userData.en, 0.025);
-		label.color = 'red';
+		let label = new makeTextSprite(line.userData.en, );
+		
 		label.name = line.name
-		x_lbl = (parseFloat(nodes[0].position.x)+parseFloat(nodes[1].position.x))/2+0.1
-		y_lbl = (parseFloat(nodes[0].position.y)+parseFloat(nodes[1].position.y))/2+0.2
-		z_lbl = (parseFloat(nodes[0].position.z)+parseFloat(nodes[1].position.z))/2+0.1
-		label.position.set( x_lbl, y_lbl, z_lbl)
+		
+		
+		
+		label.name = line.name
+		x_lbl = (xj-xi)/2
+		y_lbl = (zj-zi)/2
+		z_lbl = (yj-yi)/2
+		console.log(middle)
+		
+		line.applyMatrix( transformMatrix )
+		label.position.set(middle.x, middle.y, middle.z)
+		THREE.SceneUtils.attach( label, editor.scene, line );
+		line.updateMatrixWorld()
+		
 		
 		editor.execute( new AddObjectCommand( line ) );
-		editor.sceneHelpers.add( label )
-		render();
+		
+		
 	
 		elemCount+=1
 		

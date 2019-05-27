@@ -59,10 +59,10 @@ Sidebar.Nodes = function ( editor ) {
     {
         if ( parameters === undefined ) parameters = {};
         var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Arial";
-        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 50;
+        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 70;
         var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
         var borderColor = parameters.hasOwnProperty("borderColor") ?parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
-        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["backgroundColor"] : { r:255, g:255, b:255, a:0.0 };
+        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["backgroundColor"] : { r:0, g:0, b:200, a:0.5 };
         var textColor = parameters.hasOwnProperty("textColor") ?parameters["textColor"] : { r:0, g:0, b:0, a:1.0 };
 
         var canvas = document.createElement('canvas');
@@ -150,7 +150,7 @@ Sidebar.Nodes = function ( editor ) {
 
 		};	
 		
-		var geometry = new THREE.SphereGeometry( 0.1, 12, 12, 0, Math.PI * 2, 0, Math.PI );
+		var geometry = new THREE.SphereGeometry( 0.05, 12, 12, 0, Math.PI * 2, 0, Math.PI );
 		var mesh = new THREE.Mesh( geometry, node_material );
 		mesh.extra = [];
 		//mesh.matrixAutoUpdate = false;
@@ -174,7 +174,7 @@ Sidebar.Nodes = function ( editor ) {
 		//mesh.updateMatrix();
 		
 		let label = new makeTextSprite(mesh.userData.nn, );
-		label.color = 'red';
+		
 		label.name = mesh.name
 		
 		console.log(label)

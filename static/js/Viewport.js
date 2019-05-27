@@ -37,18 +37,7 @@ var Viewport = function ( editor ) {
     gridXZ.position.set( 10,0,10 );
     sceneHelpers.add(gridXZ);
 	
-    var gridXY = new THREE.GridHelper(20, 20);
-	
-    gridXY.position.set( 10,10,0 );
-    gridXY.rotation.x = Math.PI/2;
-	//gridXY.setColors( new THREE.Color(0x000066), new THREE.Color(0x000066) );
-    sceneHelpers.add(gridXY);
-
-	var gridYZ = new THREE.GridHelper(20, 20);
-	gridYZ.position.set( 0,10,10 );
-	gridYZ.rotation.z = Math.PI/2;
-	//gridYZ.setColors( new THREE.Color(0x660000), new THREE.Color(0x660000) );
-	sceneHelpers.add(gridYZ);
+    
 
 	var array = grid.geometry.attributes.color.array;
 
@@ -133,39 +122,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			switch ( transformControls.getMode() ) {
-
-				case 'translate':
-
-					if ( ! objectPositionOnDown.equals( object.position ) ) {
-
-						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
-
-					}
-
-					break;
-
-				case 'rotate':
-
-					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
-
-						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
-
-					}
-
-					break;
-
-				case 'scale':
-
-					if ( ! objectScaleOnDown.equals( object.scale ) ) {
-
-						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
-
-					}
-
-					break;
-
-			}
+			
 
 		}
 
@@ -206,25 +163,25 @@ var Viewport = function ( editor ) {
 	function handleClick() {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
-
+			
 			var intersects = getIntersects( onUpPosition, objects );
-
+			
 			if ( intersects.length > 0 ) {
 
 				var object = intersects[ 0 ].object;
-				if (object.type!="Sprite"){
+				
 					if ( object.userData.object !== undefined ) {
 
 						// helper
 
-						editor.select( object.userData.object );
+						//editor.select( object.userData.object );
 						
-					} else {
+					} else if (object.parent.name=="Scene") {
 
 						editor.select( object );
 
 					}
-				}
+				
 
 			} else {
 

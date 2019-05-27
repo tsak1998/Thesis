@@ -10,13 +10,15 @@ Sidebar.PointLoads = function ( editor ) {
     
     var point_loads = [];
 
+    var load_id = 0;
+
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 	container.setPaddingBottom( '20px' );
 
-	// load type
+	// load on where
 
 	var type = {
 		'onNode': 'ON NODE',
@@ -28,11 +30,42 @@ Sidebar.PointLoads = function ( editor ) {
 	var loadType = new UI.Select().setWidth( '150px' );
     loadType.setOptions( type );
 
-    loadTypeRow.add( new UI.Text( 'Load Type' ).setWidth( '90px' ) );
+    loadTypeRow.add( new UI.Text( 'On' ).setWidth( '90px' ) );
 	loadTypeRow.add( loadType );
 
     container.add( loadTypeRow );
 
+    //load type (moment, force)
+    var type2 = {
+		'load': 'LOAD',
+		'moment': 'MOMENT'
+	};
+
+	
+	var loadTypeRow2 = new UI.Row();
+	var loadType2 = new UI.Select().setWidth( '150px' );
+    loadType2.setOptions( type2 );
+
+    loadTypeRow2.add( new UI.Text( 'Load Type' ).setWidth( '90px' ) );
+	loadTypeRow2.add( loadType2 );
+
+    container.add( loadTypeRow2 );
+    //load direction
+    var directions = {
+		'x': 'X',
+        'y': 'Y',
+        'z': 'Z'
+	};
+
+	
+	var directionRow = new UI.Row();
+	var direction = new UI.Select().setWidth( '150px' );
+    direction.setOptions( directions );
+
+    directionRow.add( new UI.Text( 'Direction' ).setWidth( '90px' ) );
+	directionRow.add( direction );
+
+    container.add( directionRow );
     
 
     //dp/l ratio for the point load on member
@@ -56,32 +89,117 @@ Sidebar.PointLoads = function ( editor ) {
     } );
     // load.value = 'Px,Py,Pz,Mx,My,Mz'
 
-	loadRow.add( new UI.Text( 'Load Values' ).setWidth( '90px' ) );
+	loadRow.add( new UI.Text( 'Load Value' ).setWidth( '90px' ) );
     loadRow.add( loadInp );
     
     container.add(loadRow)
 
-	
+    var objectRow = new UI.Row();
+	var object = new UI.Input( '' ).setLeft( '100px' ).setWidth( '40px' ).onChange( function () {
 
+	} );
     
+
+	objectRow.add( new UI.Text( 'Node/Member' ).setWidth( '90px' ) );
+    objectRow.add( object );
+
+    container.add( objectRow)
+
     var buttonRow = new UI.Row();
     
-    var btn = new UI.Button( 'Define Load' ).onClick( function () {
+    var btn = new UI.Button( 'Add Load' ).onClick( function () {
+        elements = object.getValue().split(",");
 
-        load_values = loadInp.getValue().split(",")
-        point_loads.push({'id' : point_loads.length+1,
-            'type': loadType.getValue(),
-            'c': lengthRatio.getValue(),
-            'p_x': parseFloat(load_values[0]),
-            'p_y': parseFloat(load_values[1]),
-            'p_z': parseFloat(load_values[2]),
-            'm_x': parseFloat(load_values[3]),
-            'm_y': parseFloat(load_values[4]),
-            'm_z': parseFloat(load_values[5])
-        });
-    
-		refreshUI();
-		
+        for ( var i = 0, l = elements.length; i < l; i ++ ) {
+            load_id+=1;
+            
+            if (loadType.getValue()=='onNode'){
+                name = 'Node '+String( elements[i] );
+                obj = editor.scene.getObjectByName( name );
+                xDir = new THREE.Vector3()
+                yDir = new THREE.Vector3()
+                zDir = new THREE.Vector3()
+                obj.matrix.extractBasis( xDir, yDir, zDir)
+                m = new THREE.Matrix4()
+                m.copyPosition( obj.matrix ) 
+                c = 0
+                positionOffset = new THREE.Vector3( xDir.x*c*obj.userData.length, xDir.z*c*obj.userData.length, xDir.y*c*obj.userData.length)
+            }else{
+                name = 'Element '+String( elements[i] );
+                obj = editor.scene.getObjectByName( name );
+                
+                // direction vector
+                xDir = new THREE.Vector3()
+                yDir = new THREE.Vector3()
+                zDir = new THREE.Vector3()
+                obj.matrix.extractBasis( xDir, yDir, zDir)
+                m = new THREE.Matrix4()
+                m.copyPosition( obj.matrix ) 
+                c = parseFloat(lengthRatio.getValue())
+                positionOffset = new THREE.Vector3( xDir.x*c*obj.userData.length, xDir.z*c*obj.userData.length, xDir.y*c*obj.userData.length)
+                
+            }
+            
+            
+            
+            
+            if (loadType2.getValue()=='load') {
+                
+             
+                var positions = [0, 0, 0, -0.07, -0.05, 0, 0.07, -0.05, 0, 0, 0, 0, 0, -1, 0];
+                var material = new THREE.LineBasicMaterial({
+                    color: 0x0000ff
+                });
+                
+                var geometry = new THREE.BufferGeometry();
+
+                // itemSize = 3 because there are 3 values (components) per vertex
+
+                geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
+                geometry.computeBoundingSphere();
+                
+                line = new THREE.Line( geometry, member_material );
+                line.name = 'Point Load '+String(load_id)
+                line.material.linewidth = 3
+                line.applyMatrix(m)
+                line.position.x += positionOffset.x
+                line.position.y += positionOffset.y
+                line.position.z += positionOffset.z
+                if (direction.getValue()=='x') {
+                //  block of code to be executed if condition1 is true
+                } else if (direction.getValue()=='y') {
+                //  block of code to be executed if the condition1 is false and condition2 is true
+                } else {
+                //  block of code to be executed if the condition1 is false and condition2 is false
+                }
+                editor.execute( new AddObjectCommand(line) )
+            } else {
+                var curve = new THREE.EllipseCurve(
+                    0, 0,             // ax, aY
+                    0.2, 0.2,            // xRadius, yRadius
+                    0,  Math.PI, // aStartAngle, aEndAngle
+                    true             // aClockwise
+                );
+                var points = curve.getSpacedPoints( 30 );
+                t = points.length
+                end = points[t-1]
+                
+                points.push(new THREE.Vector2(-0.13, -0.05))
+                points.push(new THREE.Vector2(-0.27, -0.05))
+                points.push(new THREE.Vector2(end.x, end.y))
+                var geometry = new THREE.BufferGeometry().setFromPoints( points );
+                var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+                var line = new THREE.Line( geometry, material );
+                line.name = 'Moment Load '+String(load_id)
+                line.applyMatrix(m)
+                line.position.x += positionOffset.x
+                line.position.y += positionOffset.y
+                line.position.z += positionOffset.z
+                editor.execute( new AddObjectCommand(line) )
+            }
+               
+            
+        }
 
 	} );
 	
@@ -116,16 +234,7 @@ Sidebar.PointLoads = function ( editor ) {
 
     container.add( loadIDRow )
 
-    var objectRow = new UI.Row();
-	var object = new UI.Input( '' ).setLeft( '100px' ).setWidth( '40px' ).onChange( function () {
-
-	} );
     
-
-	objectRow.add( new UI.Text( 'Node/Member' ).setWidth( '90px' ) );
-    objectRow.add( object );
-
-    container.add( objectRow)
 
 	var buttonRow = new UI.Row();
     
@@ -168,8 +277,6 @@ Sidebar.PointLoads = function ( editor ) {
             point_load.name = 'Point Load '+String(load_id)
 
             var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-            
-            
             
             
 
