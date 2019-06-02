@@ -200,7 +200,7 @@ Sidebar.Elements = function ( editor ) {
 		middle = new THREE.Vector3()
 		helpLine.delta( middle )
 		// helper vector
-		helpVector = new THREE.Vector3(xHelp, yHelp, zHelp)
+		helpVector = new THREE.Vector3(0, 1, 0)
 		//calculate the desired axis
 		zLocal = new THREE.Vector3()
 		zLocal.crossVectors(dirVector, helpVector)
@@ -228,22 +228,18 @@ Sidebar.Elements = function ( editor ) {
 		
 		//line.position.set((parseFloat(nodes[0].position.x)+parseFloat(nodes[1].position.x))/2, (parseFloat(nodes[0].position.y)+parseFloat(nodes[1].position.y))/2, (parseFloat(nodes[0].position.z)+parseFloat(nodes[1].position.z))/2)
 		
-		let label = new makeTextSprite(line.userData.en, );
+		//let label = new makeTextSprite(line.userData.en, );
 		
-		label.name = line.name
+		//label.name = line.name
 		
-		
-		
-		label.name = line.name
+
 		x_lbl = (xj-xi)/2
 		y_lbl = (zj-zi)/2
 		z_lbl = (yj-yi)/2
-		console.log(middle)
+		//console.log(middle)
 		
 		line.applyMatrix( transformMatrix )
-		label.position.set(middle.x, middle.y, middle.z)
-		THREE.SceneUtils.attach( label, editor.scene, line );
-		line.updateMatrixWorld()
+		
 		
 		
 		editor.execute( new AddObjectCommand( line ) );

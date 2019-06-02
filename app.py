@@ -4,10 +4,9 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
 from sqlalchemy import create_engine
-from parse_and_save import parse_and_save
+from parser import parse_and_save
 import pandas as pd
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
 import dxfgrabber
 import models
 import numpy as np
@@ -17,7 +16,7 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:passwords@localhost/yellow'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
@@ -53,12 +52,13 @@ def get_username():
         data = {'user': session['username']}
         return jsonify(session['username'])
 
+
 # import mysql.connector
 @app.route('/readDB', methods=['GET', 'POST'])
 def readDB():
     if request.method == 'POST':
         user = session['username']
-        engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+        engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
 
         nod = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
         elm = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
@@ -75,7 +75,7 @@ def readDXF():
         dxf = dxfgrabber.read(stream)
         nod, elm = dxf_import(dxf)
         user = session['username']
-        engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+        engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
         nod = pd.read_sql("SELECT * from nodes" + str(proj_id) + " WHERE user_id='" + user + "'", engine)
         elm = pd.read_sql("SELECT * from elements" + str(proj_id) + " WHERE user_id='" + user + "'", engine)
         return nod.to_json(orient='table') + '|' + elm.to_json(orient='table')
@@ -123,8 +123,9 @@ def login():
         password_candidate = request.form['password']
 
         # Get user by username
-        result = models.User.query.filter_by(username=username).first()
-
+        result =  None#models.User.query.filter_by(username=username).first()
+        session['logged_in'] = True
+        session['username'] = username
         if result is not None:
             # Get stored hash
             password = result.password
@@ -199,7 +200,7 @@ def autosave():
 @app.route('/loadsections', methods=['POST'])
 def load_sections():
 
-    engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+    engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
     user_id = session['username']
     sect = pd.read_sql("SELECT material, sect_type, section_id from sections WHERE user_id='" + user_id + "'", engine)
 

@@ -121,20 +121,35 @@ Menubar.File = function ( editor ) {
 	
 	option.onClick( function () {
 		data1 = []
-		var model = editor.scene.children;
+		userData = []
+		var model = [];
+		nodes = [];
+		elements = [];
+		loads = [];
+		
+		for (i=0; i<editor.scene.children.length; i++){
+			obj = editor.scene.children[i]
+			if (obj.userData.type == 'element') {
+				elements.push( obj.userData );
+			} else if (obj.userData.type == 'node') {
+				nodes.push( obj.userData );
+			} else if (obj.userData.type == 'p_load' || obj.userData.type == 'p_moment') {
+				loads.push( obj.userData );
+			}
+		}
 
-		//model = JSON.stringify( model );
-
-		var sections = editor.sections;
-
-		//sections = JSON.stringify( sections );
-
-		data1.push( model )
-		data1.push( sections )
+		// data1.push({'elements' : elements});
+		// data1.push({'nodes' : nodes});
+		// data1.push({'point_loads': loads});
+		data1.push(elements);
+		data1.push(nodes);
+		data1.push(loads);
+		var sections = editor.sections.sections;
+		data1.push(sections )
 
 
 		data1 = JSON.stringify( data1 );
-
+		console.log(data1)
 		$.ajax({
 			type: "POST",
 			url: '/save',

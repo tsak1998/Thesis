@@ -69,72 +69,31 @@ var Viewport = function ( editor ) {
 
 	}
 	//
-
 	var box = new THREE.Box3();
+	
+	
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
+	selectionBox.name = 'Selection Box'
+	selectionBox.matrixAutoUpdate = true
 	sceneHelpers.add( selectionBox );
-
+	
 	var objectPositionOnDown = null;
 	var objectRotationOnDown = null;
 	var objectScaleOnDown = null;
 
 	var transformControls = new THREE.TransformControls( camera, container.dom );
-	transformControls.addEventListener( 'change', function () {
 
-		var object = transformControls.object;
-
-		if ( object !== undefined ) {
-			
-			selectionBox.setFromObject( object );
-			
-			if ( editor.helpers[ object.id ] !== undefined ) {
-
-				editor.helpers[ object.id ].update();
-
-			}
-
-			signals.refreshSidebarObject3D.dispatch( object );
-
-		}
-
-		
-		
-
-	} );
-	transformControls.addEventListener( 'mouseDown', function () {
-
-		var object = transformControls.object;
-
-		objectPositionOnDown = object.position.clone();
-		objectRotationOnDown = object.rotation.clone();
-		objectScaleOnDown = object.scale.clone();
-
-		controls.enabled = false;
-
-	} );
-	transformControls.addEventListener( 'mouseUp', function () {
-
-		var object = transformControls.object;
-
-		if ( object !== undefined ) {
-
-			
-
-		}
-
-		controls.enabled = false;
-
-	} );
 
 	//sceneHelpers.add( transformControls );
 
 	// object picking
 
 	var raycaster = new THREE.Raycaster();
+	raycaster.linePrecision = 0.01
 	var mouse = new THREE.Vector2();
 
 	// events
@@ -186,9 +145,9 @@ var Viewport = function ( editor ) {
 			} else {
 
 				editor.select( null );
-
+				
 			}
-
+			
 			render();
 
 		}
@@ -343,23 +302,70 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectSelected.add( function ( object ) {
-
-		selectionBox.visible = false;
-		transformControls.detach();
-
+		
 		if ( object !== null && object !== scene && object !== camera ) {
 
 			box.setFromObject( object );
 
 			if ( box.isEmpty() === false ) {
-
-				selectionBox.setFromObject( object );
+				del = sceneHelpers.getObjectByName( 'Selection Box' );
+				sceneHelpers.remove ( del );
+				var selectionBox = new THREE.BoxHelper();
+				selectionBox.material.depthTest = false;
+				selectionBox.material.transparent = true;
+				selectionBox.visible = false;
+				selectionBox.name = 'Selection Box'
+				selectionBox.matrixAutoUpdate = true
+				sceneHelpers.add( selectionBox );
+				
+				if (object.name.slice(0,7)=='Element'){
+					length = object.userData.length
+					var positions = [];
+					positions.push(0, 0, 0, length, 0, 0)
+					var material = new THREE.LineBasicMaterial();
+					var geometry = new THREE.BufferGeometry();
+					geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
+					
+					line = new THREE.Line( geometry, material );
+					selectionBox.setFromObject( line );
+					m = object.matrix.clone()
+					selectionBox.applyMatrix(m)
+					
+				} else {
+					selectionBox.setFromObject( object );
+					
+				
+				}
+				//
 				selectionBox.visible = true;
+				
 
 			}
 
 			transformControls.attach( object );
 
+		} else if ( editor.selected == null) {
+
+			del = sceneHelpers.getObjectByName( 'Selection Box' );
+			sceneHelpers.remove ( del );
+			var selectionBox = new THREE.BoxHelper();
+			selectionBox.material.depthTest = false;
+			selectionBox.material.transparent = true;
+			selectionBox.visible = false;
+			selectionBox.name = 'Selection Box'
+			selectionBox.matrixAutoUpdate = true
+			sceneHelpers.add( selectionBox );
+			
+		}
+
+		render();
+
+	} );
+
+	signals.objectDeselected.add( function ( object ) {
+		if (editor.selected == null){
+			sec
+			selectionBox.visible = false
 		}
 
 		render();
@@ -525,8 +531,7 @@ var Viewport = function ( editor ) {
 	signals.showGridChanged.add( function ( showGrid ) {
 
 		gridXZ.visible = showGrid;
-		gridXY.visible = showGrid;
-		gridYZ.visible = showGrid;
+		
 		render();
 
 	} );

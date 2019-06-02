@@ -67,15 +67,33 @@ class DistLoads(db.Model):
     l = Column('l', Float)
 
 
+class Materials(db.Model):
+    __tablename__ = 'materials'
+    id = Column('id', Integer, primary_key=True)
+    material = Column('material', String(10))
+    material_category = Column('material_category', String(10))
+    E = Column('E', Float)
+    G = Column('G', Float)
+    n = Column('n', Float)
+
+
 class Sections(db.Model):
     __tablename__ = 'sections'
     id = Column('id', Integer, primary_key=True)
     user_id = Column('user_id', String(45), nullable=False)
     section_id = Column('section_id', Integer)
-    material = Column('material', String(10))
-    sect_type = Column('sect_type', String(10))
     E = Column('E', Float)
     G = Column('G', Float)
+    A = Column('A', Float)
+    Ix = Column('Ix', Float)
+    Iy = Column('Iy', Float)
+    Iz = Column('Iz', Float)
+
+
+class steelSections(db.Model):
+    __tablename__ = 'steel_sections'
+    id = Column('id', Integer, primary_key=True)
+    sect_type = Column('sect_type', String(10))
     A = Column('A', Float)
     Ix = Column('Ix', Float)
     Iy = Column('Iy', Float)
@@ -94,6 +112,7 @@ class Mqn(db.Model):
     My = Column('My', Float)
     Mz = Column('Mz', Float)
 
+
 class Displacements(db.Model):
     __tablename__ = 'displacements'
     id = Column('id', Integer, primary_key=True)
@@ -106,7 +125,7 @@ class Displacements(db.Model):
 
 def create_table():
     Base = declarative_base()
-    engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+    engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
     db.Model.metadata.create_all(bind=engine)
 
-create_table()
+#create_table()

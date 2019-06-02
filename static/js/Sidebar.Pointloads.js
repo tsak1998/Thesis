@@ -112,10 +112,13 @@ Sidebar.PointLoads = function ( editor ) {
 
         for ( var i = 0, l = elements.length; i < l; i ++ ) {
             load_id+=1;
+            value = parseFloat(loadInp.getValue());
             
             if (loadType.getValue()=='onNode'){
                 name = 'Node '+String( elements[i] );
+                
                 obj = editor.scene.getObjectByName( name );
+                objectId = obj.userData.nn
                 xDir = new THREE.Vector3()
                 yDir = new THREE.Vector3()
                 zDir = new THREE.Vector3()
@@ -127,7 +130,7 @@ Sidebar.PointLoads = function ( editor ) {
             }else{
                 name = 'Element '+String( elements[i] );
                 obj = editor.scene.getObjectByName( name );
-                
+                objectId = obj.userData.en
                 // direction vector
                 xDir = new THREE.Vector3()
                 yDir = new THREE.Vector3()
@@ -166,13 +169,30 @@ Sidebar.PointLoads = function ( editor ) {
                 line.position.y += positionOffset.y
                 line.position.z += positionOffset.z
                 if (direction.getValue()=='x') {
-                //  block of code to be executed if condition1 is true
+                    if (value>0) {
+                        line.rotateZ( -Math.PI/2 )
+                    }else{
+                        line.rotateZ( Math.PI/2 )
+                    }
                 } else if (direction.getValue()=='y') {
-                //  block of code to be executed if the condition1 is false and condition2 is true
+                    if (value>0) {
+                        line.rotateX( Math.PI/2 )
+                    }else{
+                        line.rotateX( -Math.PI/2 )
+                    }
                 } else {
-                //  block of code to be executed if the condition1 is false and condition2 is false
+                    if (value>0) {
+                       
+                    }else{
+                        line.rotateX( Math.PI )
+                    }
                 }
-                editor.execute( new AddObjectCommand(line) )
+                line.userData = {'nn' : objectId,
+                            'type': 'p_load',
+                            'c': parseFloat(lengthRatio.getValue()),
+                            'direction' : direction.getValue(),
+                            'value': parseFloat(loadInp.getValue())}
+                
             } else {
                 var curve = new THREE.EllipseCurve(
                     0, 0,             // ax, aY
@@ -195,10 +215,33 @@ Sidebar.PointLoads = function ( editor ) {
                 line.position.x += positionOffset.x
                 line.position.y += positionOffset.y
                 line.position.z += positionOffset.z
-                editor.execute( new AddObjectCommand(line) )
+                if (direction.getValue()=='x') {
+                    if (value>0) {
+                        line.rotateY( -Math.PI/2 )
+                    }else{
+                        line.rotateY( Math.PI/2 )
+                    }
+                } else if (direction.getValue()=='y') {
+                    if (value>0) {
+                       
+                    }else{
+                        line.rotateX( Math.PI )
+                    }
+                } else {
+                    if (value>0) {
+                        line.rotateX( Math.PI/2 )
+                    }else{
+                        line.rotateX( -Math.PI/2 )
+                    }
+                }
+                line.userData = {'nn' : objectId,
+                                'type': 'p_moment',
+                                'c': parseFloat(lengthRatio.getValue()),
+                                'direction' : direction.getValue(),
+                                'value': parseFloat(loadInp.getValue())}
             }
-               
             
+            editor.execute( new AddObjectCommand(line) )
         }
 
 	} );
@@ -229,178 +272,7 @@ Sidebar.PointLoads = function ( editor ) {
 	} );
 	
 
-	loadIDRow.add( new UI.Text( 'Load ID' ).setWidth( '90px' ) );
-    loadIDRow.add( loadID );
-
-    container.add( loadIDRow )
-
-    
-
-	var buttonRow = new UI.Row();
-    
-    var btn = new UI.Button( 'Add Load' ).onClick( function () {
-
-        // loop for multiple loads and for the load values
-        elements = object.getValue().split(",");
-
-        load_id = parseInt(loadID.getValue());
-        
-        load = point_loads[load_id-1]
-        
-        for ( var i = 0, l = elements.length; i < l; i ++ ) {
-
-            if (load.c==''){
-                name = 'Node '+String( elements[i] );
-                obj = editor.scene.getObjectByName( name );
-                load_position = [obj.position.x, obj.position.z, obj.position.y] 
-                console.log('yel')
-            }else{
-                name = 'Element '+String( elements[i] );
-                obj = editor.scene.getObjectByName( name );
-                
-                position = obj.geometry.attributes.position.array
-                // direction vector
-                CXx = (position[3]-position[0])/obj.userData.length
-                CYx = (position[5]-position[2])/obj.userData.length
-                CZx = (position[4]-position[1])/obj.userData.length
-    
-                console.log(CXx, CYx, CZx)
-                load_position = [position[0]+CXx*load.c*obj.userData.length, position[1]+CZx*load.c*obj.userData.length, position[2] +CYx*load.c*obj.userData.length]
-                console.log('yellow')
-                console.log(load_position)
-            }
-            
-            // Px
-            var point_load = new THREE.Group();
-            
-
-            point_load.name = 'Point Load '+String(load_id)
-
-            var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-            
-            
-
-            if (load.p_x==0) {
-               
-            } else if (load.p_x>0) {
-                var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-                var geometry = new THREE.ConeGeometry( 0.02, 0.15, 32 );
-
-                var cone = new THREE.Mesh( geometry, material );
-                cone.rotation.z = -Math.PI/2;
-                cone.position.set( load_position[0]-0.05, load_position[1], load_position[2] );
-                var positions = [ load_position[0]-0.05, load_position[1], load_position[2], load_position[0] -1, load_position[1], load_position[2] ];
-                line_material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-    
-                var geometry = new THREE.BufferGeometry();
-    
-                // itemSize = 3 because there are 3 values (components) per vertex
-    
-                geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-                geometry.computeBoundingSphere();
-            
-                line = new THREE.Line( geometry, line_material );
-    
-                point_load.add(line);
-                point_load.add(cone);
-            } else {
-                var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-                var geometry = new THREE.ConeGeometry( 0.02, 0.15, 32 );
-                
-                var cone = new THREE.Mesh( geometry, material );
-                cone.rotation.z = Math.PI/2;
-                cone.position.set( load_position[0]+0.05, load_position[1], load_position[2] );
-                var positions = [ load_position[0]+0.05, load_position[1], load_position[2], load_position[0] +1, load_position[1], load_position[2] ];
-
-                line_material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-    
-                var geometry = new THREE.BufferGeometry();
-    
-                // itemSize = 3 because there are 3 values (components) per vertex
-    
-                geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-                geometry.computeBoundingSphere();
-            
-                line = new THREE.Line( geometry, line_material );
-    
-                point_load.add(line);
-                point_load.add(cone);
-
-            };
-
-           
-
-            if (load.p_y==0) {
-               
-            } else if (load.p_y>0) {
-                var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-                var geometry = new THREE.ConeGeometry( 0.02, 0.15, 32 );
-                
-                var cone = new THREE.Mesh( geometry, material );
-                cone.rotation.x = Math.PI/2;
-                cone.rotation.y = Math.PI;
-                
-                cone.position.set( load_position[0], load_position[1], load_position[2] -0.05 );
-                var positions = [ load_position[0], load_position[1], load_position[2] -0.05, load_position[0] , load_position[1], load_position[2]-1 ];
-                line_material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-    
-                var geometry = new THREE.BufferGeometry();
-    
-                // itemSize = 3 because there are 3 values (components) per vertex
-    
-                geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-                geometry.computeBoundingSphere();
-            
-                line = new THREE.Line( geometry, line_material );
-    
-                point_load.add(line)
-                point_load.add(cone)
-            } else {
-                var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-                var geometry = new THREE.ConeGeometry( 0.02, 0.15, 32 );
-                
-                var cone = new THREE.Mesh( geometry, material );
-                cone.rotation.x = -Math.PI/2;
-                cone.rotation.y = -Math.PI;
-                cone.position.set( load_position[0], load_position[1], load_position[2]+0.05 );
-                var positions = [ load_position[0], load_position[1], load_position[2]+0.05, load_position[0], load_position[1], load_position[2]+1 ];
-
-                line_material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-    
-                var geometry = new THREE.BufferGeometry();
-    
-                // itemSize = 3 because there are 3 values (components) per vertex
-    
-                geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-                geometry.computeBoundingSphere();
-            
-                line = new THREE.Line( geometry, line_material );
-    
-                point_load.add(line)
-                point_load.add(cone)
-
-            };
-
-            
-            //mesh.updateMatrix();
-           
-            editor.execute( new AddObjectCommand( point_load ) );
-            
-            render();
-        };
-
-               
-		
-		
-
-    } );
-    
-    
 	
-
-	buttonRow.add( btn );
-
-	container.add( buttonRow );
         
     var refreshUI = function () {
 

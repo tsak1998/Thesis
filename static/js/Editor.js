@@ -61,6 +61,7 @@ var Editor = function () {
 		geometryChanged: new Signal(),
 
 		objectSelected: new Signal(),
+		objectDeselected: new Signal(),
 		objectFocused: new Signal(),
 
 		objectAdded: new Signal(),
@@ -113,7 +114,7 @@ var Editor = function () {
 	//look  if the object is created
 	// create THREE.Object3D and add it to the scene
 	// query the database for the sections
-	this.sections = {'sections': ''};
+	this.sections = {'sections': []};
 	
 	
 	

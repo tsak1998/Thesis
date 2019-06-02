@@ -13,146 +13,141 @@ Sidebar.Supports = function ( editor ) {
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
-	//supports radio buttons
+	function makeTextSprite( message, parameters )
+    {
+        if ( parameters === undefined ) parameters = {};
+        var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Arial";
+        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 70;
+        var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
+        var borderColor = parameters.hasOwnProperty("borderColor") ?parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["backgroundColor"] : { r:0, g:0, b:200, a:0.5 };
+        var textColor = parameters.hasOwnProperty("textColor") ?parameters["textColor"] : { r:0, g:0, b:0, a:1.0 };
 
-    var fixedRow = new UI.Row();
-	var fixed = new UI.Checkbox().onChange( update );
-	fixed.dom.id = 'fixed';
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = "Bold " + fontsize + "px " + fontface;
+        var metrics = context.measureText( message );
+        var textWidth = metrics.width;
 
-	fixedRow.add( new UI.Text( 'Fixed' ).setWidth( '90px' ) );
-	fixedRow.add( fixed );
+        context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
+        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
 
-	container.add( fixedRow );
+        context.lineWidth = borderThickness;
 
-	var pinnedRow = new UI.Row();
-	var pinned = new UI.Checkbox().onChange( update );
-	pinned.dom.id = 'pinned';
+        context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
+        context.fillText( message, borderThickness, fontsize + borderThickness);
 
-	pinnedRow.add( new UI.Text( 'Pinned' ).setWidth( '90px' ) );
-	pinnedRow.add( pinned );
+        var texture = new THREE.Texture(canvas) 
+        texture.needsUpdate = true;
 
-	container.add( pinnedRow );
+        var spriteMaterial = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: false } );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprite.scale.set(0.4, 0.4,0.4);
+        return sprite;  
+    }
 
-	var rollerRow = new UI.Row();
-	var roller = new UI.Checkbox().onChange( update );
-	roller.dom.id = 'roller';
+	//dofs radio buttons
 
-	rollerRow.add( new UI.Text( 'Roller' ).setWidth( '90px' ) );
-	rollerRow.add( roller );
 
-	container.add( rollerRow );
+	var dofXRow = new UI.Row();
+	var dofX = new UI.Checkbox();
+	dofX.dom.id = 'dx';
+
+	dofXRow.add( new UI.Text( 'Dx' ).setWidth( '90px' ) );
+	dofXRow.add( dofX );
+
+	container.add( dofXRow );
+
+	var dofYRow = new UI.Row();
+	var dofY = new UI.Checkbox();
+	dofY.dom.id = 'dy';
+
+	dofYRow.add( new UI.Text( 'Dy' ).setWidth( '90px' ) );
+	dofYRow.add( dofY );
+
+	container.add( dofYRow );
+
+	var dofZRow = new UI.Row();
+	var dofZ = new UI.Checkbox();
+	dofZ.dom.id = 'dz';
+
+	dofZRow.add( new UI.Text( 'Dz' ).setWidth( '90px' ) );
+	dofZRow.add( dofZ );
+
+	container.add( dofZRow );
+
+	var dofRxRow = new UI.Row();
+	var dofRx = new UI.Checkbox();
+	dofRx.dom.id = 'rx';
+
+	dofRxRow.add( new UI.Text( 'Rx' ).setWidth( '90px' ) );
+	dofRxRow.add( dofRx );
+
+	container.add( dofRxRow );
+
+	var dofRyRow = new UI.Row();
+	var dofRy = new UI.Checkbox();
+	dofRy.dom.id = 'ry';
+
+	dofRyRow.add( new UI.Text( 'Ry' ).setWidth( '90px' ) );
+	dofRyRow.add( dofRy );
+
+	container.add( dofRyRow );
+
+	var dofRzRow = new UI.Row();
+	var dofRz = new UI.Checkbox();
+	dofRz.dom.id = 'rz';
+
+	dofRzRow.add( new UI.Text( 'Rz' ).setWidth( '90px' ) );
+	dofRzRow.add( dofRz );
+
+	container.add( dofRzRow );
 	
 	//node
 
 	var nodeRow = new UI.Row();
-	var node = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
-
-	} );
+	var node = new UI.Input( '' ).setLeft( '100px' )
 	
 	nodeRow.add( new UI.Text('Node').setWidth( '90px' ) );
 	nodeRow.add( node );
 
 	container.add( nodeRow );
 
-	var buttonRow = new UI.Row();
-	var btn = new UI.Button( 'Pick Node' ).onClick( function () {
-		nodes=[]
-
-		{
-
-		//document.addEventListener( "mousedown", onMouseDown, false );
-		
-		document.addEventListener( "click", onMouseUp, false );
-		
-
-	}
-
-	function onMouseUp(event){
-		if ( editor.selected == null ) {
-
-
-		}else if(nodes.length<1) {
-			if (nodes[0]==editor.selected){
-				
-			}else{
-				nodes.push(editor.selected)
-				node.dom.value = editor.selected.userData.id
-				}
-				
-			}
-		else {
-			document.removeEventListener( "click", onMouseUp, false );
-		
-		
-		}
-
-	}
-		
-	} );
-	
-
-	buttonRow.add( btn );
-
-	container.add( buttonRow );
-	
 
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Define Support' ).onClick( function () {
-		if ( supportType == 'fixed' ){
-			nodes[0].userData.dof_dx = 0
-			nodes[0].userData.dof_dy = 0
-			nodes[0].userData.dof_dz = 0
-			nodes[0].userData.dof_rx = 0
-			nodes[0].userData.dof_ry = 0
-			nodes[0].userData.dof_rz = 0
-		}else if ( supportType == 'pinned' ){
-			nodes[0].userData.dof_dx = 0
-			nodes[0].userData.dof_dy = 0
-			nodes[0].userData.dof_dz = 0
-			nodes[0].userData.dof_rx = 1
-			nodes[0].userData.dof_ry = 1
-			nodes[0].userData.dof_rz = 1
+		nodes = node.getValue().split(",");
 
-		}else if ( supportType == 'roller' ){
-			nodes[0].userData.dof_dx = 0
-			nodes[0].userData.dof_dy = 1
-			nodes[0].userData.dof_dz = 0
-			nodes[0].userData.dof_rx = 1
-			nodes[0].userData.dof_ry = 1
-			nodes[0].userData.dof_rz = 1
+		for(i=0; i<nodes.length; i++){
+			name = 'Node '+nodes[i];
+			node_ = editor.scene.getObjectByName( name );
+			editor.scene.remove( node_ );
 
+			var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+			var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+			var cone = new THREE.Mesh( geometry, material );
+			cone.name = node_.name
+			cone.applyMatrix( node_.matrix );
+			cone.userData = node_.userData;
+
+			var label = node_.children[0].clone();
+			cone.add(label);
+			cone.parent = editor.scene;
+			cone.userData.dof_dx = dofX.getValue() ? 0 : 1;
+			cone.userData.dof_dy = dofY.getValue() ? 0 : 1;
+			cone.userData.dof_dz = dofZ.getValue() ? 0 : 1;
+			cone.userData.dof_rx = dofRx.getValue() ? 0 : 1;
+			cone.userData.dof_ry = dofRy.getValue() ? 0 : 1;
+			cone.userData.dof_rz = dofRz.getValue() ? 0 : 1;
+
+			editor.execute( new AddObjectCommand( cone ) );
 		}
-
-		nodes[0].userData.supportType = supportType
-		
 	} );
 	
 
 	buttonRow.add( btn );
 
     container.add( buttonRow );
-
-	
-    function update() {
-
-		
-		if (this.dom.id == 'fixed'){
-			supportType = 'fixed'
-			pinned.dom.checked = false
-			roller.dom.checked = false
-		}else if (this.dom.id == 'pinned'){
-			supportType = 'pinned'
-			fixed.dom.checked = false
-			roller.dom.checked = false
-		}else if (this.dom.id == 'roller'){
-			supportType = 'roller'
-			fixed.dom.checked = false
-			pinned.dom.checked = false
-		}
-			
-		
-
-	}
 
 
 	return container;

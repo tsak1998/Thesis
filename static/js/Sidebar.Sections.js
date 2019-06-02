@@ -22,28 +22,43 @@ Sidebar.Sections = function ( editor ) {
 
 	// material and section types
 
-	var options = {
+	var optionsMaterial = {
 		'con': 'Concrete',
 		'stl': 'Steel'
 	};
 
 	var materialRow = new UI.Row();
 	var material = new UI.Select().setWidth( '150px' );
+	material.setOptions( optionsMaterial );
+	material.setValue( '' );
+
+	
+
+	var materialCategoryRow = new UI.Row();
+	var materialCategory = new UI.Select().setWidth( '150px' );
+	materialCategory.setOptions( optionsConcreteCategory );
+	materialCategory.setValue( '' );
+
+	
+
+	/*
+	var options = {
+		'con': 'Concrete',
+		'stl': 'Steel'
+	};
+	var materialRow = new UI.Row();
+	var material = new UI.Select().setWidth( '150px' );
 	material.setOptions( options );
-
-	if ( config.getKey( 'language' ) !== undefined ) {
-
-		material.setValue( '' );
-
-	}
-
+	material.setValue( '' );
+	*/
 
 	var sectTypeRow = new UI.Row();
 	var sectType = new UI.Select().setWidth( '150px' );
 
 	var options_concrete = {
 		'rect' : 'RECTANGLE',
-		'T' : 'T'
+		'T' : 'T',
+		'L' : 'L'
 		
 	};
 
@@ -53,14 +68,25 @@ Sidebar.Sections = function ( editor ) {
 		
 	};
 
+	var optionsConcreteCategory = {
+		'c20/25': 'C20/25',
+		'c25/30': 'C25/30'
+	};
+
+	var optionsSteelCategory = {
+		's225': 'S225'
+	};
+
 
 	material.onChange( function () {
 
 		var value = this.getValue();
 		if ( value == 'con' ){
-			sectType.setOptions( options_concrete )
+			sectType.setOptions( options_concrete );
+			materialCategory.setOptions( optionsConcreteCategory );
 		} else if ( value == 'stl' ){
-			sectType.setOptions( options_steel )
+			sectType.setOptions( options_steel );
+			materialCategory.setOptions( optionsSteelCategory );
 		}
 	} );
 
@@ -68,6 +94,11 @@ Sidebar.Sections = function ( editor ) {
 	materialRow.add( material );
 
 	container.add( materialRow );
+
+	materialCategoryRow.add( new UI.Text( 'Material Category' ).setWidth( '90px' ) );
+	materialCategoryRow.add( materialCategory );
+
+	container.add( materialCategoryRow );
 
 	// section types
 
@@ -158,20 +189,23 @@ Sidebar.Sections = function ( editor ) {
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Define Section' ).onClick( function () {
 		if (material.getValue() == 'con'){
+			sectCount += 1
 			if (sectType.getValue() == 'rect'){
-				sectCount += 1
+				
 				section = {
 					'section_id' : sectCount,
-					'material' : 'C20/25',
+					'material' : material.getValue(),
+					'material_category' : materialCategory.getValue(),
 					'sect_type' : sectType.getValue(),
 					'h' : h.getValue(),
 					'b' : b.getValue()
 				}
 			}else if (sectType.getValue() == 'T'){
-				sectCount += 1
+				
 				section = {
 					'section_id' : sectCount,
-					'material' : 'C20/25',
+					'material' : material.getValue(),
+					'material_category' : materialCategory.getValue(),
 					'sect_type' : sectType.getValue(),
 					'h' : h.getValue(),
 					'b' : b.getValue(),
@@ -184,7 +218,8 @@ Sidebar.Sections = function ( editor ) {
 			sectCount += 1
 			section = {
 				'section_id' : sectCount,
-				'material' : 'S255',
+				'material' : material.getValue(),
+				'material_category' : materialCategory.getValue(),
 				'sect_type' : sectType.getValue(),
 
 			}
@@ -277,6 +312,7 @@ Sidebar.Sections = function ( editor ) {
 			success: function (e) {
 				console.log(JSON.parse(e).data)
 				editor.sections.sections = JSON.parse(e).data
+				sectCount = editor.sections.sections.length
 				refreshUI()						
 			},
 			error: function(xhr, status, error) {
