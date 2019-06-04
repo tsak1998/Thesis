@@ -70,7 +70,7 @@ def plot_mqn(user_id, mqn):
         
         show = np.array([True, True, True, True, True, True])
         
-        visible = np.zeros((2*6), dtype=bool)
+        visible = np.zeros((8*6), dtype=bool)
         visible[i:j] = show
         
         element_id = df2.iloc[0].en
@@ -153,7 +153,7 @@ def plot_displacements(user_id, displacements):
         
         show = np.array([True, True])
         
-        visible = np.zeros((2*6), dtype=bool)
+        visible = np.zeros((8*6), dtype=bool)
         visible[i:j] = show
         
         element_id = df2.iloc[0].en

@@ -1,10 +1,7 @@
 import pandas as pd
-from sqlalchemy import create_engine
-from createdb import createDB
 from section_properties import section_properties
 
-def parse_and_save(user_id, data):
-	engine = create_engine("mysql+pymysql://root:password@localhost:3306/yellow")  
+def parser(user_id, data, engine):
 	# data contains dicts of elements, labels, loads and sections
 	elements = pd.DataFrame(data[0])
 	elements['user_id'] = user_id
@@ -17,23 +14,27 @@ def parse_and_save(user_id, data):
 	# loads have to be parsed and saved in this structure
 	point_loads = pd.DataFrame(columns=['user_id', 'nn', 'c', 'p_x', 'p_y', 'p_z', 'm_x', 'm_y', 'm_z'])
 	temp_loads = pd.DataFrame(data[2])
-	for index, load in temp_loads.iterrows():	
-		if load.type == 'p_load':
-			if load.direction=='x':
-				p = [load.value, 0, 0, 0, 0, 0]
-			elif load.direction=='y':
-				p = [0 ,load.value ,0 ,0, 0, 0]
+	temp_loads_group = temp_loads.groupby(['nn','c'])
+	for t in temp_loads_group:
+		nn = t[0][0]
+		c = t[0][1]
+		p_x, p_y, p_z, m_x, m_y, m_z = 0, 0, 0, 0, 0, 0
+		for index, load in t[1].iterrows():
+			if load.type == 'p_load':
+				if load.direction=='x':
+					p_x += load.value
+				elif load.direction=='y':
+					p_y += load.value
+				else:
+					p_z += load.value
 			else:
-				p = [0, 0, load.value, 0, 0, 0]
-		else:
-			if load.direction=='x':
-				p = [0, 0, 0, load.value, 0, 0]
-			elif load.direction=='y':
-				p = [0 ,0 ,0 ,0, load.value, 0]
-			else:
-				p = [0, 0, 0, 0, 0, load.value]
-		temp_load = {'nn' : load.nn , 'c': load.c, 'p_x': p[0],
-					'p_y': p[1], 'p_z': p[2], 'm_x': p[3], 'm_y': p[4], 'm_z': p[5]}
+				if load.direction=='x':
+					m_x += load.value
+				elif load.direction=='y':
+					m_y += load.value
+				else:
+					m_z += load.value
+		temp_load = {'nn' : load.nn , 'c': load.c, 'p_x': p_x, 'p_y': p_y, 'p_z': p_z, 'm_x': m_x, 'm_y': m_y, 'm_z': m_z}
 		df = pd.DataFrame([temp_load], columns=temp_load.keys())
 		point_loads = pd.concat([point_loads, df], axis =0).reset_index(drop=True)
 	point_loads['user_id'] = user_id
@@ -45,20 +46,25 @@ def parse_and_save(user_id, data):
 	temp_sections = pd.DataFrame(data[3])
 	steel_sections = temp_sections.loc[temp_sections['material']=='stl']
 	concrete_sections = temp_sections.loc[temp_sections['material']=='con']
-	concrete_sections = section_properties(concrete_sections, user_id)
+	concrete_sections = section_properties(concrete_sections, user_id, engine)
 	# need the library
 	df_steel_sections = pd.DataFrame(columns=['section_id', 'A', 'E', 'G',
 										'Ix', 'Iy', 'Iz'])
 	for index, section in steel_sections.iterrows():
-		engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
 		sect = pd.read_sql("SELECT A,Ix,Iy,Iz from steel_sections WHERE sect_type='" + section.sect_type + "'", engine)
-		mat = pd.read_sql("SELECT E,G from materials WHERE material_category='" + section.material_category + "'", engine)
+		mat = pd.read_sql("SELECT material,material_category,E,G from materials WHERE material_category='" + section.material_category + "'", engine)
+		mat['section_id'] = section['section_id']
 		sect['user_id'] = user_id
 		sect['section_id'] = section['section_id']
-		temp_sect = pd.concat([sect, mat], axis=1)
-	sections = pd.concat([temp_sect, concrete_sections], axis=0)
+		sect.merge(mat, on='section_id')
+		
+		df_steel_sections = pd.concat([df_steel_sections, sect], axis=0)
+	sections = pd.concat([df_steel_sections, concrete_sections], axis=0)
+	print('con ' ,concrete_sections.to_string())
+	print('stl ', df_steel_sections.to_string())
 	
-	createDB(user_id, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections)
+	
+	return elements, nodes, point_loads, sections
 
 	
 '''

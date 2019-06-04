@@ -4,20 +4,20 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
 from sqlalchemy import create_engine
-from parser import parse_and_save
+from parser_ import parser
 import pandas as pd
 from sqlalchemy.ext.declarative import declarative_base
 import dxfgrabber
 import models
 import numpy as np
 from computations import main
+from save_db import save_db
 
 app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:passwords@localhost/yellow'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -25,16 +25,14 @@ db = SQLAlchemy(app)
 app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
+# set global engine
+engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('home.html')
 
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
 
 
 @app.route('/editor')
@@ -54,15 +52,17 @@ def get_username():
 
 
 # import mysql.connector
-@app.route('/readDB', methods=['GET', 'POST'])
-def readDB():
+@app.route('/load', methods=['GET', 'POST'])
+def load():
     if request.method == 'POST':
         user = session['username']
-        engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
-
-        nod = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
-        elm = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
-        return nod.to_json(orient='table') + '|' + elm.to_json(orient='table')
+        nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
+        del nodes['id'], nodes['user_id']
+        elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
+        del elements['id'], elements['user_id']
+        point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user + "'", engine)
+        del point_loads['id'], point_loads['user_id']
+        return nodes.to_json(orient='table', index=False) + '|' + elements.to_json(orient='table', index=False)+ '|' + point_loads.to_json(orient='table', index=False)
 
 
 @app.route('/readDXF', methods=['GET', 'POST'])
@@ -75,9 +75,7 @@ def readDXF():
         dxf = dxfgrabber.read(stream)
         nod, elm = dxf_import(dxf)
         user = session['username']
-        engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
-        nod = pd.read_sql("SELECT * from nodes" + str(proj_id) + " WHERE user_id='" + user + "'", engine)
-        elm = pd.read_sql("SELECT * from elements" + str(proj_id) + " WHERE user_id='" + user + "'", engine)
+
         return nod.to_json(orient='table') + '|' + elm.to_json(orient='table')
     else:
         return 'Could not read DXF file'
@@ -113,7 +111,6 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-
 # User login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -123,11 +120,12 @@ def login():
         password_candidate = request.form['password']
 
         # Get user by username
-        result =  None#models.User.query.filter_by(username=username).first()
-        session['logged_in'] = True
-        session['username'] = username
+        result =  models.User.query.filter_by(username=username).first()
+        
         if result is not None:
             # Get stored hash
+            session['logged_in'] = True
+            session['username'] = username
             password = result.password
 
             # Compare Passwords
@@ -136,7 +134,7 @@ def login():
                 session['logged_in'] = True
                 session['username'] = username
                 flash('You are now logged in', 'success')
-                return redirect(url_for('about'))
+                return redirect(url_for('editor'))
             else:
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
@@ -147,7 +145,6 @@ def login():
             return render_template('login.html', error=error)
 
     return render_template('login.html')
-
 
 # Check if user logged in
 def is_logged_in(f):
@@ -161,7 +158,6 @@ def is_logged_in(f):
 
     return wrap
 
-
 # Logout
 @app.route('/logout')
 @is_logged_in
@@ -170,23 +166,17 @@ def logout():
     flash('You are now logged out', 'sucess')
     return redirect(url_for('login'))
 
-
 # yellow save
-
 @app.route('/save', methods=["GET", "POST"])
 def save():
     if request.method == 'POST':
-        
-        # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        
-        parse_and_save(user_id, data)
-
+        elements, nodes, point_loads, sections = parser(user_id, data, engine)
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections)
     return render_template('editor.html')
 
 # yellow save
-
 @app.route('/autosave', methods=["GET", "POST"])
 def autosave():
     if request.method == 'POST':
@@ -194,39 +184,27 @@ def autosave():
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        parse_and_save(user_id, data)
+        elements, nodes, point_loads, sections = parser(user_id, data, engine)
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections)
 
 
 @app.route('/loadsections', methods=['POST'])
 def load_sections():
-
-    engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
     user_id = session['username']
     sect = pd.read_sql("SELECT material, sect_type, section_id from sections WHERE user_id='" + user_id + "'", engine)
-
     return sect.to_json(orient='table', index=False)
 
 
 @app.route('/yellow', methods=["GET", "POST"])
 def run_analysis():
     if request.method == 'POST':
-        
-        # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        #parse_and_save(user_id, data)
-        
-        user_id = session['username']
-        main(user_id)
-
+        main(user_id, engine)
     return render_template('editor.html')
-
 
 
 if __name__ == '__main__':
     app.secret_key = "^A%DJAJU^JJ123"
     app.run(debug=True)
 
-'''
-		
-		'''

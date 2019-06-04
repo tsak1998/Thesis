@@ -17,6 +17,17 @@ Sidebar.Results = function ( editor ) {
 	options.setClass( 'options' );
 	//container.add( options );
     //supports radio buttons
+    title = new UI.Text('Reactions').setWidth( '150px' ) 
+    container.add( title )
+    container.add( new UI.Break() );
+    container.add( new UI.Break() );
+    var mqnRow = new UI.Row();
+    var mqn = new UI.Button( 'Reactions', 'openerReactions' )
+        
+    mqnRow.add( mqn );
+
+	container.add( mqnRow );
+
     
     container.add( new UI.HorizontalRule() );
     title = new UI.Text('Results on Members').setWidth( '150px' ) 

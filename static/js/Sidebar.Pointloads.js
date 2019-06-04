@@ -127,6 +127,7 @@ Sidebar.PointLoads = function ( editor ) {
                 m.copyPosition( obj.matrix ) 
                 c = 0
                 positionOffset = new THREE.Vector3( xDir.x*c*obj.userData.length, xDir.z*c*obj.userData.length, xDir.y*c*obj.userData.length)
+                c =99999
             }else{
                 name = 'Element '+String( elements[i] );
                 obj = editor.scene.getObjectByName( name );
@@ -139,7 +140,7 @@ Sidebar.PointLoads = function ( editor ) {
                 m = new THREE.Matrix4()
                 m.copyPosition( obj.matrix ) 
                 c = parseFloat(lengthRatio.getValue())
-                positionOffset = new THREE.Vector3( xDir.x*c*obj.userData.length, xDir.z*c*obj.userData.length, xDir.y*c*obj.userData.length)
+                positionOffset = new THREE.Vector3( xDir.x*c*obj.userData.length, xDir.y*c*obj.userData.length, xDir.z*c*obj.userData.length)
                 
             }
             
@@ -189,7 +190,7 @@ Sidebar.PointLoads = function ( editor ) {
                 }
                 line.userData = {'nn' : objectId,
                             'type': 'p_load',
-                            'c': parseFloat(lengthRatio.getValue()),
+                            'c': c,
                             'direction' : direction.getValue(),
                             'value': parseFloat(loadInp.getValue())}
                 
@@ -236,7 +237,7 @@ Sidebar.PointLoads = function ( editor ) {
                 }
                 line.userData = {'nn' : objectId,
                                 'type': 'p_moment',
-                                'c': parseFloat(lengthRatio.getValue()),
+                                'c': c,
                                 'direction' : direction.getValue(),
                                 'value': parseFloat(loadInp.getValue())}
             }

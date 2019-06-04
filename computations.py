@@ -14,18 +14,11 @@ def load_data(user_id, engine):
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
 
-    elements = pd.read_sql('elements', engine)
-    elements = elements.loc[elements['user_id'] == user_id]
     truss_elements = elements.loc[elements['elem_type'] == 'truss']
-    nodes = pd.read_sql('nodes', engine)
-    nodes = nodes.loc[nodes['user_id'] == user_id]
-    sections = pd.read_sql('sections', engine)
-    sections = sections.loc[sections['user_id'] == user_id]
-    point_loads = pd.read_sql('point_loads', engine)
-    point_loads = point_loads.loc[point_loads['user_id'] == user_id]
+    
     dist_loads = pd.read_sql('dist_loads', engine)
     dist_loads = dist_loads.loc[dist_loads['user_id'] == user_id]
-
+    
     elements.to_csv('model_test/elements.csv', index=False)
     truss_elements.to_csv('model_test/truss_elements.csv', index=False)
     nodes.to_csv('model_test/nodes.csv', index=False)
@@ -33,15 +26,39 @@ def load_data(user_id, engine):
     point_loads.to_csv('model_test/point_loads.csv', index=False)
     dist_loads = dist_loads.to_csv('model_test/dist_loads.csv', index=False)
     '''
+    
 
     elements = pd.read_csv('model_test/test_1/elements.csv')
     truss_elements = pd.read_csv('model_test/test_1/truss_elements.csv')
     nodes = pd.read_csv('model_test/test_1/nodes.csv')
-    sections = pd.read_csv('model_test/test_1/sections.csv')
+    
     point_loads = pd.read_csv('model_test/test_1/point_loads.csv')
     dist_loads = pd.read_csv('model_test/test_1/dist_loads.csv')
-
-    return elements, nodes, sections, point_loads, dist_loads, truss_elements
+    
+    
+    nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user_id + "'", engine)
+    elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user_id + "'", engine)
+    sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
+    point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
+    sections = pd.read_csv('model_test/test_1/sections.csv')
+    point_loads_new = pd.DataFrame([], columns=point_loads.columns)
+    temp_loads_group = point_loads.groupby(['nn','c'])
+    for t in temp_loads_group:
+        nn = t[0][0]
+        c = t[0][1]
+        p_x, p_y, p_z, m_x, m_y, m_z = 0, 0, 0, 0, 0, 0
+        for index, load in t[1].iterrows():
+                p_x += load.p_x
+                p_y += load.p_y
+                p_z += load.p_z
+                m_x += load.m_x
+                m_y += load.m_y
+                m_z += load.m_z
+        temp_load = [10, user_id, nn, c, p_x,  p_y, p_z, m_x, m_y, m_z]
+        df = pd.DataFrame([temp_load], columns=point_loads.columns)
+        point_loads_new = pd.concat([point_loads_new, df], axis =0).reset_index(drop=True)
+    
+    return elements, nodes, sections, point_loads_new, dist_loads, truss_elements
 
 
 # calculate DOFS
@@ -54,7 +71,7 @@ def dofs(nodes):
     dofs = constraints.argsort()
     node_dofs = pd.DataFrame(np.reshape(np.sort(dofs), (nodes_n, 6)))
     node_dofs['nn'] = nodes['nn']
-    node_dofs.columns = ['dofx', 'dofy', 'dofz', 'dofrx', 'dofry', 'dofrz', 'nn']
+    node_dofs.columns = ['dof_dx', 'dof_dy', 'dof_dz', 'dof_rx', 'dof_ry', 'dof_rz', 'nn']
     a = constraints[constraints.argsort()]
     temp = np.where(a == 0)
     slice = temp[0][len(temp[0]) - 1] + 1
@@ -62,6 +79,7 @@ def dofs(nodes):
     free_dofs = sorted(dofs[slice:].tolist())
     arranged_dofs = free_dofs + sup_dofs
     print('DOFS: ', time.time() - t1)
+    print(node_dofs)
     return arranged_dofs, free_dofs, sup_dofs, node_dofs
 
 
@@ -85,19 +103,19 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
         if elm.elem_type == 'beam':
             dofs_i = node_dofs.loc[node_dofs.nn == i]
             dofs_j = node_dofs.loc[node_dofs.nn == j]
-            dof_a, dof_b = dofs_i['dofx'].get_values()[0], \
-                           dofs_i['dofrz'].get_values()[0] + 1
-            dof_c, dof_d = dofs_j['dofx'].get_values()[0], \
-                           dofs_j['dofrz'].get_values()[0] + 1
+            dof_a, dof_b = dofs_i['dof_dx'].get_values()[0], \
+                           dofs_i['dof_rz'].get_values()[0] + 1
+            dof_c, dof_d = dofs_j['dof_dx'].get_values()[0], \
+                           dofs_j['dof_rz'].get_values()[0] + 1
             K_ol[dof_a:dof_b, dof_a:dof_b] += t[:6, :6]
             K_ol[dof_a:dof_b, dof_c:dof_d] += t[:6, 6:]
             K_ol[dof_c:dof_d, dof_a:dof_b] += t[6:, :6]
             K_ol[dof_c:dof_d, dof_c:dof_d] += t[6:, 6:]
         else:
-            dof_a, dof_b = node_dofs.loc[node_dofs.nn == nodei.nn]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodei.nn]['dofz'].get_values()[0] + 1
-            dof_c, dof_d = node_dofs.loc[node_dofs.nn == nodej.nn]['dofx'].get_values()[0], \
-                           node_dofs.loc[node_dofs.nn == nodej.nn]['dofz'].get_values()[0] + 1
+            dof_a, dof_b = node_dofs.loc[node_dofs.nn == nodei.nn]['dof_dx'].get_values()[0], \
+                           node_dofs.loc[node_dofs.nn == nodei.nn]['dof_rz'].get_values()[0] + 1
+            dof_c, dof_d = node_dofs.loc[node_dofs.nn == nodej.nn]['dof_dx'].get_values()[0], \
+                           node_dofs.loc[node_dofs.nn == nodej.nn]['dof_rz'].get_values()[0] + 1
             K_ol[dof_a:dof_b, dof_a:dof_b] += t[:3, :3]
             K_ol[dof_a:dof_b, dof_c:dof_d] += t[:3, 3:]
             K_ol[dof_c:dof_d, dof_a:dof_b] += t[3:, :3]
@@ -266,8 +284,8 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         A_j = np.zeros((6, 1))
         if load.c == 99999:
             node = load.nn
-            a, b = node_dofs.loc[node_dofs.nn == node]['dofx'].get_values()[0], \
-                   node_dofs.loc[node_dofs.nn == node]['dofrz'].get_values()[0] + 1
+            a, b = node_dofs.loc[node_dofs.nn == node]['dof_dx'].get_values()[0], \
+                   node_dofs.loc[node_dofs.nn == node]['dof_rz'].get_values()[0] + 1
             P_nodal[a:b] += [[load.p_x], [load.p_y], [load.p_z],
                              [load.m_x], [load.m_y], [load.m_z]]
         else:
@@ -276,10 +294,10 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             L = elm.length.get_values()[0]
             nodei = elm.nodei.get_values()[0]
             nodej = elm.nodej.get_values()[0]
-            dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
-                         node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
-            dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
-                         node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+            dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dof_dx'].get_values()[0], \
+                         node_dofs.loc[node_dofs.nn == nodei]['dof_rz'].get_values()[0] + 1
+            dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dof_dx'].get_values()[0], \
+                         node_dofs.loc[node_dofs.nn == nodej]['dof_rz'].get_values()[0] + 1
             a = load.c * L
             b = (1 - load.c) * L
             # add the appropriate moment loads
@@ -314,10 +332,10 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         L = elm.length.get_values()[0]
         nodei = elm.nodei.get_values()[0]
         nodej = elm.nodej.get_values()[0]
-        dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
-                     node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
-        dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
-                     node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+        dofa, dofb = node_dofs.loc[node_dofs.nn == nodei]['dof_dx'].get_values()[0], \
+                     node_dofs.loc[node_dofs.nn == nodei]['dof_rz'].get_values()[0] + 1
+        dofc, dofd = node_dofs.loc[node_dofs.nn == nodej]['dof_dx'].get_values()[0], \
+                     node_dofs.loc[node_dofs.nn == nodej]['dof_rz'].get_values()[0] + 1
 
         p = d_load.iloc[[3, 4, 5, 6, 7, 8]].get_values()
         a = d_load.c * L
@@ -427,15 +445,15 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
         nodei = elm.nodei
         nodej = elm.nodej
 
-        a, b = node_dofs.loc[node_dofs.nn == nodei]['dofx'].get_values()[0], \
-               node_dofs.loc[node_dofs.nn == nodei]['dofrz'].get_values()[0] + 1
-        c, d = node_dofs.loc[node_dofs.nn == nodej]['dofx'].get_values()[0], \
-               node_dofs.loc[node_dofs.nn == nodej]['dofrz'].get_values()[0] + 1
+        a, b = node_dofs.loc[node_dofs.nn == nodei]['dof_dx'].get_values()[0], \
+               node_dofs.loc[node_dofs.nn == nodei]['dof_rz'].get_values()[0] + 1
+        c, d = node_dofs.loc[node_dofs.nn == nodej]['dof_dx'].get_values()[0], \
+               node_dofs.loc[node_dofs.nn == nodej]['dof_rz'].get_values()[0] + 1
         d_elem = np.zeros((12, 1))
         d_elem[:6], d_elem[6:] = displacments[a:b], displacments[c:d]
         # local displacments
         d_local = rot.dot(d_elem)
-        print(d_local)
+       
 
         MQN = k.dot(d_local)
         MQN[:6, 0] += fixed_forces[:6, index]
@@ -479,7 +497,7 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
             d_load['p_1_x'], d_load['p_1_y'], d_load['p_1_z'] = p_1[0], p_1[1], p_1[2]
             d_load['p_2_x'], d_load['p_2_y'], d_load['p_2_z'] = p_2[0], p_2[1], p_2[2]
             dist_loads.iloc[d_load.index, :] = d_load
-
+    print(point_loads)
     return point_loads, dist_loads
 
 
@@ -502,6 +520,7 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
             c = L * p_load.c.get_values()
             # length
             # separate x around c
+            print(c)
             temp = 10
             x1 = np.linspace(0, c, temp, endpoint=False)
             x2 = np.linspace(c, L, temp)
@@ -582,7 +601,7 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
     return MQN_values
 
 
-def displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays):
+def displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays, node_dofs):
     n = 50
     D_LOCAL = pd.DataFrame([], columns=['en', 'x', 'u_y', 'u_z'])
     D_GLOBAL = pd.DataFrame([], columns=['en', 'x', 'u_y', 'u_z'])
@@ -653,7 +672,84 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         D_LOCAL = pd.concat([D_LOCAL, df], axis=0).reset_index(drop=True)
         
         #
-        # global dispalecements
+       
+        
+        #df = pd.DataFrame(d_global, columns=['en', 'x', 'u_y', 'u_z'])
+        #D_GLOBAL = pd.concat([D_GLOBAL, df], axis=0).reset_index(drop=True)
+        D_GLOBAL = []
+    return D_LOCAL, D_GLOBAL
+
+
+def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
+    reactions = pd.DataFrame(columns=['user_id', 'nn', 'f_x', 'f_y', 'f_z', 'm_x', 'm_y', 'm_z'])
+    for index, node in node_dofs.iterrows():
+        dofs = [node.dof_dx, node.dof_dy, node.dof_dz, node.dof_rx, node.dof_ry, node.dof_rz]
+        ind_fx = arranged_dofs.index(node.dof_dx)
+        ind_fy = arranged_dofs.index(node.dof_dy)
+        ind_fz = arranged_dofs.index(node.dof_dz)
+        ind_mx = arranged_dofs.index(node.dof_rx)
+        ind_my = arranged_dofs.index(node.dof_ry)
+        ind_mz = arranged_dofs.index(node.dof_rz)
+        Fx = P_whole[ind_fx][0]
+        Fy = P_whole[ind_fy][0]
+        Fz = P_whole[ind_fz][0]
+        Mx = P_whole[ind_mx][0]
+        My = P_whole[ind_my][0]
+        Mz = P_whole[ind_mz][0]
+
+
+        temp_react = {'f_x': Fx, 'f_y': Fy, 'f_z': Fz, 'm_x': Mx, 'm_y': My, 'm_z': Mz}
+        df = pd.DataFrame([temp_react], columns=temp_react.keys())
+        # drops lines with zeroes
+        df = df[(df.T != 0).any()]
+        df['user_id'] = user_id
+        df['nn'] = node.nn
+        reactions = pd.concat([reactions, df], axis =0, sort=False).reset_index(drop=True)
+    return reactions
+
+def save_results(user_id, engine, **kwargs): 
+    for key in kwargs.keys():
+        sql_stmt = "DELETE FROM "+ key + " WHERE user_id='"+user_id+"'"
+        with engine.connect() as con:
+            rs = con.execute(sql_stmt)
+        kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
+
+
+def plot_results(user_id, mqn, displacements):
+    from plots import plot_mqn, plot_displacements
+    plot_mqn(user_id, mqn)
+    plot_displacements(user_id, displacements)
+
+
+def main(user_id, engine):
+    elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id, engine)
+    arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
+    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
+    point_loads_tr, dist_loads_tr = rotate_loads(elements, point_loads, dist_loads, transf_arrays)
+    P_nodal, S, fixed_forces = nodal_forces(point_loads_tr, dist_loads_tr, node_dofs, transf_arrays, arranged_dofs,
+                                            elements)
+    P_s, global_dispalecements = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
+    MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, global_dispalecements, elements, node_dofs, S, nodes,
+                                               point_loads, fixed_forces)
+    MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
+    d_local, d_global =  displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays, node_dofs)
+    MQN_values['user_id'] = user_id
+    d_local['user_id'] = user_id
+    save_results(user_id, engine, mqn=MQN_values, displacements=d_local)
+    plot_results(user_id, MQN_values, d_local)
+    P_whole = np.round(K_ol.dot(global_dispalecements)-P_nodal,3)
+   
+    reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
+    print(reactions.to_json(orient='table', index=False))
+    # MQN_values.to_csv('model_test/test_1/mqn.csv')
+    # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
+    
+
+# t1 = time.time()
+# main('cv13116')
+# print('Run: ', time.time() - t1)
+'''
+ # global dispalecements
         #
         nn_i = int(node_i.nn.get_values())
         nn_j = int(node_j.nn.get_values())
@@ -676,12 +772,15 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         
         x = np.linspace(0,L,n)
         # z
-        print(d)
-        d = global_dispalecements
         
+        d = global_dispalecements
+        print(len(d))
+        print(dof_a,dof_b)
+        print(dof_c,dof_d)
+
         m2_A = d[dof_a:dof_b]
         m2_B = d[dof_c:dof_d]
-        
+       
         #
         # test sto z
         if index>0:
@@ -751,55 +850,5 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         d_global[:, 0] = index+1
         d_global[:, 1] = x_real
         d_global[:, 2] = y_real
-        d_global[:, 3] = z_real
-        
-        df = pd.DataFrame(d_global, columns=['en', 'x', 'u_y', 'u_z'])
-        D_GLOBAL = pd.concat([D_GLOBAL, df], axis=0).reset_index(drop=True)
-   
-    return D_LOCAL, D_GLOBAL
-
-
-def pretty_print(elements, nodes, D, P_s, node_dofs):
-    displacements = np.zeros((len(nodes), 7))
-
-
-def save_results(user_id, engine, **kwargs): 
-    for key in kwargs.keys():
-        sql_stmt = "DELETE FROM "+ key + " WHERE user_id='"+user_id+"'"
-        with engine.connect() as con:
-            rs = con.execute(sql_stmt)
-        kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
-
-
-def plot_results(user_id, mqn, displacements):
-    from plots import plot_mqn, plot_displacements
-    plot_mqn(user_id, mqn)
-    plot_displacements(user_id, displacements)
-
-
-def main(user_id):
-    engine = create_engine("mysql+pymysql://root:pass@localhost:3306/yellow")
-    elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id, engine)
-    arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
-    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
-    point_loads_tr, dist_loads_tr = rotate_loads(elements, point_loads, dist_loads, transf_arrays)
-    P_nodal, S, fixed_forces = nodal_forces(point_loads_tr, dist_loads_tr, node_dofs, transf_arrays, arranged_dofs,
-                                            elements)
-    P_s, global_dispalecements = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
-    MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, global_dispalecements, elements, node_dofs, S, nodes,
-                                               point_loads, fixed_forces)
-    MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
-    d_local, d_global =  displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays)
-    MQN_values['user_id'] = user_id
-    d_local['user_id'] = user_id
-
-    save_results(user_id, engine, mqn=MQN_values, displacements=d_local)
-    # MQN_values.to_sql('mqn', engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
-    plot_results(user_id, MQN_values, d_local)
-    # MQN_values.to_csv('model_test/test_1/mqn.csv')
-    global_dispalecements = pd.DataFrame(global_dispalecements)# .to_csv('model_test/test_1/displacements.csv')
-    
-
-# t1 = time.time()
-# main('cv13116')
-# print('Run: ', time.time() - t1)
+        d_global[:, 3] = z_reals
+'''

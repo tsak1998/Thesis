@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment="" />
+    <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/createdb.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/section_properties.py" beforeDir="false" afterPath="$PROJECT_DIR$/section_properties.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Menubar.File.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Menubar.File.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Pointloads.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Pointloads.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.bak" beforeDir="false" afterPath="$PROJECT_DIR$/test_1.bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.rtd" beforeDir="false" afterPath="$PROJECT_DIR$/test_1.rtd" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,11 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2329">
-              <caret line="149" column="37" selection-start-line="149" selection-start-column="37" selection-end-line="149" selection-end-column="37" />
-              <folding>
-                <element signature="e#0#99#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="951">
+              <caret line="149" selection-start-line="149" selection-end-line="149" />
             </state>
           </provider>
         </entry>
@@ -25,8 +36,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/computations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7072">
-              <caret line="422" column="26" selection-start-line="422" selection-start-column="26" selection-end-line="422" selection-end-column="26" />
+            <state relative-caret-position="6970">
+              <caret line="416" column="20" selection-start-line="416" selection-start-column="20" selection-end-line="416" selection-end-column="20" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -62,18 +73,6 @@
               <caret line="13" column="41" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="41" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/createdb.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="32" column="26" selection-start-line="32" selection-start-column="26" selection-end-line="32" selection-end-column="26" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -126,7 +125,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
+  <component name="ProjectFrameBounds">
     <option name="x" value="215" />
     <option name="y" value="270" />
     <option name="width" value="1294" />
@@ -288,7 +287,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="215" y="270" width="1294" height="1047" extended-state="1" />
+    <frame x="215" y="270" width="1294" height="1047" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12261146" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -479,38 +479,14 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/computations/computations.py" />
     <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Yellow.js" />
-    <entry file="file://$PROJECT_DIR$/computations/tables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="20" lean-forward="true" selection-start-line="18" selection-start-column="20" selection-end-line="18" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#53#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/computations/tables.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2018.3/system/python_stubs/-1163008897/builtins.py" />
-    <entry file="file://$PROJECT_DIR$/computations/database.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-306">
-          <caret column="8" selection-end-line="2" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/computations/database.py" />
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.6/site-packages/pandas/core/generic.py" />
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.6/site-packages/pandas/core/indexing.py" />
     <entry file="file://$PROJECT_DIR$/test_loop.py" />
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.6/site-packages/numpy/lib/twodim_base.py" />
-    <entry file="file://$PROJECT_DIR$/computations/calcs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5993">
-          <caret line="14" column="49" lean-forward="true" selection-start-line="14" selection-start-column="49" selection-end-line="14" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/computations/calcs.py" />
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pymysql/err.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -542,18 +518,15 @@
     <entry file="file://$PROJECT_DIR$/dxfin.py" />
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2329">
-          <caret line="149" column="37" selection-start-line="149" selection-start-column="37" selection-end-line="149" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#99#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="951">
+          <caret line="149" selection-start-line="149" selection-end-line="149" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/computations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7072">
-          <caret line="422" column="26" selection-start-line="422" selection-start-column="26" selection-end-line="422" selection-end-column="26" />
+        <state relative-caret-position="6970">
+          <caret line="416" column="20" selection-start-line="416" selection-start-column="20" selection-end-line="416" selection-end-column="20" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

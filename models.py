@@ -125,7 +125,7 @@ class Displacements(db.Model):
 
 def create_table():
     Base = declarative_base()
-    engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
+    engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
     db.Model.metadata.create_all(bind=engine)
 
-#create_table()
+# create_table()

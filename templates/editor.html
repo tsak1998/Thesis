@@ -157,7 +157,10 @@
 		<script src="{{ url_for('static', filename='js/libs/labels/THREE.spritetext.js') }}"></script>
 		
 		<!-- Vision-specific modules-->
-		<script src="{{ url_for('static', filename='js/drawFromDB.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/makeTextSprite.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/drawNodes.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/drawElements.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/drawPointLoads.js') }}"></script>
 
 		<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/light.css') }}">
@@ -338,6 +341,31 @@
 		
 	</div>
 	<script>
+		function buildTable(data) {
+			var table = document.createElement("table");
+			table.className="gridtable";
+			var thead = document.createElement("thead");
+			var tbody = document.createElement("tbody");
+			var headRow = document.createElement("tr");
+			["user_id","nn","f_x", "f_y", "f_z", "m_x", "m_y", "m_z"].forEach(function(el) {
+			var th=document.createElement("th");
+			th.appendChild(document.createTextNode(el));
+			headRow.appendChild(th);
+			});
+			thead.appendChild(headRow);
+			table.appendChild(thead); 
+			data.forEach(function(el) {
+			var tr = document.createElement("tr");
+			for (var o in el) {  
+				var td = document.createElement("td");
+				td.appendChild(document.createTextNode(el[o]))
+				tr.appendChild(td);
+			}
+			tbody.appendChild(tr);  
+			});
+			table.appendChild(tbody);             
+			return table;
+		}
 		$.ajax({
 				type: "POST",
 				url: "/getUsername",
@@ -353,6 +381,8 @@
 	</script>
 	
 	<script>
+		MOUNTAINS =  [{"user_id":"cv13116","nn":1,"f_x":-49.352,"f_y":-0.578,"f_z":-35.821,"m_x":3.745,"m_y":-122.859,"m_z":0.464},{"user_id":"cv13116","nn":6,"f_x":-50.99,"f_y":-3.367,"f_z":-26.298,"m_x":7.656,"m_y":-128.082,"m_z":0.402},{"user_id":"cv13116","nn":7,"f_x":-50.9,"f_y":0.797,"f_z":30.223,"m_x":-3.684,"m_y":-127.694,"m_z":0.536},{"user_id":"cv13116","nn":8,"f_x":-48.759,"f_y":3.147,"f_z":31.895,"m_x":-6.684,"m_y":-120.654,"m_z":0.615}]
+		
 		$(function () {
 			$( "#mqn" ).dialog({
 				autoOpen: false,
@@ -386,13 +416,55 @@
 				
 			});
 		});
+
+		$(function () {
+			$( "#reactions" ).dialog({
+				autoOpen: false,
+				resizable: false,
+				height: 300,
+				width: 500
+			});
+			
+			$("#openerReactions").click(function() {
+				
+				$("#reactions").dialog('open');
+				
+				
+			});
+		});
 	</script>
 	<script>
 	
 	</script>
-	
+	<div id="reactions" title="Reactions"></div>
 	<div id="mqn" title="MQN"></div>
 	<div id="displacements" title="Displacements"></div>
-	
+	<script>
+		document.getElementById("reactions").appendChild(buildTable(MOUNTAINS));
+	</script>
+	<style>
+			table.gridtable {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+			color:#333333;
+			border-width: 1px;
+			border-color: #666666;
+			border-collapse: collapse;
+		}
+		table.gridtable th {
+			border-width: 1px;
+			padding: 8px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #dedede;
+		}
+		table.gridtable td {
+			border-width: 1px;
+			padding: 8px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #ffffff;
+		}
+	</style>
 	
 {% endblock %} 

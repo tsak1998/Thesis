@@ -3,17 +3,18 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-def section_properties(concrete_sections, user_id):
-    engine = create_engine("mysql+pymysql://root:password@localhost:3306/yellow")  
+def section_properties(concrete_sections, user_id, engine):
     df_sections = pd.DataFrame(columns=['section_id', 'A', 'E', 'G',
 										'Ix', 'Iy', 'Iz'])
     for index, d in concrete_sections.iterrows():
         sect = {}
         sect['section_id'] = d['section_id']
         mat = pd.read_sql("SELECT E,G from materials WHERE material_category='" + d.material_category + "'", engine)
+        sect['sect_type'] = d.sect_type
+        sect['material'] = d.material_category
         v = 0.2
-        E = mat.E
-        G = mat.G
+        E = mat.E.get_values()[0]
+        G = mat.G.get_values()[0]
         # 
         if (d['sect_type']=='rect'):
 
@@ -47,8 +48,8 @@ def section_properties(concrete_sections, user_id):
             sect['Iz'] = ix1 + ix2
         
 
-
+    
     sect['user_id'] = user_id 
-    df = pd.DataFrame([sect], columns=sect.keys())
-    sections = pd.concat([df_sections, df], axis =0).reset_index(drop=True)
+    sections = pd.DataFrame([sect], columns=sect.keys())
+    # sections = pd.concat([df_sections, df], axis =0).reset_index(drop=True)
     return sections

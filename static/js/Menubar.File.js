@@ -49,64 +49,37 @@ Menubar.File = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
-	// Import
-
-	/*
-	var form = document.createElement( 'form' );
-	form.style.display = 'none';
-	document.body.appendChild( form );
-
-	var fileInput = document.createElement( 'input' );
-	fileInput.multiple = true;
-	fileInput.type = 'file';
-	fileInput.addEventListener( 'change', function ( event ) {
-
-		editor.loader.loadFiles( fileInput.files );
-		form.reset();
-
-	} );
-	form.appendChild( fileInput );
-
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
-	option.onClick( function () {
-
-		fileInput.click();
-
-	} );*/
-	var option = new UI.Row();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/open' ) );
+	option.setTextContent( 'Load' );
 	
 	option.onClick( function () {
 		
 		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
 			editor.clear();
-
+				
+			$.ajax({
+				type: "POST",
+				url: "/load",
+				data: {},
+				dataType: 'text',
+				success: function (e) {
+					var data = e.split("|");
+					var nodes = JSON.parse(data[0]);
+					var elements = JSON.parse(data[1]);
+					var pointLoads = JSON.parse(data[2]);
+					drawNodes( editor, nodes.data );
+					drawElements( editor, elements.data );
+					drawPointLoads( editor, pointLoads.data );		
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);	
+				}
+			});	
+			
 		}		
-		
-		
-		$.ajax({
-			type: "POST",
-			url: "/readDB",
-			data: {user: "akosmop"},
-			dataType: 'text',
-			success: function (e) {
-				var nodelm = e.split("|");
-				//console.log(nodelm[0]);
-				//console.log(nodelm[1]);
-				var nod = JSON.parse(nodelm[0]);
-				var elm = JSON.parse(nodelm[1]);
-				//console.log(nod);
-				//console.log(elm);
-				drawFromDB(editor, nod, elm);							
-			},
-			error: function(xhr, status, error) {
-				console.log(xhr, status, error);	
-			}
-		});	
+	
 	});
 	options.add( option );
 
@@ -121,12 +94,9 @@ Menubar.File = function ( editor ) {
 	
 	option.onClick( function () {
 		data1 = []
-		userData = []
-		var model = [];
 		nodes = [];
 		elements = [];
 		loads = [];
-		
 		for (i=0; i<editor.scene.children.length; i++){
 			obj = editor.scene.children[i]
 			if (obj.userData.type == 'element') {
@@ -137,10 +107,6 @@ Menubar.File = function ( editor ) {
 				loads.push( obj.userData );
 			}
 		}
-
-		// data1.push({'elements' : elements});
-		// data1.push({'nodes' : nodes});
-		// data1.push({'point_loads': loads});
 		data1.push(elements);
 		data1.push(nodes);
 		data1.push(loads);
@@ -192,11 +158,11 @@ Menubar.File = function ( editor ) {
 					var nodelm = e.split("|");
 					//console.log(nodelm[0]);
 					//console.log(nodelm[1]);
-					var nod = JSON.parse(nodelm[0]);
-					var elm = JSON.parse(nodelm[1]);
-					//console.log(nod);
-					//console.log(elm);
-					drawFromDB(editor, nod, elm);
+					var nodes = JSON.parse(nodelm[0]);
+					var elements = JSON.parse(nodelm[1]);
+					drawNodes( editor, nodes.data );
+					drawElements( editor, elements.data );
+					
 				},
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);

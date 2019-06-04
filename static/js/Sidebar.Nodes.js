@@ -158,8 +158,8 @@ Sidebar.Nodes = function ( editor ) {
 		mesh.userData = {'nn' : nodeCount,
 						 'type': 'node',
 						 'coord_x': coords.coord_x,
-						 'coord_y' : coords.coord_y, 
-						 'coord_z' : coords.coord_z};
+						 'coord_y' : coords.coord_z, 
+						 'coord_z' : coords.coord_y};
 
 		mesh.userData.dof_dx = 1;
 		mesh.userData.dof_dy = 1;
