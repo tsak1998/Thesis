@@ -165,7 +165,7 @@ Sidebar.PointLoads = function ( editor ) {
                 line = new THREE.Line( geometry, member_material );
                 line.name = 'Point Load '+String(load_id)
                 line.material.linewidth = 3
-                line.applyMatrix(m)
+                line.applyMatrix(obj.matrix)
                 line.position.x += positionOffset.x
                 line.position.y += positionOffset.y
                 line.position.z += positionOffset.z

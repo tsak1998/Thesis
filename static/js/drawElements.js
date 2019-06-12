@@ -27,6 +27,11 @@ function drawElements( editor, elements ){
 		if (dirVector.x==0 & dirVector.z==0){
 			zLocal = new THREE.Vector3(0,0,1)
 			yLocal = new THREE.Vector3(1,0,0)
+		} else if(dirVector.y==0){
+			zLocal = new THREE.Vector3()
+			zLocal.crossVectors(helpVector, dirVector)
+			yLocal = new THREE.Vector3()
+			yLocal.crossVectors(dirVector, zLocal)
 		} else {
 			zLocal = new THREE.Vector3()
 			zLocal.crossVectors(dirVector, helpVector)
@@ -70,6 +75,11 @@ function drawElements( editor, elements ){
 		
 		
 		editor.execute( new AddObjectCommand( line ) );
+		var axes = new THREE.AxesHelper(2);
+		axes.material.linewidth = 5;
 		
+		axes.applyMatrix(transformMatrix)
+
+		editor.sceneHelpers.add(axes);
     }
 };

@@ -287,7 +287,6 @@ Sidebar.Sections = function ( editor ) {
 		( function addObjects( objects ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
-				console.log(objects[i])
 				var object = '  ' + String(objects[ i ].section_id) + '  ' + String(objects[ i ].material) + '  ' + String(objects[ i ].sect_type);
 				var option = buildOption( object );
 				option.innerHTML = '&nbsp;' + object;
@@ -310,7 +309,6 @@ Sidebar.Sections = function ( editor ) {
 			url: "/loadsections",
 			dataType: 'text',
 			success: function (e) {
-				console.log(JSON.parse(e).data)
 				editor.sections.sections = JSON.parse(e).data
 				sectCount = editor.sections.sections.length
 				refreshUI()						

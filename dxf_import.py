@@ -9,7 +9,7 @@ def dxf_import(dxf):
     all_lines = [entity for entity in dxf.entities if entity.dxftype == 'LINE']
 
     # Set the precision to prcs
-    prcs = 4
+    prcs = 10
 
     # Store coordinates (precision prcs) of start & end of each line into the LIST NODES
     NODES = []

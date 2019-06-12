@@ -202,10 +202,30 @@ Sidebar.Elements = function ( editor ) {
 		// helper vector
 		helpVector = new THREE.Vector3(0, 1, 0)
 		//calculate the desired axis
-		zLocal = new THREE.Vector3()
-		zLocal.crossVectors(dirVector, helpVector)
-		yLocal = new THREE.Vector3()
-		yLocal.crossVectors(dirVector, zLocal)
+		if (dirVector.x==0 & dirVector.z==0){
+			zLocal = new THREE.Vector3(0,0,-1)
+			yLocal = new THREE.Vector3(-1,0,0)
+		} else if(dirVector.x!=0 & dirVector.y!=0 & dirVector.z==0){
+			zLocal = new THREE.Vector3()
+			zLocal.crossVectors(helpVector, dirVector)
+			yLocal = new THREE.Vector3()
+			yLocal.crossVectors(dirVector, zLocal)
+		} else if(dirVector.x==0 & dirVector.y!=0 & dirVector.z!=0){
+			yLocal = new THREE.Vector3()
+			yLocal.crossVectors(dirVector, helpVector)
+			zLocal = new THREE.Vector3()
+			zLocal.crossVectors(yLocal, dirVector)
+		}else if(dirVector.y==0){
+			zLocal = new THREE.Vector3()
+			zLocal.crossVectors(dirVector, helpVector)
+			yLocal = new THREE.Vector3()
+			yLocal.crossVectors(dirVector, zLocal)
+		}else{
+			zLocal = new THREE.Vector3()
+			zLocal.crossVectors(helpVector, dirVector)
+			yLocal = new THREE.Vector3()
+			yLocal.crossVectors(dirVector, zLocal)
+		}
 		transformMatrix = new THREE.Matrix4()
 		transformMatrix.makeBasis(dirVector, yLocal, zLocal)	
 		transformMatrix.setPosition(new THREE.Vector3(xi, yi, zi)) 
@@ -233,15 +253,16 @@ Sidebar.Elements = function ( editor ) {
 		//label.name = line.name
 		
 
-		x_lbl = (xj-xi)/2
-		y_lbl = (zj-zi)/2
-		z_lbl = (yj-yi)/2
+		console.log(dirVector, yLocal, zLocal)
 		//console.log(middle)
 		
 		line.applyMatrix( transformMatrix )
 		
+		var axes = new THREE.AxesHelper(2);
+		axes.material.linewidth = 5;
 		
-		
+		axes.applyMatrix(transformMatrix)
+		editor.sceneHelpers.add(axes);
 		editor.execute( new AddObjectCommand( line ) );
 		
 		

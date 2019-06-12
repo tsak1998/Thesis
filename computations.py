@@ -36,7 +36,8 @@ def load_data(user_id, engine):
     dist_loads = pd.read_csv('model_test/test_1/dist_loads.csv')
     
     
-    nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user_id + "'", engine)
+    nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user_id + "'", engine).sort_values(by=['nn']).reset_index()
+    del nodes['index']
     elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user_id + "'", engine)
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
@@ -57,7 +58,6 @@ def load_data(user_id, engine):
         temp_load = [10, user_id, nn, c, p_x,  p_y, p_z, m_x, m_y, m_z]
         df = pd.DataFrame([temp_load], columns=point_loads.columns)
         point_loads_new = pd.concat([point_loads_new, df], axis =0).reset_index(drop=True)
-    
     return elements, nodes, sections, point_loads_new, dist_loads, truss_elements
 
 
@@ -79,7 +79,6 @@ def dofs(nodes):
     free_dofs = sorted(dofs[slice:].tolist())
     arranged_dofs = free_dofs + sup_dofs
     print('DOFS: ', time.time() - t1)
-    print(node_dofs)
     return arranged_dofs, free_dofs, sup_dofs, node_dofs
 
 
@@ -136,7 +135,7 @@ def local_stif(element, sect):
     A = 0.027777777777777773  # 0.2090318
     E = sect.E.get_values()[0]  # 200000000  # 199948023.75
     if elem_type == 'beam':
-        Iy, Iz, G, J = sect.Ix.get_values()[0], sect.Iy.get_values()[0], sect.G.get_values()[0], sect.Iz.get_values()[0]
+        Iy, Iz, G, J = sect.Iy.get_values()[0], sect.Iz.get_values()[0], sect.G.get_values()[0], sect.Ix.get_values()[0]
         # Iy = 64300411.522633724e-12  # 0.00364
         # Iz = 64300411.522633724 * 10 ** -12  # 0.00364
         G = E / 2 / 1.27  # 76904146.79
@@ -154,33 +153,7 @@ def local_stif(element, sect):
 
         y = np.zeros((12, 12))
         # creates half the stifness matrix
-        y[0, 0] = w1
-        y[6, 0] = -w1
-        y[1, 1] = w2
-        y[5, 1] = w3
-        y[7, 1] = -w2
-        y[11, 1] = w3
-        y[2, 2] = w6
-        y[4, 2] = -w7
-        y[8, 2] = -w6
-        y[10, 2] = -w7
-        y[3, 3] = w10
-        y[9, 3] = -w10
-        y[4, 4] = w8
-        y[8, 4] = w7
-        y[10, 4] = w9
-        y[5, 5] = w4
-        y[11, 5] = w5
-        y[6, 6] = w1
-        y[7, 5] = w7
-        y[7, 7] = w2
-        y[11, 7] = -w3
-        y[8, 8] = w6
-        y[10, 8] = w7
-        y[9, 9] = w10
-        y[10, 10] = w8
-        y[11, 11] = w4
-
+       
         y = np.array([[w1, 0, 0, 0, 0, 0, -w1, 0, 0, 0, 0, 0],
                       [0, w2, 0, 0, 0, w3, 0, -w2, 0, 0, 0, w3],
                       [0, 0, w6, 0, -w7, 0, 0, 0, -w6, 0, -w7, 0],
@@ -193,7 +166,31 @@ def local_stif(element, sect):
                       [0, 0, 0, -w10, 0, 0, 0, 0, 0, w10, 0, 0],
                       [0, 0, -w7, 0, w9, 0, 0, 0, w7, 0, w8, 0],
                       [0, w3, 0, 0, 0, w5, 0, -w3, 0, 0, 0, w4]])
-
+        '''
+        w1 = E*A/L;
+        w2 = 12*E*Iz/(L*L*L);
+        w3 = 6*E*Iz/(L*L);
+        w4 = 4*E*Iz/L;
+        w5 = 2*E*Iz/L;
+        w6 = 12*E*Iy/(L*L*L);
+        w7 = 6*E*Iy/(L*L);
+        w8 = 4*E*Iy/L;
+        w9 = 2*E*Iy/L;
+        w10 = G*J/L;
+        
+        y = [w1 0  0  0   0  0  -w1 0  0   0   0   0  ;
+            0  w2 0  0   0  w3 0  -w2 0   0   0   w3 ;
+            0  0  w6 0  -w7 0  0   0 -w6  0  -w7  0  ;
+            0  0  0  w10 0  0  0   0  0 -w10  0   0  ;
+            0  0 -w7 0   w8 0  0   0  w7  0   w9  0  ;
+            0  w3 0  0   0  w4 0  -w3 0   0   0   w5 ;
+            -w1 0  0  0   0  0  w1  0  0   0   0   0  ;
+            0 -w2 0  0   0 -w3 0   w2 0   0   0  -w3 ;
+            0  0 -w6 0   w7 0  0   0  w6  0   w7  0  ;
+            0  0  0 -w10 0  0  0   0  0  w10  0   0  ;
+            0  0 -w7 0   w9 0  0   0  w7  0   w8  0  ;
+            0  w3 0  0   0  w5 0  -w3 0   0   0   w4 ];
+        '''
         # y = np.round(y, precision)
 
     else:
@@ -221,11 +218,31 @@ def transformation_array(element, nodei, nodej):
     CXx = (x2 - x1) / L
     CYx = (y2 - y1) / L
     CZx = (z2 - z1) / L
-
-    if CZx == 0:
-        xR, yR, zR = 0, 110000, 0
+    '''
+    helpVector = np.array([0, 1, 0])
+    dirVector = np.array([CXx, CYx, CZx])
+    if (CXx==0 and CYx==0):
+        zLocal = np.array([1, 0, 0])
+        yLocal = np.array([0, 1, 0])
+    elif (CXx!=0 and CZx!=0 and CYx==0):
+        zLocal = np.cross(helpVector, dirVector)
+        yLocal = np.cross(dirVector, zLocal )
+    elif (CXx==0 and CYx!=0 and CZx!=0):
+        yLocal = np.cross(dirVector, helpVector)
+        zLocal = np.cross(yLocal, dirVector)
+    elif(CZx==0):
+        yLocal = np.cross(dirVector, helpVector)
+        zLocal = np.cross(yLocal, dirVector)
     else:
-        xR, yR, zR = 0, 110000, 0
+        zLocal = np.cross(helpVector, dirVector)
+        yLocal = np.cross(dirVector, zLocal )
+
+    Lambda = np.zeros((3, 3))
+    Lambda[0, :] = dirVector
+    Lambda[1, :] = yLocal
+    Lambda[2, :] = zLocal
+    '''
+    xR, yR, zR = 0, 1, 0
 
     Lambda = np.zeros((3, 3))
     if element.elem_type == 'beam':
@@ -265,12 +282,13 @@ def transformation_array(element, nodei, nodej):
             Lambda[2, 0] = (CXx * CYx * SINY - CZx * COSY) / SQ
             Lambda[2, 1] = -SQ * SINY
             Lambda[2, 2] = (CYx * CZx * SINY + CXx * COSY) / SQ
-
+    
     LAMDA = np.zeros((12, 12))
     zeroes = np.array([0, 0, 0])
 
     LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
     LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
+    print(Lambda)
     return LAMDA
 
 
@@ -322,7 +340,6 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             S[dofc:dofd] += np.transpose(rot).dot(A_j)
             fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
             fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
-
     # approaching dist loads adding two triangle loads: (p1,0) + (0,p2)0
     for index, d_load in dist_loads.iterrows():
         A_i = np.zeros((6, 1))
@@ -472,13 +489,13 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
         p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
         d_load = dist_loads.loc[(dist_loads.en == element.en)]
         if not p_load.empty:
-            P_x = np.array([p_load.p_x.get_values()[0], 0, 0])
+            P_x = np.array([p_load.p_x.get_values()[0], 0,  0])
             P_y = np.array([0, p_load.p_y.get_values()[0], 0])
             P_z = np.array([0, 0, p_load.p_z.get_values()[0]])
 
             rot = transf_arrays[index][:3, :3]
             p = rot.dot(P_x) + rot.dot(P_y) + rot.dot(P_z)
-            # p =
+            
 
             # .p_x,  point_loads.iloc[p_load.index].p_y,  point_loads.iloc[p_load.index].p_z = p[0], p[1], p[2]
             p_load['p_x'], p_load['p_y'], p_load['p_z'] = p[0], p[1], p[2]
@@ -497,7 +514,6 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
             d_load['p_1_x'], d_load['p_1_y'], d_load['p_1_z'] = p_1[0], p_1[1], p_1[2]
             d_load['p_2_x'], d_load['p_2_y'], d_load['p_2_z'] = p_2[0], p_2[1], p_2[2]
             dist_loads.iloc[d_load.index, :] = d_load
-    print(point_loads)
     return point_loads, dist_loads
 
 
@@ -520,7 +536,6 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
             c = L * p_load.c.get_values()
             # length
             # separate x around c
-            print(c)
             temp = 10
             x1 = np.linspace(0, c, temp, endpoint=False)
             x2 = np.linspace(c, L, temp)
@@ -737,10 +752,9 @@ def main(user_id, engine):
     d_local['user_id'] = user_id
     save_results(user_id, engine, mqn=MQN_values, displacements=d_local)
     plot_results(user_id, MQN_values, d_local)
-    P_whole = np.round(K_ol.dot(global_dispalecements)-P_nodal,3)
-   
+    P_whole = np.round(K_ol.dot(global_dispalecements)+S,3)
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
-    print(reactions.to_json(orient='table', index=False))
+    print(reactions.to_string())
     # MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
     
