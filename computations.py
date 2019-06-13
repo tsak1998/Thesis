@@ -401,9 +401,9 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         A_j[5] = -p[2] * c * (d1 * (d1 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2 - p[3] * c * (
                 d2 * (d2 - L) ** 2 + c ** 2 * (L / 3 + 17 * c / 45 - b) / 6) / 2 / L ** 2  # Mz_j
 
-        # rot = tranf_arrays[elm.index[0]][:6, :6]
-        # S[dofa:dofb] += np.transpose(rot).dot(A_i)
-        # S[dofc:dofd] += np.transpose(rot).dot(A_j)
+        rot = tranf_arrays[elm.index[0]][:6, :6]
+        S[dofa:dofb] += np.transpose(rot).dot(A_i)
+        S[dofc:dofd] += np.transpose(rot).dot(A_j)
         # fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
         # fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
 
@@ -744,6 +744,7 @@ def main(user_id, engine):
     P_nodal, S, fixed_forces = nodal_forces(point_loads_tr, dist_loads_tr, node_dofs, transf_arrays, arranged_dofs,
                                             elements)
     P_s, global_dispalecements = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
+    print(P_s)
     MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, global_dispalecements, elements, node_dofs, S, nodes,
                                                point_loads, fixed_forces)
     MQN_values = mqn_member(elements, MQN_nodes, local_displacements, sections, point_loads_tr, dist_loads_tr)
