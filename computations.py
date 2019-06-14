@@ -42,8 +42,9 @@ def load_data(user_id, engine):
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
     sections = pd.read_csv('model_test/test_1/sections.csv')
-    point_loads_new = pd.DataFrame([], columns=point_loads.columns)
+    #
     temp_loads_group = point_loads.groupby(['nn','c'])
+    temp_load = []
     for t in temp_loads_group:
         nn = t[0][0]
         c = t[0][1]
@@ -55,9 +56,9 @@ def load_data(user_id, engine):
                 m_x += load.m_x
                 m_y += load.m_y
                 m_z += load.m_z
-        temp_load = [10, user_id, nn, c, p_x,  p_y, p_z, m_x, m_y, m_z]
-        df = pd.DataFrame([temp_load], columns=point_loads.columns)
-        point_loads_new = pd.concat([point_loads_new, df], axis =0).reset_index(drop=True)
+        temp_load.append((user_id, nn, c, p_x,  p_y, p_z, m_x, m_y, m_z))
+        # df = pd.DataFrame([temp_load], columns=point_loads.columns)
+    point_loads_new = pd.DataFrame(temp_load, columns=point_loads.columns)
     return elements, nodes, sections, point_loads_new, dist_loads, truss_elements
 
 
@@ -130,16 +131,10 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
 def local_stif(element, sect):
     L = element.length
     elem_type = element.elem_type
-
-    # A, E = sect.A, sect.E
-    A = 0.027777777777777773  # 0.2090318
+    A = sect.A.get_values()[0]  # 0.2090318
     E = sect.E.get_values()[0]  # 200000000  # 199948023.75
     if elem_type == 'beam':
         Iy, Iz, G, J = sect.Iy.get_values()[0], sect.Iz.get_values()[0], sect.G.get_values()[0], sect.Ix.get_values()[0]
-        # Iy = 64300411.522633724e-12  # 0.00364
-        # Iz = 64300411.522633724 * 10 ** -12  # 0.00364
-        G = E / 2 / 1.27  # 76904146.79
-        # J = 108506944.4444444 * 10 ** -12  # 0.00614
         w1 = E * A / L
         w2 = 12 * E * Iz / (L * L * L)
         w3 = 6 * E * Iz / (L * L)
@@ -166,32 +161,7 @@ def local_stif(element, sect):
                       [0, 0, 0, -w10, 0, 0, 0, 0, 0, w10, 0, 0],
                       [0, 0, -w7, 0, w9, 0, 0, 0, w7, 0, w8, 0],
                       [0, w3, 0, 0, 0, w5, 0, -w3, 0, 0, 0, w4]])
-        '''
-        w1 = E*A/L;
-        w2 = 12*E*Iz/(L*L*L);
-        w3 = 6*E*Iz/(L*L);
-        w4 = 4*E*Iz/L;
-        w5 = 2*E*Iz/L;
-        w6 = 12*E*Iy/(L*L*L);
-        w7 = 6*E*Iy/(L*L);
-        w8 = 4*E*Iy/L;
-        w9 = 2*E*Iy/L;
-        w10 = G*J/L;
         
-        y = [w1 0  0  0   0  0  -w1 0  0   0   0   0  ;
-            0  w2 0  0   0  w3 0  -w2 0   0   0   w3 ;
-            0  0  w6 0  -w7 0  0   0 -w6  0  -w7  0  ;
-            0  0  0  w10 0  0  0   0  0 -w10  0   0  ;
-            0  0 -w7 0   w8 0  0   0  w7  0   w9  0  ;
-            0  w3 0  0   0  w4 0  -w3 0   0   0   w5 ;
-            -w1 0  0  0   0  0  w1  0  0   0   0   0  ;
-            0 -w2 0  0   0 -w3 0   w2 0   0   0  -w3 ;
-            0  0 -w6 0   w7 0  0   0  w6  0   w7  0  ;
-            0  0  0 -w10 0  0  0   0  0  w10  0   0  ;
-            0  0 -w7 0   w9 0  0   0  w7  0   w8  0  ;
-            0  w3 0  0   0  w5 0  -w3 0   0   0   w4 ];
-        '''
-        # y = np.round(y, precision)
 
     else:
         w1 = E * A / L
@@ -319,7 +289,8 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             a = load.c * L
             b = (1 - load.c) * L
             # add the appropriate moment loads
-            p = load.iloc[[4, 5, 6, 7, 8, 9]].get_values()
+            p = load.iloc[[3, 4, 5, 6, 7, 8]].get_values()
+            
             A_i[0] = -p[0] * (1 - load.c)  # Fx_i
             A_j[0] = -p[0] * load.c  # Fx_j
             A_i[1] = -p[1] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fy_i
@@ -482,24 +453,20 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
 
 
 def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
+    point_loads_loc = []
     for index, element in elements.iterrows():
         L = element.length
 
         # transform the loads here, its easier
-        p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
+        p_loads = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
         d_load = dist_loads.loc[(dist_loads.en == element.en)]
-        if not p_load.empty:
-            P_x = np.array([p_load.p_x.get_values()[0], 0,  0])
-            P_y = np.array([0, p_load.p_y.get_values()[0], 0])
-            P_z = np.array([0, 0, p_load.p_z.get_values()[0]])
-
-            rot = transf_arrays[index][:3, :3]
-            p = rot.dot(P_x) + rot.dot(P_y) + rot.dot(P_z)
+        for jindex, p_load in p_loads.iterrows():
+            P = np.array([p_load.p_x, p_load.p_y, p_load.p_z,  p_load.m_x, p_load.m_y,p_load.m_z])
             
 
-            # .p_x,  point_loads.iloc[p_load.index].p_y,  point_loads.iloc[p_load.index].p_z = p[0], p[1], p[2]
-            p_load['p_x'], p_load['p_y'], p_load['p_z'] = p[0], p[1], p[2]
-            point_loads.iloc[p_load.index, :] = p_load
+            rot = transf_arrays[index][:6, :6]
+            p = rot.dot(P)
+            point_loads_loc.append((p_load.user_id, p_load.nn, p_load.c, p[0], p[1], p[2], p[3], p[4], p[5]))
         if not d_load.empty:
             rot = transf_arrays[index][:3, :3]
             p_1_x = [d_load.p_1_x.get_values()[0], 0, 0]
@@ -514,7 +481,9 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
             d_load['p_1_x'], d_load['p_1_y'], d_load['p_1_z'] = p_1[0], p_1[1], p_1[2]
             d_load['p_2_x'], d_load['p_2_y'], d_load['p_2_z'] = p_2[0], p_2[1], p_2[2]
             dist_loads.iloc[d_load.index, :] = d_load
-    return point_loads, dist_loads
+    point_loads_local = pd.DataFrame(point_loads_loc, columns=point_loads.columns)
+    point_loads_local.to_csv('model_test/test_1/point_loads_rotated.csv')
+    return point_loads_local, dist_loads
 
 
 def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
