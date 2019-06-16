@@ -2,19 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/thesis_repo.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/thesis_repo.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Untitled.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Untitled.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/createdb.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/section_properties.py" beforeDir="false" afterPath="$PROJECT_DIR$/section_properties.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Menubar.File.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Menubar.File.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Pointloads.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Pointloads.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editor.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_1.bak" beforeDir="false" afterPath="$PROJECT_DIR$/test_1.bak" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_1.rtd" beforeDir="false" afterPath="$PROJECT_DIR$/test_1.rtd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_2.bak" beforeDir="false" afterPath="$PROJECT_DIR$/test_2.bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_2.rtd" beforeDir="false" afterPath="$PROJECT_DIR$/test_2.rtd" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,20 +21,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="951">
-              <caret line="149" selection-start-line="149" selection-end-line="149" />
+            <state>
+              <folding>
+                <element signature="e#0#108#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/computations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6970">
-              <caret line="416" column="20" selection-start-line="416" selection-start-column="20" selection-end-line="416" selection-end-column="20" />
+            <state relative-caret-position="147">
+              <caret line="606" column="70" selection-start-line="606" selection-start-column="55" selection-end-line="606" selection-end-column="76" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -125,9 +124,9 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="215" />
-    <option name="y" value="270" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="403" />
+    <option name="y" value="-26" />
     <option name="width" value="1294" />
     <option name="height" value="1047" />
   </component>
@@ -136,11 +135,22 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="thesis_repo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="thesis_repo" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -165,7 +175,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="SDK_HOME" value="C:\Users\tsaka\AppData\Local\Programs\Python\Python36\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -263,6 +273,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.app" />
+      <item itemvalue="Python.computations" />
+      <item itemvalue="Python.createdb" />
+      <item itemvalue="Python.models" />
+      <item itemvalue="Python.tables" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.app" />
@@ -286,24 +303,33 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="215" y="270" width="1294" height="1047" extended-state="0" />
+    <frame x="-8" y="-8" width="2576" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12261146" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09732073" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4988938" weight="0.3033586" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.30525163" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4988938" weight="0.30010834" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.30444205" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32932165" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32936078" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32827735" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.33260393" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5011062" side_tool="true" weight="0.304253" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -338,6 +364,46 @@
       </list>
     </option>
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -362,8 +428,9 @@
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <option name="timeStamp" value="92" />
+          <url>file://$PROJECT_DIR$/computations.py</url>
+          <line>609</line>
+          <option name="timeStamp" value="95" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -430,6 +497,11 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
+        <expression-string>global_dispalecements</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>point_loads.nn</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
@@ -469,11 +541,6 @@
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>p[0] * c / 2 * f2</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
@@ -504,31 +571,15 @@
     </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pandas/core/generic.py" />
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pandas/core/ops.py" />
-    <entry file="file://$PROJECT_DIR$/parse_and_save.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-790">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/parse_and_save.py" />
     <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Project.js" />
     <entry file="file://$PROJECT_DIR$/dxfin.py" />
+    <entry file="file://$PROJECT_DIR$/createdb.py" />
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="951">
-          <caret line="149" selection-start-line="149" selection-end-line="149" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/computations.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6970">
-          <caret line="416" column="20" selection-start-line="416" selection-start-column="20" selection-end-line="416" selection-end-column="20" />
+        <state>
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#108#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -560,12 +611,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/createdb.py">
+    <entry file="file://$PROJECT_DIR$/computations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="32" column="26" selection-start-line="32" selection-start-column="26" selection-end-line="32" selection-end-column="26" />
+        <state relative-caret-position="147">
+          <caret line="606" column="70" selection-start-line="606" selection-start-column="55" selection-end-line="606" selection-end-column="76" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

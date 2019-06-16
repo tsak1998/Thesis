@@ -258,7 +258,6 @@ def transformation_array(element, nodei, nodej):
 
     LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
     LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
-    print(Lambda)
     return LAMDA
 
 
@@ -494,71 +493,86 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
     for index, element in elements.iterrows():
         mqn_nodes = MQN_nodes[index]
         disp = d_local[index]
-        mqn_values = np.zeros((points, 8))
-        disp_member_local = np.zeros((8, points))
+        q_i = mqn_nodes[:6]
+        q_j = mqn_nodes[6:]
         L = element.length
 
-        p_load = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
+        p_loads = point_loads.loc[(point_loads.nn == element.en) & (point_loads.c != 99999)]
         d_load = dist_loads.loc[(dist_loads.en == element.en)]
         # MQN for Point Loads
-        if not p_load.empty:
-            c = L * p_load.c.get_values()
-            # length
-            # separate x around c
-            temp = 10
-            x1 = np.linspace(0, c, temp, endpoint=False)
-            x2 = np.linspace(c, L, temp)
-            x = np.unique(np.concatenate((x1, x2), axis=0))
+        if not p_loads.empty:
+            start = 0
+            Fxi, Fyi, Fzi = q_i[0][0], q_i[1][0], q_i[2][0]
+            Mxi, Myi, Mzi = q_i[3][0], q_i[4][0], q_i[5][0]
+            Fxj, Fyj, Fzj = q_j[0][0], q_j[1][0], q_j[2][0]
+            Mxj, Myj, Mzj = q_j[3][0], q_j[4][0], q_j[5][0]
+            
+            Nx, Qy, Qz  = [], [], []
+            M_x, M_y, M_z = [], [], []
 
-            mqn_values[:points, 0] = element.en
-            mqn_values[:points, -1] = x
-
-            # Fx
-            mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
-            mqn_values[temp:, 1].fill(-mqn_nodes[6, 0])
-            # Fy
-            mqn_values[:temp, 2].fill(mqn_nodes[1, 0])
-            mqn_values[temp:, 2].fill(-mqn_nodes[7, 0])
-            # Fz
-            mqn_values[:temp, 3].fill(mqn_nodes[2, 0])
-            mqn_values[temp:, 3].fill(-mqn_nodes[8, 0])
-            # Mx
-            mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
-            mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
-            # My
-            mqn_values[:temp, 5] = mqn_nodes[2, 0] * x1 + mqn_nodes[4, 0]  # - p_load.p_z.get_values()*c*(1-c)**2/L**2
-            mqn_values[temp:, 5] = mqn_nodes[2, 0] * x2 + mqn_nodes[
-                4, 0] - p_load.p_z.get_values() * c + p_load.p_z.get_values() * x2
-            # Mz
-            mqn_values[:temp, 6] = mqn_nodes[1, 0] * x1 - mqn_nodes[5, 0]  # - p_load.p_z.get_values()*c*(1-c)**2/L**2
-            mqn_values[temp:, 6] = mqn_nodes[1, 0] * x2 - mqn_nodes[
-                5, 0] - p_load.p_y.get_values() * c + p_load.p_y.get_values() * x2
-
+            for index,load in point_loads.iterrows():
+                c = load.c
+                L = element.length#.get_values()
+                end = c*L
+                
+                Fx = Fxi
+                Nx.append([(start,end),(Fxi,Fx)])
+                Fxi = Fx+load.p_x
+                
+                Fy = Fyi
+                Qy.append([(start,end),(Fyi,Fy)])
+                Fyi = Fy+load.p_y
+                Mz = Mzi+(end-start)*Fy
+                if load.m_z!=0:
+                    Mz = Mzi+Fyi*(end-start)
+                    M_z.append([(start,end),(Mzi,Mz)])
+                    Mzi = Mz
+                    Mz -=load.m_z
+                    start = end
+                M_z.append([(start,end),(Mzi,Mz)])    
+                Mzi = Mz
+                #else:
+                Fz = Fzi
+                Qz.append([(start,end),(Fzi,Fz)])
+                Fzi = Fz+load.p_z
+                My = Myi+(end-start)*Fz
+                if load.m_y!=0:
+                    My = Myi+Fyi*(end-start)
+                    M_y.append([(start,end),(Myi,My)])
+                    Myi = My
+                    My -= load.m_y
+                    start = end
+                M_y.append([(start,end),(Myi,My)])    
+                Myi = My
+                Mx = Mxi
+                if load.m_x!=0:
+                    
+                    M_x.append([(start,end),(Mxi,Mx)])
+                    
+                    Mx -= load.m_x
+                    Mxi = Mx
+                    start = end
+                M_x.append([(start,end),(Mxi,Mx)])
+                start = end
+                #if (index == len(point_loads)-1):
+            Nx.append([(start,L),(Fxi,Fxj)])
+            Qy.append([(start,L),(Fyi,Fyj)])
+            Qz.append([(start,L),(Fzi,Fzj)])
+            M_z.append([(start,L),(Mzi,Mzj)])
+            M_x.append([(start,L),(Mxi,Mxj)])
+            M_y.append([(start,L),(Myi,Myj)])
+            df = fit_points(3, Fx=Nx, Fy=Qy, Fz=Qz, Mx=M_x, My=M_y, Mz=M_z)
+            df['en'] = element.en
+           
         else:
-            mqn_values[:points, 0] = element.en
-            x = np.linspace(0, L, points)
-            mqn_values[:points, -1] = x
-            temp = 10
-            # Fx
-            mqn_values[:temp, 1].fill(mqn_nodes[0, 0])
-            mqn_values[temp:, 1].fill(-mqn_nodes[6, 0])
-            # Fy
-            mqn_values[:temp, 2].fill(mqn_nodes[1, 0])
-            mqn_values[temp:, 2].fill(-mqn_nodes[7, 0])
-            # Fz
-            mqn_values[:temp, 3].fill(mqn_nodes[2, 0])
-            mqn_values[temp:, 3].fill(-mqn_nodes[8, 0])
-            # Mx
-            mqn_values[:temp, 4].fill(mqn_nodes[3, 0])
-            mqn_values[temp:, 4].fill(-mqn_nodes[9, 0])
-            # My
-            mqn_values[:, 5] = mqn_nodes[2, 0] * x + mqn_nodes[4, 0]
-            # mqn_values[temp:, 5] = mqn_nodes[10, 0]
-            # Mz
-            mqn_values[:, 6] = mqn_nodes[1, 0] * x - mqn_nodes[5, 0]
-
+           
+            Nx, Qy, Qz  = [[(0,L),(Fxi,Fxj)]], [[(0,L),(Fxi,Fxj)]], [[(0,L),(Fxi,Fxj)]]
+            M_x, M_y, M_z = [[(0,L),(Mxi,Mxj)]], [[(0,L),(Myi,Myj)]], [[(0,L),(Mzi,Mzj)]]
+            df = fit_points(10, Fx=Nx, Fy=Qy, Fz=Qz, Mx=M_x, My=M_y, Mz=M_z)
+            df['en'] = element.en
         # Displacements for point Loads
-        if not p_load.empty:
+        '''
+        if not p_loads.empty:
             sect = sections.loc[sections.section_id == element.section_id]
             E, Iy, Iz, G, J = sect.E.get_values()[0], sect.Ix.get_values()[0], sect.Iy.get_values()[0], \
                               sect.G.get_values()[0], \
@@ -577,9 +591,14 @@ def mqn_member(elements, MQN_nodes, d_local, sections, point_loads, dist_loads):
             # Dy
             disp_member_local[2, :temp] = disp[1] + disp_member_local[4, :temp]*x1 + mqn_values[:temp, 6] * x1**2 /2/ E / Iz + mqn_values[:temp, 2] * x1 ** 3 / 6 / E / Iz
             disp_member_local[2, temp:] = disp[1] + disp_member_local[4, temp:]*x2 #+ mqn_values[temp:, 6] * x2**2 /2/ E / Iz - mqn_values[temp:, 2] * x2 ** 3 / 6 / E / Iz
-
-        
-        df = pd.DataFrame(mqn_values, columns=['en', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz', 'x'])
+        '''
+        print(Nx)
+        print(Qy)
+        print(Qz)
+        print(M_z)
+        print(M_x)
+        print(M_y)
+        #df = pd.DataFrame(mqn_values, columns=['en', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz', 'x'])
         MQN_values = pd.concat([MQN_values, df], axis=0).reset_index(drop=True)
         # MQN_values.append(mqn_values)
     return MQN_values
@@ -662,6 +681,31 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         #D_GLOBAL = pd.concat([D_GLOBAL, df], axis=0).reset_index(drop=True)
         D_GLOBAL = []
     return D_LOCAL, D_GLOBAL
+
+
+def fit_points(num_points, **kwargs):
+    columns = ['x']+list(kwargs)
+    df = pd.DataFrame([], columns=columns)
+    for key in kwargs.keys():
+        for segment in kwargs[key]:
+            x_ = segment[0]
+            y_ = segment[1]
+            a, b = x_[0], x_[-1]
+            if len(x_)<4:
+                degree = 1
+            else:
+                degree = 3
+            x = np.linspace(a, b, num_points)
+            coef = np.polyfit(x_, y_, degree)
+            if degree==1:
+                values = x*coef[0]+coef[1]
+            else:
+                values = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3] 
+            d_t = pd.DataFrame([], columns=columns)
+            d_t[key] = values
+            d_t['x'] = x
+            df = pd.concat([df,d_t],axis=0, sort=False)
+    return df
 
 
 def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
