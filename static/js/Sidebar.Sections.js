@@ -24,7 +24,8 @@ Sidebar.Sections = function ( editor ) {
 
 	var optionsMaterial = {
 		'con': 'Concrete',
-		'stl': 'Steel'
+		'stl': 'Steel',
+		'cstm': 'Custom'
 	};
 
 	var materialRow = new UI.Row();
@@ -77,17 +78,94 @@ Sidebar.Sections = function ( editor ) {
 		's225': 'S225'
 	};
 
+    // custom section properties
+    var customMat = new UI.Panel();
+    var customSect = new UI.Panel();
+    var ERow = new UI.Row();
+	var E = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+
+	ERow.add( new UI.Text( 'E' ).setWidth( '90px' ) );
+	ERow.add( E );
+
+	var GRow = new UI.Row();
+	var G = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+
+	GRow.add( new UI.Text( 'G' ).setWidth( '90px' ) );
+	GRow.add( G );
+
+	var ARow = new UI.Row();
+	var A = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+
+	ARow.add( new UI.Text( 'A' ).setWidth( '90px' ) );
+	ARow.add( A );
+
+	var IxRow = new UI.Row();
+	var Ix = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+
+	IxRow.add( new UI.Text( 'Ix' ).setWidth( '90px' ) );
+	IxRow.add( Ix );
+
+	var IyRow = new UI.Row();
+	var Iy = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+
+	IyRow.add( new UI.Text( 'Iy' ).setWidth( '90px' ) );
+	IyRow.add( Iy );
+
+	var IzRow = new UI.Row();
+	var Iz = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+
+	IzRow.add( new UI.Text( 'Iz' ).setWidth( '90px' ) );
+	IzRow.add( Iz );
+
+    customMst.add(ERow);
+    customMst.add(GRow);
+    customSect.add(ARow);
+    customSect.add(IxRow);
+    customSect.add(IyRow);
+    customSect.add(IzRow);
+    customMst.dom.hidden=true;
+    customSect.dom.hidden=true;
+
+
 
 	material.onChange( function () {
 
 		var value = this.getValue();
 		if ( value == 'con' ){
+		    customSect.dom.hidden=true;
 			sectType.setOptions( options_concrete );
 			materialCategory.setOptions( optionsConcreteCategory );
 		} else if ( value == 'stl' ){
+		    customSect.dom.hidden=true;
 			sectType.setOptions( options_steel );
 			materialCategory.setOptions( optionsSteelCategory );
-		}
+		}else {
+		    customSect.dom.hidden=false;
+		};
 	} );
 
 	materialRow.add( new UI.Text( 'Material' ).setWidth( '90px' ) );
@@ -110,6 +188,7 @@ Sidebar.Sections = function ( editor ) {
 
 	container.add( sectTypeRow );
 
+    container.add(customSect)
 	//container.add( new Sidebar.Settings.Shortcuts( editor ) );
 
 	//section dimensions
@@ -150,7 +229,18 @@ Sidebar.Sections = function ( editor ) {
 	b1Row.add( new UI.Text('b1').setWidth( '90px' ) );
 	b1Row.add( b1 );
 
+    rectContainer = new UI.Panel();
+    tContainer = new UI.Panel();
 
+    rectContainer.add( hRow );
+    rectContainer.add( bRow );
+    rectContainer.dom.hidden = true;
+    tContainer.add( h1Row );
+    tContainer.add( b1Row );
+    tContainer.dom.hidden = true;
+
+    container.add(rectContainer);
+    container.add(tContainer);
 
 
 	sectType.onChange( function () {
@@ -162,17 +252,12 @@ Sidebar.Sections = function ( editor ) {
 
 		//add material conditions 
 		if ( value == 'rect' ){
-			container.add( h1Row );
-			container.add( b1Row );
-			container.remove( h1Row );
-			container.remove( b1Row );
-			container.add( hRow );
-			container.add( bRow );
+		    tContainer.dom.hidden = true;
+            rectContainer.dom.hidden = false;
 		}else if ( value == 'T' ) {
-			container.add( hRow );
-			container.add( bRow );
-			container.add( h1Row );
-			container.add( b1Row );
+		    tContainer.dom.hidden = false;
+            rectContainer.dom.hidden = false;
+
 
 		}
 	
@@ -185,7 +270,7 @@ Sidebar.Sections = function ( editor ) {
 
 	} );
 
-	
+
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Define Section' ).onClick( function () {
 		if (material.getValue() == 'con'){
@@ -245,7 +330,7 @@ Sidebar.Sections = function ( editor ) {
 
 	//
 
-    container.add( new UI.Break(), new UI.Break() );
+    container.add( new UI.Break() );
     
 
 	var ignoreObjectSelectedSignal = false;

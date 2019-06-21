@@ -18,7 +18,7 @@ def plot_mqn(user_id, mqn):
         df2 = d[1]
 
         
-        Fx = go.Scatter(x=list(df2.x),
+        Fx = go.Scatter(x=list(df2.x_Fx),
                         y=list(df2.Fx),
                         hoverinfo = ['x', 'y'],
                         name='Mx',
@@ -26,35 +26,35 @@ def plot_mqn(user_id, mqn):
                         showlegend=False,
                         line=dict(color='#33CFA5'))
 
-        Fy = go.Scatter(x=list(df2.x),
+        Fy = go.Scatter(x=list(df2.x_Fy),
                         y=list(df2.Fy),
                         name='My',
                         visible=False,
                         showlegend=False,
                         line=dict(color='#33CFA5'))
 
-        Fz = go.Scatter(x=list(df2.x),
+        Fz = go.Scatter(x=list(df2.x_Fz),
                         y=list(df2.Fz),
                         name='Mz',
                         visible=False,
                         showlegend=False,
                         line=dict(color='#F06A6A'))
 
-        Mx = go.Scatter(x=list(df2.x),
+        Mx = go.Scatter(x=list(df2.x_Mx),
                         y=list(df2.Mx),
                         name='Mx',
                         visible=False,
                         showlegend=False,
                         line=dict(color='#33CFA5'))
 
-        My = go.Scatter(x=list(df2.x),
+        My = go.Scatter(x=list(df2.x_My),
                         y=list(df2.My),
                         name='My',
                         visible=False,
                         showlegend=False,
                         line=dict(color='#33CFA5'))
 
-        Mz = go.Scatter(x=list(df2.x),
+        Mz = go.Scatter(x=list(df2.x_Mz),
                         y=list(df2.Mz),
                         name='Mz',
                         visible=False,
