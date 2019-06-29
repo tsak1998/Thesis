@@ -39,9 +39,10 @@ def load_data(user_id, engine):
     del nodes['index']
     elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user_id + "'", engine)
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
+    materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
-    del point_loads['id']
-    sections = pd.read_csv('model_test/test_1/sections.csv')
+    #del point_loads['id']
+    #sections = pd.read_csv('model_test/test_1/sections.csv')
     dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user_id + "'", engine)
     temp_loads_group = point_loads.groupby(['nn', 'c'])
     temp_load = []
@@ -59,7 +60,7 @@ def load_data(user_id, engine):
         temp_load.append((user_id, nn, c, p_x, p_y, p_z, m_x, m_y, m_z))
         # df = pd.DataFrame([temp_load], columns=point_loads.columns)
     point_loads_new = pd.DataFrame(temp_load, columns=point_loads.columns)
-    return elements, nodes, sections, point_loads_new, dist_loads, truss_elements
+    return elements, nodes, sections, materials, point_loads_new, dist_loads, truss_elements
 
 
 # calculate DOFS
@@ -83,7 +84,7 @@ def dofs(nodes):
     return arranged_dofs, free_dofs, sup_dofs, node_dofs
 
 
-def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
+def stifness_array(dofs, elements, nodes, sections, materials, node_dofs, truss_elements):
     t1 = time.time()
     local_stifness = []
     transf_arrays = []
@@ -93,7 +94,8 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
         nodei = nodes.loc[nodes.nn == elm.nodei]
         nodej = nodes.loc[nodes.nn == elm.nodej]
         sect = sections.loc[sections.section_id == elm.section_id]
-        k = local_stif(elm, sect)
+        material = materials.loc[materials.material_id == sect.material]
+        k = local_stif(elm, sect, material)
         local_stifness.append(k.copy())
         rot = transformation_array(elm, nodei, nodej)
         transf_arrays.append(rot.copy())
@@ -128,13 +130,13 @@ def stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements):
     return local_stifness, transf_arrays, K_ol
 
 
-def local_stif(element, sect):
+def local_stif(element, sect, material):
     L = element.length
     elem_type = element.elem_type
     A = sect.A.get_values()[0]  # 0.2090318
-    E = sect.E.get_values()[0]  # 200000000  # 199948023.75
+    E = material.E.get_values()[0]  # 200000000  # 199948023.75
     if elem_type == 'beam':
-        Iy, Iz, G, J = sect.Iy.get_values()[0], sect.Iz.get_values()[0], sect.G.get_values()[0], sect.Ix.get_values()[0]
+        Iy, Iz, G, J = sect.Iy.get_values()[0], sect.Iz.get_values()[0], material.G.get_values()[0], sect.Ix.get_values()[0]
         w1 = E * A / L
         w2 = 12 * E * Iz / (L * L * L)
         w3 = 6 * E * Iz / (L * L)
@@ -750,9 +752,9 @@ def plot_results(user_id, mqn, displacements):
 
 
 def main(user_id, engine):
-    elements, nodes, sections, point_loads, dist_loads, truss_elements = load_data(user_id, engine)
+    elements, nodes, sections, materials, point_loads, dist_loads, truss_elements = load_data(user_id, engine)
     arranged_dofs, free_dofs, sup_dofs, node_dofs = dofs(nodes)
-    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, node_dofs, truss_elements)
+    local_stifness, transf_arrays, K_ol = stifness_array(dofs, elements, nodes, sections, materials, node_dofs, truss_elements)
     point_loads_tr, dist_loads_tr = rotate_loads(elements, point_loads, dist_loads, transf_arrays)
     P_nodal, S, fixed_forces = nodal_forces(point_loads_tr, dist_loads_tr, node_dofs, transf_arrays, arranged_dofs,
                                             elements)
@@ -768,7 +770,7 @@ def main(user_id, engine):
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
-    #save_results(user_id, engine, reactions=reactions, mqn=MQN_values, displacements=d_local)
+    save_results(user_id, engine, reactions=reactions, mqn=MQN_values, displacements=d_local)
     plot_results(user_id, MQN_values, d_local)
 
     print(reactions.to_string())

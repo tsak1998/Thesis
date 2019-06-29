@@ -169,13 +169,13 @@ Sidebar.PointLoads = function ( editor ) {
                 line.position.x += positionOffset.x
                 line.position.y += positionOffset.y
                 line.position.z += positionOffset.z
-                if (direction.getValue()=='x') {
+                if (direction.getValue()=='y') {
                     if (value>0) {
                         line.rotateZ( -Math.PI/2 )
                     }else{
                         line.rotateZ( Math.PI/2 )
                     }
-                } else if (direction.getValue()=='y') {
+                } else if (direction.getValue()=='x') {
                     if (value>0) {
                         line.rotateX( Math.PI/2 )
                     }else{
@@ -216,13 +216,13 @@ Sidebar.PointLoads = function ( editor ) {
                 line.position.x += positionOffset.x
                 line.position.y += positionOffset.y
                 line.position.z += positionOffset.z
-                if (direction.getValue()=='x') {
+                if (direction.getValue()=='y') {
                     if (value>0) {
                         line.rotateY( -Math.PI/2 )
                     }else{
                         line.rotateY( Math.PI/2 )
                     }
-                } else if (direction.getValue()=='y') {
+                } else if (direction.getValue()=='x') {
                     if (value>0) {
                        
                     }else{
@@ -243,6 +243,7 @@ Sidebar.PointLoads = function ( editor ) {
             }
             
             editor.execute( new AddObjectCommand(line) )
+            console
         }
 
 	} );
@@ -263,46 +264,324 @@ Sidebar.PointLoads = function ( editor ) {
 
     } );
     
-    container.add( outliner );
+    function buildOption( object, draggable ) {
 
-    container.add( new UI.HorizontalRule() );
+		var option = document.createElement( 'div' );
+		option.draggable = draggable;
+		option.innerHTML = buildHTML( object );
+		option.value = object.id;
 
-    var loadIDRow = new UI.Row();
-	var loadID = new UI.Input( '' ).setLeft( '100px' ).setWidth( '40px' ).onChange( function () {
+		return option;
 
-	} );
-	
+	}
 
-	
-        
-    var refreshUI = function () {
+	function escapeHTML( html ) {
 
-		var options = [];
-		var enumerator = 1;
+		return html
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' );
 
-		function buildOption( object ) {
+	}
 
-			var option = document.createElement( 'div' );
-			option.value = object;
-			return option;
+	function getMaterialName( material ) {
 
-		}
+		if ( Array.isArray( material ) ) {
 
-		( function addObjects( objects ) {
+			var array = [];
 
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+			for ( var i = 0; i < material.length; i ++ ) {
 
-                var object = '  ' + String(objects[ i ].id) + '  |  ' + String(objects[ i ].c) + ', ' + String(objects[ i ].p_x)+', '+String(objects[ i ].p_y)+ ', ' + String(objects[ i ].p_z) + ', '+String(objects[ i ].m_x)+', '+String(objects[ i ].m_y)+', '+String(objects[ i ].m_z);
-				var option = buildOption( object );
-				option.innerHTML = '&nbsp;' + object;
-
-				options.push( option );
+				array.push( material[ i ].name );
 
 			}
 
-        } )( point_loads );
-        outliner.setOptions( options );
-    };
+			return array.join( ',' );
+
+		}
+
+		return material.name;
+
+	}
+
+	function getScript( uuid ) {
+
+		if ( editor.scripts[ uuid ] !== undefined ) {
+
+			return ' <span class="type Script"></span>';
+
+		}
+
+		return '';
+
+	}
+
+	var ignoreObjectSelectedSignal = false;
+
+	function buildHTML( object ) {
+
+		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
+
+		if ( object instanceof THREE.Mesh ) {
+
+			var geometry = object.geometry;
+			var material = object.material;
+
+			html += ' <span class="type ' + geometry.type + '"></span> ' + escapeHTML( geometry.name );
+			html += ' <span class="type ' + material.type + '"></span> ' + escapeHTML( getMaterialName( material ) );
+
+		}
+
+		html += getScript( object.uuid );
+
+		return html;
+
+	}
+
+	var outliner = new UI.Outliner( editor );
+	outliner.setId( 'outliner' );
+	outliner.onChange( function () {
+
+		ignoreObjectSelectedSignal = true;
+        valueId = parseInt( outliner.getValue())
+
+		 if (valueId == pLoads.id){
+
+        }else{
+           editor.selectById( valueId );
+           updatePloadProperties(editor.selected.userData)
+
+        }
+
+		ignoreObjectSelectedSignal = false;
+
+	} );
+
+	outliner.onDblClick( function () {
+        valueId = parseInt( outliner.getValue())
+        if (valueId == pLoads.id){
+
+        }else{
+           editor.focusById( valueId );
+        }
+
+	} );
+
+	container.add( outliner );
+	container.add( new UI.Break() );
+
+
+    /*
+	var nodeXRow = new UI.Row();
+	var nodeX = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+
+	} );
+
+
+	nodeXRow.add( new UI.Text('x').setWidth( '90px' ) );
+	nodeXRow.add( nodeX );
+
+	container.add( nodeXRow );
+	*/
+
+
+    var pLoads = new THREE.Object3D()
+    pLoads.name = 'Point Loads'
+	function refreshUI() {
+	    p_loads = []
+        for (i=0; i<editor.scene.children.length; i++){
+			obj = editor.scene.children[i]
+			if (obj.userData.type == 'p_load') {
+				p_loads.push( obj );
+			}
+		}
+		var camera = editor.camera;
+		var scene = editor.scene;
+
+		var options = [];
+
+
+		options.push( buildOption( pLoads, false ) );
+
+		( function addObjects( objects, pad ) {
+
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+				var object = objects[ i ];
+
+				var option = buildOption( object, true );
+				option.style.paddingLeft = ( pad * 10 ) + 'px';
+				options.push( option );
+
+				// addObjects( object.children, pad + 1 );
+
+			}
+
+		} )
+		(p_loads, 1 );
+
+		outliner.setOptions( options );
+
+		if ( editor.selected !== null ) {
+
+			outliner.setValue( editor.selected.id );
+
+		}
+
+		if ( scene.background ) {
+
+			//backgroundColor.setHexValue( scene.background.getHex() );
+
+		}
+
+
+
+	}
+
+	var nodeIdRow = new UI.Row();
+	var nodeId = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	nodeId.dom.disabled = true;
+	nodeId.dom.value = '';
+
+	nodeIdRow.add( new UI.Text( 'Node Id').setWidth( '90px' ) );
+	nodeIdRow.add( nodeId );
+
+	container.add( nodeIdRow );
+
+	// position
+
+	var objectPositionRow = new UI.Row();
+	var objectPositionX = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	objectPositionX.dom.disabled = true;
+	objectPositionX.dom.value = '';
+	var objectPositionY = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	objectPositionY.dom.disabled = true;
+	objectPositionY.dom.value = '';
+	var objectPositionZ = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+    objectPositionZ.dom.disabled = true;
+    objectPositionZ.dom.value = '';
+	objectPositionRow.add(  new UI.Text( 'Coordinates').setWidth( '90px' ) );
+	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
+
+    container.add(objectPositionRow)
+
+    //dofs
+
+    var dofsRow = new UI.Row();
+	var dofX = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	dofX.dom.disabled = true;
+	dofX.max = 1;
+	dofX.min = 0;
+	dofX.dom.value = '';
+	var dofY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+	dofY.dom.disabled = true;
+	dofY.max = 1;
+	dofY.min = 0;
+	dofY.dom.value = '';
+	var dofZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+    dofZ.dom.disabled = true;
+    dofZ.max = 1;
+	dofZ.min = 0;
+	dofZ.dom.value = '';
+    var dofRX = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+	dofRX.dom.disabled = true;
+    dofRX.max = 1;
+	dofRX.min = 0;
+	dofRX.dom.value = '';
+	var dofRY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+	dofRY.dom.disabled = true;
+	dofRY.max = 1;
+	dofRY.min = 0;
+	dofRY.dom.value = '';
+	var dofRZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+    dofRZ.dom.disabled = true;
+    dofRZ.max = 1;
+	dofRZ.min = 0;
+	dofRZ.dom.value = '';
+	dofsRow.add(  new UI.Text( 'Dofs').setWidth( '90px' ) );
+	dofsRow.add( dofX, dofY, dofZ, dofRX, dofRY, dofRZ);
+
+    container.add(dofsRow)
+
+    refreshUI();
+
+    var updatePloadProperties = function(values){
+        nodeId.dom.value = values.nn
+        objectPositionX.dom.value = values.coord_x
+        objectPositionY.dom.value = values.coord_y
+        objectPositionZ.dom.value = values.coord_z
+        dofX.dom.value = values.dof_dx
+        dofY.dom.value = values.dof_dy
+        dofZ.dom.value = values.dof_dz
+        dofRX.dom.value = values.dof_rx
+        dofRY.dom.value = values.dof_ry
+        dofRZ.dom.value = values.dof_rz
+    }
+
+    signals.editorCleared.add( refreshUI );
+
+	signals.sceneGraphChanged.add( refreshUI );
+
+	signals.objectChanged.add( function ( object ) {
+
+		var options = outliner.options;
+
+		for ( var i = 0; i < options.length; i ++ ) {
+
+			var option = options[ i ];
+
+			if ( option.value === object.id ) {
+
+				option.innerHTML = buildHTML( object );
+				return;
+
+			}
+
+		}
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+	    if (object!=null){
+
+	        if(object.userData.type == 'node'){
+                updatePloadProperties(object.userData)
+            }
+        }
+		if ( ignoreObjectSelectedSignal === true ) return;
+
+		outliner.setValue( object !== null ? object.id : null );
+
+	} );
+
+	function updateRenderer() {
+
+		createRenderer( THREE.WebGLRenderer, true, false, false, false);
+
+	}
+
+	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
+
+
+
+		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
+		renderer.gammaInput = gammaIn;
+		renderer.gammaOutput = gammaOut;
+		if ( shadows && renderer.shadowMap ) {
+
+			renderer.shadowMap.enabled = true;
+			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+		}
+
+		signals.rendererChanged.dispatch( renderer );
+
+	}
 
     refreshUI(); 
 

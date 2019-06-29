@@ -26,7 +26,7 @@ app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # set global engine
-engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
 
 
 @app.route('/')
@@ -178,8 +178,9 @@ def save():
     if request.method == 'POST':
         data = request.get_json()
         user_id = session['username']
-        elements, nodes, point_loads, sections = parser(user_id, data, engine)
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections)
+        elements, nodes, point_loads, sections, materials = parser(user_id, data, engine)
+
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials)
     return render_template('editor.html')
 
 
@@ -191,8 +192,8 @@ def autosave():
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        elements, nodes, point_loads, sections = parser(user_id, data, engine)
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections)
+        elements, nodes, point_loads, sections, materials = parser(user_id, data, engine)
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials)
 
 
 @app.route('/loadsections', methods=['POST'])

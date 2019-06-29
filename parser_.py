@@ -1,73 +1,84 @@
 import pandas as pd
 from section_properties import section_properties
 
-def parser(user_id, data, engine):
-	# data contains dicts of elements, labels, loads and sections
-	elements = pd.DataFrame(data[0])
-	elements['user_id'] = user_id
-	del elements['type']
-	nodes = pd.DataFrame(data[1])
-	nodes['user_id'] =user_id
-	del nodes['type']
-	# for loads and sections data needs to be created
-	# because computations take as argouments loads: P = [px,py,pz,mx,my,mz]
-	# loads have to be parsed and saved in this structure
-	point_loads = pd.DataFrame(columns=['user_id', 'nn', 'c', 'p_x', 'p_y', 'p_z', 'm_x', 'm_y', 'm_z'])
-	temp_loads = pd.DataFrame(data[2])
-	temp_loads_group = temp_loads.groupby(['nn','c'])
-	for t in temp_loads_group:
-		nn = t[0][0]
-		c = t[0][1]
-		p_x, p_y, p_z, m_x, m_y, m_z = 0, 0, 0, 0, 0, 0
-		for index, load in t[1].iterrows():
-			if load.type == 'p_load':
-				if load.direction=='x':
-					p_x += load.value
-				elif load.direction=='y':
-					p_y += load.value
-				else:
-					p_z += load.value
-			else:
-				if load.direction=='x':
-					m_x += load.value
-				elif load.direction=='y':
-					m_y += load.value
-				else:
-					m_z += load.value
-		temp_load = {'nn' : load.nn , 'c': load.c, 'p_x': p_x, 'p_y': p_y, 'p_z': p_z, 'm_x': m_x, 'm_y': m_y, 'm_z': m_z}
-		df = pd.DataFrame([temp_load], columns=temp_load.keys())
-		point_loads = pd.concat([point_loads, df], axis =0).reset_index(drop=True)
-	point_loads['user_id'] = user_id
-	# sections
-	# the data provided is the material and the section geometry
-	# for steel sections A, Ix, Iy, Iz will be taken from the database
-	# for concrete  will be calculated
-	# group the sections by material
-	temp_sections = pd.DataFrame(data[3])
-	steel_sections = temp_sections.loc[temp_sections['material']=='stl']
-	concrete_sections = temp_sections.loc[temp_sections['material']=='con']
-	concrete_sections = section_properties(concrete_sections, user_id, engine)
-	# need the library
-	df_steel_sections = pd.DataFrame(columns=['section_id', 'A', 'E', 'G',
-										'Ix', 'Iy', 'Iz'])
-	for index, section in steel_sections.iterrows():
-		sect = pd.read_sql("SELECT A,Ix,Iy,Iz from steel_sections WHERE sect_type='" + section.sect_type + "'", engine)
-		mat = pd.read_sql("SELECT material,material_category,E,G from materials WHERE material_category='" + section.material_category + "'", engine)
-		mat['section_id'] = section['section_id']
-		sect['user_id'] = user_id
-		sect['section_id'] = section['section_id']
-		sect.merge(mat, on='section_id')
-		
-		df_steel_sections = pd.concat([df_steel_sections, sect], axis=0)
-	sections = pd.concat([df_steel_sections, concrete_sections], axis=0)
-	print('con ' ,concrete_sections.to_string())
-	print('stl ', df_steel_sections.to_string())
-	
-	
-	return elements, nodes, point_loads, sections
 
-	
+def parser(user_id, data, engine):
+    # data contains dicts of elements, labels, loads and sections
+    elements = pd.DataFrame(data[0])
+    elements['user_id'] = user_id
+    del elements['type']
+    nodes = pd.DataFrame(data[1])
+    nodes['user_id'] = user_id
+    del nodes['type']
+    sections = pd.DataFrame(data[3])
+    #sections.columns = ['section_id', 'material', 'type', 'dimensions', 'A', 'Ix', 'Iy', 'Iz']
+    sections['user_id'] = user_id
+    sections['section_id'] = sections['id']
+    sections = sections.rename(columns={'Material Id': 'material'})
+    materials = pd.DataFrame(data[4])
+    materials['user_id'] = user_id
+    materials = materials.rename(columns={'id': 'material_id'})
+    # for loads and sections data needs to be created
+    # because computations take as argouments loads: P = [px,py,pz,mx,my,mz]
+    # loads have to be parsed and saved in this structure
+    point_loads = pd.DataFrame(columns=['user_id', 'nn', 'c', 'p_x', 'p_y', 'p_z', 'm_x', 'm_y', 'm_z'])
+    temp_loads = pd.DataFrame(data[2])
+    temp_loads_group = temp_loads.groupby(['nn', 'c'])
+    for t in temp_loads_group:
+        nn = t[0][0]
+        c = t[0][1]
+        p_x, p_y, p_z, m_x, m_y, m_z = 0, 0, 0, 0, 0, 0
+        for index, load in t[1].iterrows():
+            if load.type == 'p_load':
+                if load.direction == 'x':
+                    p_x += load.value
+                elif load.direction == 'y':
+                    p_y += load.value
+                else:
+                    p_z += load.value
+            else:
+                if load.direction == 'x':
+                    m_x += load.value
+                elif load.direction == 'y':
+                    m_y += load.value
+                else:
+                    m_z += load.value
+        temp_load = {'nn': load.nn, 'c': load.c, 'p_x': p_x, 'p_y': p_y, 'p_z': p_z, 'm_x': m_x, 'm_y': m_y, 'm_z': m_z}
+        df = pd.DataFrame([temp_load], columns=temp_load.keys())
+        point_loads = pd.concat([point_loads, df], axis=0).reset_index(drop=True)
+    point_loads['user_id'] = user_id
+    # sections
+    # the data provided is the material and the section geometry
+    # for steel sections A, Ix, Iy, Iz will be taken from the database
+    # for concrete  will be calculated
+    # group the sections by material
+    # temp_sections = pd.DataFrame(data[3])
+    #steel_sections = temp_sections.loc[temp_sections['material'] == 'stl']
+    # concrete_sections = temp_sections.loc[temp_sections['material'] == 'con']
+    #concrete_sections = section_properties(concrete_sections, user_id, engine)
+    # need the library
+
+    return elements, nodes, point_loads, sections, materials
+
+
 '''
+df_steel_sections = pd.DataFrame(columns=['section_id', 'A', 'E', 'G',
+                                              'Ix', 'Iy', 'Iz'])
+    for index, section in steel_sections.iterrows():
+        sect = pd.read_sql("SELECT A,Ix,Iy,Iz from steel_sections WHERE sect_type='" + section.sect_type + "'", engine)
+        mat = pd.read_sql(
+            "SELECT material,material_category,E,G from materials WHERE material_category='" + section.material_category + "'",
+            engine)
+        mat['section_id'] = section['section_id']
+        sect['user_id'] = user_id
+        sect['section_id'] = section['section_id']
+        sect.merge(mat, on='section_id')
+
+        df_steel_sections = pd.concat([df_steel_sections, sect], axis=0)
+    sections = pd.concat([df_steel_sections, concrete_sections], axis=0)
+    print('con ', concrete_sections.to_string())
+    print('stl ', df_steel_sections.to_string())
+    
 df_model = pd.DataFrame(columns=['en', 'nn' 'type', 'supportType', 'nodal_load', 'nodei', 'nodej',
 									'coord_x', 'coord_y', 'coord_z', 'elem_type', 'length', 'section_id',
 									'dof_dx', 'dof_dy', 'dof_dz', 'dof_rx', 'dof_ry', 'dof_rz'])

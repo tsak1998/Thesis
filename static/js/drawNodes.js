@@ -1,12 +1,14 @@
 function drawNodes( editor, nodes ){
     
     
-    for (i=0; i<nodes.length; i++) {
-        node = nodes[i];
+    for (a=0; a<nodes.length; a++) {
+        
+        node = nodes[a];
+        
         // check if the node is supported
         dofs = [node.dof_dx, node.dof_dy, node.dof_dz, node.dof_rx, node.dof_ry, node.dof_rz];
         supported = false;
-        j = 0;
+        
         for (j=0; j<dofs.length; j++) {
             
             if( dofs[j]==0){

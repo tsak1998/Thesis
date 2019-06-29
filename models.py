@@ -82,6 +82,7 @@ class Sections(db.Model):
     id = Column('id', Integer, primary_key=True)
     user_id = Column('user_id', String(45), nullable=False)
     section_id = Column('section_id', Integer)
+    type = Column('type', String(10))
     E = Column('E', Float)
     G = Column('G', Float)
     A = Column('A', Float)

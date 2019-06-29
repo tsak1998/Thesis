@@ -1,10 +1,11 @@
 function drawElements( editor, elements ){
-
-    for (i=0; i<elements.length; i++){
-        var element = elements[i];
+	console.log(elements)
+    for (a=0; a<elements.length; a++){
+		var element = elements[a];
+		console.log(element)
         var nodeI = editor.scene.getObjectByName( 'Node '+ String(element.nodei) );
         var nodeJ = editor.scene.getObjectByName( 'Node '+ String(element.nodej) );
-		
+		console.log(nodeI, nodeJ)
         xi = nodeI.position.x
 		yi = nodeI.position.y
 		zi = nodeI.position.z
@@ -75,11 +76,12 @@ function drawElements( editor, elements ){
 		
 		
 		editor.execute( new AddObjectCommand( line ) );
+		console.log(line)
 		var axes = new THREE.AxesHelper(2);
 		axes.material.linewidth = 5;
 		
 		axes.applyMatrix(transformMatrix)
 
-		editor.sceneHelpers.add(axes);
+		//editor.sceneHelpers.add(axes);
     }
 };

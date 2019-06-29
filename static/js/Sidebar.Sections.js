@@ -104,7 +104,7 @@ Sidebar.Sections = function ( editor ) {
     });
     matButtonRow.add(matBtn)
 
-    $(document).ready(function(){
+    editor.signals.savingFinished.add(function(){
         matDiv = document.getElementById( 'material-tab' )
         matDiv.appendChild (materialRow.dom )
         matDiv.appendChild( materialCategoryRow.dom )
@@ -342,7 +342,6 @@ Sidebar.Sections = function ( editor ) {
             sect_id = editor.sections.sections.length+1
             editor.sections.sections.push({'id': sect_id, 'Material Id': mat_id, 'type': value, 'dimensions': 'ed', 'A': A_, 'Ix': Ix_, 'Iy': Iy_, 'Iz': Iz_})
             data = editor.sections.sections
-            console.log(data)
             headers = ['id', 'Material Id', 'type', 'dimensions', 'A', 'Ix', 'Iy', 'Iz']
             sectDiv = document.getElementById( 'section-tab' )
             child = document.getElementById( 'sect_table' )
@@ -360,8 +359,8 @@ Sidebar.Sections = function ( editor ) {
 
 
 
-    // section related
-    $(document).ready(function(){
+	// section related
+	editor.signals.savingFinished.add(function(){
         sectDiv = document.getElementById( 'section-tab' )
         //sectDiv.appendChild (Row.dom )
         sectDiv.appendChild( sectTypeRow.dom );
@@ -371,11 +370,12 @@ Sidebar.Sections = function ( editor ) {
         sectDiv.appendChild( tContainer.dom );
         sectDiv.appendChild( sectButtonRow.dom );
         //sectDiv.appendChild( matButtonRow.dom )
-        data  = editor.sections.sections
+		data  = editor.sections.sections
+		console.log(data)
         headers = ['id', 'Material id', 'type', 'dimensions', 'A', 'Ix', 'Iy', 'Iz']
         sectDiv.appendChild(buildTable(data, headers, 'sect_table'));
         //buildTable(data)
-    });
+    })
 
 
 

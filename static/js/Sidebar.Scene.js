@@ -159,7 +159,7 @@ Sidebar.Scene = function ( editor ) {
 			}
 
 		} )
-		(elements, 1 );
+		(editor.scene.children, 1 );
 
 		outliner.setOptions( options );
 

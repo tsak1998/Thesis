@@ -112,6 +112,7 @@ Menubar.File = function ( editor ) {
 		data1.push(loads);
 		var sections = editor.sections.sections;
 		data1.push(sections )
+		data1.push( editor.sectMaterials.sectMaterials )
 
 
 		data1 = JSON.stringify( data1 );
