@@ -431,8 +431,25 @@
 			});
 			
 			$("#openerReactions").click(function() {
+				reactDiv = document.getElementById( 'react-table' )
+				$.ajax({
+				type: "POST",
+				url: "/getReactions",
+				data: {},
+				dataType: 'text',
+				success: function (e) {
+					var data = JSON.parse(e)
+					console.log(data)
+					headers = ['id', 'user_id', 'Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
+					
+					reactDiv.appendChild(buildTable( data.data, headers, 'react-table' ));
+					$("#reactions").dialog('open');
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
 				
-				$("#reactions").dialog('open');
 				
 				
 			});
@@ -461,7 +478,9 @@
 	<script>
 	
 	</script>
-	<div id="reactions" title="Reactions"></div>
+	<div id="reactions" title="Reactions">
+		<div id='react-table'></div>
+	</div>
 	<div id="mqn" title="MQN"></div>
 	<div id="displacements" title="Displacements"></div>
 	<div id="sections" title="Sections" style="background-color: LightGray">
@@ -477,7 +496,9 @@
 	</div>
 	<script>
 
-		console.log(editor.storage)
+		reactDiv = document.getElementById( 'react-table' )
+		headers = ['id', 'user_id', 'Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
+		data = []
 		
 	</script>
 

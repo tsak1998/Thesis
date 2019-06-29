@@ -26,13 +26,13 @@ app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # set global engine
-engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
+
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('home.html')
-
 
 
 @app.route('/editor')
@@ -62,7 +62,9 @@ def load():
         del elements['id'], elements['user_id']
         point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user + "'", engine)
         del point_loads['id'], point_loads['user_id']
-        return nodes.to_json(orient='table', index=False) + '|' + elements.to_json(orient='table', index=False)+ '|' + point_loads.to_json(orient='table', index=False)
+        return nodes.to_json(orient='table', index=False) + '|' + elements.to_json(orient='table',
+                                                                                   index=False) + '|' + point_loads.to_json(
+            orient='table', index=False)
 
 
 @app.route('/readDXF', methods=['GET', 'POST'])
@@ -111,6 +113,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
+
 # User login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -120,8 +123,8 @@ def login():
         password_candidate = request.form['password']
 
         # Get user by username
-        result =  models.User.query.filter_by(username=username).first()
-        
+        result = models.User.query.filter_by(username=username).first()
+
         if result is not None:
             # Get stored hash
             session['logged_in'] = True
@@ -146,6 +149,7 @@ def login():
 
     return render_template('login.html')
 
+
 # Check if user logged in
 def is_logged_in(f):
     @wraps(f)
@@ -158,6 +162,7 @@ def is_logged_in(f):
 
     return wrap
 
+
 # Logout
 @app.route('/logout')
 @is_logged_in
@@ -165,6 +170,7 @@ def logout():
     session.clear()
     flash('You are now logged out', 'sucess')
     return redirect(url_for('login'))
+
 
 # yellow save
 @app.route('/save', methods=["GET", "POST"])
@@ -175,6 +181,7 @@ def save():
         elements, nodes, point_loads, sections = parser(user_id, data, engine)
         save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections)
     return render_template('editor.html')
+
 
 # yellow save
 @app.route('/autosave', methods=["GET", "POST"])
@@ -204,15 +211,15 @@ def run_analysis():
     return render_template('editor.html')
 
 
-@app.route('/getReactions', methods=["GET", "POST"])
+@app.route('/getReactions', methods=["POST"])
 def get_reactions():
     if request.method == 'POST':
-        data = request.get_json()
+        data = pd.DataFrame(columns=['nn', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz'])
         user_id = session['username']
-        main(user_id, engine)
-    return render_template('editor.html')
+        reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
+    return reactions.to_json(orient='table', index=False)
+
 
 if __name__ == '__main__':
     app.secret_key = "^A%DJAJU^JJ123"
     app.run(debug=True)
-

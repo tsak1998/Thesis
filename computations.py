@@ -40,6 +40,7 @@ def load_data(user_id, engine):
     elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user_id + "'", engine)
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
+    del point_loads['id']
     sections = pd.read_csv('model_test/test_1/sections.csv')
     dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user_id + "'", engine)
     temp_loads_group = point_loads.groupby(['nn', 'c'])
@@ -767,7 +768,7 @@ def main(user_id, engine):
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
-    # save_results(user_id, engine, reactions=reactions, mqn=MQN_values, displacements=d_local)
+    #save_results(user_id, engine, reactions=reactions, mqn=MQN_values, displacements=d_local)
     plot_results(user_id, MQN_values, d_local)
 
     print(reactions.to_string())
