@@ -65,7 +65,7 @@ var Storage = function () {
 		},
 
 		set: function ( data, callback ) {
-
+            console.log(data)
 			var start = performance.now();
 
 			var transaction = database.transaction( [ 'states' ], 'readwrite' );

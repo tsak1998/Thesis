@@ -204,6 +204,14 @@ def run_analysis():
     return render_template('editor.html')
 
 
+@app.route('/getReactions', methods=["GET", "POST"])
+def get_reactions():
+    if request.method == 'POST':
+        data = request.get_json()
+        user_id = session['username']
+        main(user_id, engine)
+    return render_template('editor.html')
+
 if __name__ == '__main__':
     app.secret_key = "^A%DJAJU^JJ123"
     app.run(debug=True)

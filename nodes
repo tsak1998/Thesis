@@ -1,4 +1,0 @@
-,id,user_id,nn,coord_x,coord_y,coord_z,dof_dx,dof_dy,dof_dz,dof_rx,dof_ry,dof_rz
-0,1,cv13116,1,0.0,0.0,0.0,0,0,0,0,0,0
-1,2,cv13116,2,3.0,3.0,3.0,1,1,1,1,1,1
-2,3,cv13116,3,5.0,0.0,3.0,0,0,0,1,1,1

@@ -100,6 +100,19 @@ class steelSections(db.Model):
     Iz = Column('Iz', Float)
 
 
+class Reactions(db.Model):
+    __tablename__ = 'reactions'
+    id = Column('id', Integer, primary_key=True)
+    user_id = Column('user_id', String(45), nullable=False)
+    nn = Column('nn', Integer)
+    Fx = Column('Fx', Float)
+    Fy = Column('Fy', Float)
+    Fz = Column('Fz', Float)
+    Mx = Column('Mx', Float)
+    My = Column('My', Float)
+    Mz = Column('Mz', Float)
+
+
 class Mqn(db.Model):
     __tablename__ = 'mqn'
     id = Column('id', Integer, primary_key=True)

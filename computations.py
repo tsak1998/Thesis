@@ -707,15 +707,15 @@ def fit_points(num_points, **kwargs):
 
 
 def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
-    reactions = pd.DataFrame(columns=['user_id', 'nn', 'f_x', 'f_y', 'f_z', 'm_x', 'm_y', 'm_z'])
+    reactions = pd.DataFrame(columns=['user_id', 'nn', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz'])
     for index, node in node_dofs.iterrows():
         dofs = [node.dof_dx, node.dof_dy, node.dof_dz, node.dof_rx, node.dof_ry, node.dof_rz]
-        ind_fx = arranged_dofs.index(node.dof_dx)
-        ind_fy = arranged_dofs.index(node.dof_dy)
-        ind_fz = arranged_dofs.index(node.dof_dz)
-        ind_mx = arranged_dofs.index(node.dof_rx)
-        ind_my = arranged_dofs.index(node.dof_ry)
-        ind_mz = arranged_dofs.index(node.dof_rz)
+        ind_fx = dofs[0] #arranged_dofs.index(node.dof_dx)
+        ind_fy = dofs[1] #arranged_dofs.index(node.dof_dy)
+        ind_fz = dofs[2]#arranged_dofs.index(node.dof_dz)
+        ind_mx = dofs[3]#arranged_dofs.index(node.dof_rx)
+        ind_my = dofs[4]#arranged_dofs.index(node.dof_ry)
+        ind_mz = dofs[5]#arranged_dofs.index(node.dof_rz)
         Fx = P_whole[ind_fx][0]
         Fy = P_whole[ind_fy][0]
         Fz = P_whole[ind_fz][0]
@@ -723,7 +723,7 @@ def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
         My = P_whole[ind_my][0]
         Mz = P_whole[ind_mz][0]
 
-        temp_react = {'f_x': Fx, 'f_y': Fy, 'f_z': Fz, 'm_x': Mx, 'm_y': My, 'm_z': Mz}
+        temp_react = {'Fx': Fx, 'Fy': Fy, 'Fz': Fz, 'Mx': Mx, 'My': My, 'Mz': Mz}
         df = pd.DataFrame([temp_react], columns=temp_react.keys())
         # drops lines with zeroes
         df = df[(df.T != 0).any()]
@@ -765,10 +765,11 @@ def main(user_id, engine):
                                      node_dofs)
     MQN_values['user_id'] = user_id
     d_local['user_id'] = user_id
-    # save_results(user_id, engine, mqn=MQN_values, displacements=d_local)
-    plot_results(user_id, MQN_values, d_local)
-    P_whole = np.round(K_ol.dot(global_dispalecements) + S, 3)
+    P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
+    # save_results(user_id, engine, reactions=reactions, mqn=MQN_values, displacements=d_local)
+    plot_results(user_id, MQN_values, d_local)
+
     print(reactions.to_string())
     # MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)

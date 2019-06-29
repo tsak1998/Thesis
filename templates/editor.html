@@ -25,12 +25,12 @@
 {% block body %}
 
 
-		<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+
 		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>	
-
+		<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
 		<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
 		<link id="theme" href="{{ url_for('static', filename='css/light.css') }}" rel="stylesheet" />
 		
@@ -72,7 +72,6 @@
 		<script src="{{ url_for('static', filename='js/libs/app.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Player.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Script.js') }}"></script>
-		<script src="{{ url_for('static', filename='js/examples/js/vr/WebVR.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Storage.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Editor.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Config.js') }}"></script>
@@ -162,7 +161,8 @@
 		<script src="{{ url_for('static', filename='js/drawNodes.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/drawElements.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/drawPointLoads.js') }}"></script>
-
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
+		<link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
 		<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/light.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
@@ -171,8 +171,7 @@
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/show-hint.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/tern.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
-		<link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
+
 		
 		<script>
 			
@@ -256,8 +255,10 @@
 						editor.signals.savingStarted.dispatch();
 
 						timeout = setTimeout( function () {
-
-							editor.storage.set( editor.toJSON() );
+							
+							data = editor.toJSON()
+							
+							editor.storage.set( data );
 
 							editor.signals.savingFinished.dispatch();
 
@@ -344,13 +345,13 @@
 		
 	</div>
 	<script>
-		function buildTable(data) {
+		function buildTable(data, headers, id) {
 			var table = document.createElement("table");
 			table.className="gridtable";
 			var thead = document.createElement("thead");
 			var tbody = document.createElement("tbody");
 			var headRow = document.createElement("tr");
-			["user_id","nn","f_x", "f_y", "f_z", "m_x", "m_y", "m_z"].forEach(function(el) {
+			headers.forEach(function(el) {
 			var th=document.createElement("th");
 			th.appendChild(document.createTextNode(el));
 			headRow.appendChild(th);
@@ -366,7 +367,8 @@
 			}
 			tbody.appendChild(tr);  
 			});
-			table.appendChild(tbody);             
+			table.appendChild(tbody)
+			table.id = id;
 			return table;
 		}
 		$.ajax({
@@ -424,8 +426,8 @@
 			$( "#reactions" ).dialog({
 				autoOpen: false,
 				resizable: false,
-				height: 300,
-				width: 500
+				height: 500,
+				width: 600
 			});
 			
 			$("#openerReactions").click(function() {
@@ -435,6 +437,26 @@
 				
 			});
 		});
+
+		$(function () {
+			$( "#sections" ).dialog({
+				autoOpen: false,
+				resizable: false,
+				height: 500,
+				width: 600
+			});
+
+			$("#openerSections").click(function() {
+
+				$("#sections").dialog('open');
+
+
+			});
+		});
+
+		$( function() {
+			$( "#sections" ).tabs();
+	  	} );
 	</script>
 	<script>
 	
@@ -442,9 +464,23 @@
 	<div id="reactions" title="Reactions"></div>
 	<div id="mqn" title="MQN"></div>
 	<div id="displacements" title="Displacements"></div>
+	<div id="sections" title="Sections" style="background-color: LightGray">
+		<ul>
+			<li><a href="#material-tab">Material</a></li>
+			<li><a href="#section-tab">Section</a></li>
+		</ul>
+		<div id="material-tab">
+			<div id="material-table"></div>
+		</div>
+		<div id="section-tab">
+		</div>
+	</div>
 	<script>
-		document.getElementById("reactions").appendChild(buildTable(MOUNTAINS));
+
+		console.log(editor.storage)
+		
 	</script>
+
 	<style>
 			table.gridtable {
 			font-family: verdana,arial,sans-serif;

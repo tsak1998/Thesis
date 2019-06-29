@@ -16,7 +16,7 @@ var Sidebar = function ( editor ) {
 	var nodesTab = new UI.Text( strings.getKey( 'sidebar/project' ) ).setTextTransform( 'uppercase' );
 	nodesTab.onClick( function () { select( 'NODES' ) } );
 	
-	var elementsTab = new UI.Text( strings.getKey( 'sidebar/createElement' ) ).setTextTransform( 'uppercase' );
+	var elementsTab = new UI.Text( 'ELEMENTS' ).setTextTransform( 'uppercase' );
 	elementsTab.onClick( function () { select( 'ELEMENTS' ) } );
 
 

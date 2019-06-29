@@ -1,17 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/static/js/Sidebar.Sections.js" line="185" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/vision.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/vision/Main/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/vision/Main/errors.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/vision/Main/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete/vision/__init__.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sections.csv" beforeDir="false" afterPath="$PROJECT_DIR$/sections.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_/calcs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_/database.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_/fetchFromDB.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_/tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_/test.dxf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/d_global.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/displ.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/displ_cv13116.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist_loads.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dofs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fibo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jquery-ui.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/loopVarray.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/loops_vs_large_array.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mjfjij" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mqn.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mqn.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mqn_cv13116.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/name.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nodes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/point_loads.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sections.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Editor.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Editor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Elements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Elements.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Nodes.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Nodes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Scene.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Scene.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Sections.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Sections.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/Storage.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Storage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/temp-plot.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.dwl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.dwl2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.dxf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1.rtd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_1_recover.dwg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_2.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_2.rtd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_graph.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_loop.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/truss_elements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yellow/editor/computations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yellow/editor/computations/calcs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yellow/editor/computations/database.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yellow/editor/computations/tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yellow/editor/run.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/your_file.txt" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,24 +78,47 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app.py">
+        <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Scene.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="28" column="49" selection-start-line="28" selection-start-column="49" selection-end-line="28" selection-end-column="49" />
-              <folding>
-                <element signature="e#0#108#0" expanded="true" />
-              </folding>
+            <state>
+              <caret line="110" column="17" lean-forward="true" selection-start-line="110" selection-start-column="17" selection-end-line="110" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/computations.py">
+        <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Nodes.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="387" lean-forward="true" selection-start-line="387" selection-end-line="387" />
+            <state relative-caret-position="527">
+              <caret line="405" column="36" lean-forward="true" selection-start-line="380" selection-start-column="4" selection-end-line="405" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Elements.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="234">
+              <caret line="394" column="32" lean-forward="true" selection-start-line="394" selection-start-column="32" selection-end-line="394" selection-end-column="32" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/static/js/Menubar.File.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1751">
+              <caret line="103" column="23" selection-start-line="103" selection-start-column="23" selection-end-line="103" selection-end-column="50" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/save_db.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -48,37 +127,43 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Sections.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1190">
-              <caret line="149" column="13" selection-start-line="149" selection-start-column="13" selection-end-line="149" selection-end-column="13" />
+            <state relative-caret-position="7820">
+              <caret line="460" column="26" selection-start-line="457" selection-start-column="8" selection-end-line="463" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/editor.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2047">
+              <caret line="462" column="13" lean-forward="true" selection-start-line="462" selection-start-column="13" selection-end-line="462" selection-end-column="13" />
+              <folding>
+                <element signature="e#19701#19736#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="395">
+              <caret line="204" lean-forward="true" selection-start-line="204" selection-end-line="204" />
+              <folding>
+                <element signature="e#0#108#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/editor.html">
+        <entry file="file://$PROJECT_DIR$/computations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="173" column="8" selection-start-line="173" selection-start-column="8" selection-end-line="173" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Elements.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="113" column="4" selection-start-line="113" selection-start-column="4" selection-end-line="134" selection-end-column="31" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/plots.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="850">
-              <caret line="56" column="39" selection-start-line="56" selection-start-column="39" selection-end-line="56" selection-end-column="39" />
+            <state relative-caret-position="317">
+              <caret line="769" column="6" selection-start-line="769" selection-start-column="6" selection-end-line="769" selection-end-column="6" />
               <folding>
-                <element signature="e#0#26#0" expanded="true" />
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -87,32 +172,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="3" column="36" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tables.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="850">
-              <caret line="52" column="25" selection-start-line="52" selection-start-column="25" selection-end-line="52" selection-end-column="25" />
-              <folding>
-                <element signature="e#0#53#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/database.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="13" column="41" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="41" />
-              <folding>
-                <element signature="e#0#36#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="425">
+              <caret line="103" column="30" selection-start-line="103" selection-start-column="30" selection-end-line="103" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -128,24 +189,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>dofs_arranged</find>
-      <find>dofs_element</find>
-      <find>rint</find>
-      <find>.dot</find>
-      <find>and</find>
-      <find>print</find>
-      <find>direction_vector</find>
-      <find>.index</find>
-      <find>nodal_forces</find>
-      <find>round</find>
-      <find>print(</find>
-      <find>transpos</find>
-      <find>logg</find>
-      <find>fit</find>
-      <find>rotate</find>
-      <find>if</find>
-      <find>break</find>
+      <find>def</find>
+      <find>sections</find>
+      <find>section</find>
+      <find>sectType</find>
+      <find>} );</find>
+      <find>rectContainer.dom.hidden</find>
+      <find>ARow</find>
       <find>customSect</find>
+      <find>customMat</find>
+      <find>tContainer</find>
+      <find>rectContainer</find>
+      <find>hand</find>
+      <find>materialRow</find>
+      <find>sect_table</find>
+      <find>on</find>
+      <find>nodes_</find>
+      <find>build</find>
+      <find>buildOp</find>
+      <find>buildOption</find>
+      <find>click</find>
+      <find>Elements</find>
+      <find>Nodes</find>
+      <find>elements_</find>
+      <find>scene</find>
+      <find>editor.scene.children.length</find>
+      <find>editor.scene.ch</find>
+      <find>editor.scene.children</find>
+      <find>render</find>
+      <find>refre</find>
+      <find>editor.scene</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -162,19 +235,25 @@
         <option value="$PROJECT_DIR$/parse_and_save.py" />
         <option value="$PROJECT_DIR$/createdb.py" />
         <option value="$PROJECT_DIR$/static/js/Sidebar.Project.js" />
-        <option value="$PROJECT_DIR$/models.py" />
         <option value="$PROJECT_DIR$/tables.py" />
-        <option value="$PROJECT_DIR$/app.py" />
         <option value="$PROJECT_DIR$/plots.py" />
-        <option value="$PROJECT_DIR$/computations.py" />
-        <option value="$PROJECT_DIR$/static/js/Sidebar.Sections.js" />
         <option value="$PROJECT_DIR$/templates/editor.html" />
+        <option value="$PROJECT_DIR$/static/js/Storage.js" />
+        <option value="$PROJECT_DIR$/static/js/Editor.js" />
+        <option value="$PROJECT_DIR$/static/js/Sidebar.Scene.js" />
+        <option value="$PROJECT_DIR$/static/js/Sidebar.Sections.js" />
+        <option value="$PROJECT_DIR$/static/js/Sidebar.js" />
+        <option value="$PROJECT_DIR$/static/js/Sidebar.Nodes.js" />
+        <option value="$PROJECT_DIR$/static/js/Sidebar.Elements.js" />
+        <option value="$PROJECT_DIR$/app.py" />
+        <option value="$PROJECT_DIR$/models.py" />
+        <option value="$PROJECT_DIR$/computations.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1146" />
-    <option name="y" value="-10" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="483" />
+    <option name="y" value="-8" />
     <option name="width" value="1294" />
     <option name="height" value="1047" />
   </component>
@@ -183,7 +262,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -211,6 +289,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -365,6 +444,14 @@
       <option name="presentableId" value="Default" />
       <updated>1550712858802</updated>
     </task>
+    <task id="LOCAL-00001" summary=".......">
+      <created>1561161158205</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1561161158205</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView">
@@ -380,12 +467,12 @@
     <frame x="-8" y="-8" width="2576" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.09732073" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.098502755" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4988938" visible="true" weight="0.2990249" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4988938" visible="true" weight="0.2990249" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.30444205" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -399,20 +486,20 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.178487" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.098502755" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.304253" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3031625" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4988938" visible="true" weight="0.2990249" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.30444205" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32932165" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32936078" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32827735" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.33260393" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5011062" side_tool="true" weight="0.304253" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -471,19 +558,13 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="......." />
+    <option name="LAST_COMMIT_MESSAGE" value="......." />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/test_loop.py</url>
-          <line>88</line>
-          <option name="timeStamp" value="50" />
-        </line-breakpoint>
-        <line-breakpoint suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/test_loop.py</url>
-          <line>87</line>
-          <option name="timeStamp" value="51" />
-        </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations/calcs.py</url>
           <line>503</line>
@@ -496,13 +577,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>610</line>
-          <option name="timeStamp" value="130" />
+          <line>772</line>
+          <option name="timeStamp" value="133" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>615</line>
-          <option name="timeStamp" value="131" />
+          <line>710</line>
+          <option name="timeStamp" value="134" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/computations.py</url>
+          <line>712</line>
+          <option name="timeStamp" value="137" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -654,16 +740,6 @@
     <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Project.js" />
     <entry file="file://$PROJECT_DIR$/dxfin.py" />
     <entry file="file://$PROJECT_DIR$/createdb.py" />
-    <entry file="file://$PROJECT_DIR$/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="28" column="49" selection-start-line="28" selection-start-column="49" selection-end-line="28" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#108#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/plots.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="850">
@@ -671,13 +747,6 @@
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="3" column="36" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
         </state>
       </provider>
     </entry>
@@ -701,34 +770,128 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/computations.py">
+    <entry file="file://$PROJECT_DIR$/static/js/Storage.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="387" lean-forward="true" selection-start-line="387" selection-end-line="387" />
+        <state relative-caret-position="469">
+          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parser_.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Elements.js">
+    <entry file="file://$PROJECT_DIR$/static/js/Editor.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="113" column="4" selection-start-line="113" selection-start-column="4" selection-end-line="134" selection-end-column="31" />
+        <state relative-caret-position="9877">
+          <caret line="581" column="45" selection-start-line="581" selection-start-column="45" selection-end-line="581" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/Sidebar.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" column="44" selection-start-line="18" selection-start-column="44" selection-end-line="18" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Object.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1700">
+          <caret line="100" column="4" selection-start-line="100" selection-start-column="4" selection-end-line="108" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/commands/AddObjectCommand.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1037">
+          <caret line="61" column="9" selection-start-line="61" selection-start-column="9" selection-end-line="61" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/Menubar.File.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1751">
+          <caret line="103" column="23" selection-start-line="103" selection-start-column="23" selection-end-line="103" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/save_db.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Sections.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1190">
-          <caret line="149" column="13" selection-start-line="149" selection-start-column="13" selection-end-line="149" selection-end-column="13" />
+        <state relative-caret-position="7820">
+          <caret line="460" column="26" selection-start-line="457" selection-start-column="8" selection-end-line="463" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Elements.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="394" column="32" lean-forward="true" selection-start-line="394" selection-start-column="32" selection-end-line="394" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Nodes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="405" column="36" lean-forward="true" selection-start-line="380" selection-start-column="4" selection-end-line="405" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/Sidebar.Scene.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="110" column="17" lean-forward="true" selection-start-line="110" selection-start-column="17" selection-end-line="110" selection-end-column="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/editor.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="173" column="8" selection-start-line="173" selection-start-column="8" selection-end-line="173" selection-end-column="8" />
+        <state relative-caret-position="2047">
+          <caret line="462" column="13" lean-forward="true" selection-start-line="462" selection-start-column="13" selection-end-line="462" selection-end-column="13" />
+          <folding>
+            <element signature="e#19701#19736#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="204" lean-forward="true" selection-start-line="204" selection-end-line="204" />
+          <folding>
+            <element signature="e#0#108#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="103" column="30" selection-start-line="103" selection-start-column="30" selection-end-line="103" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/computations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="317">
+          <caret line="769" column="6" selection-start-line="769" selection-start-column="6" selection-end-line="769" selection-end-column="6" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

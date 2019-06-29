@@ -10,39 +10,15 @@ Sidebar.Elements = function ( editor ) {
 	var strings = editor.strings;
 	var nodeCount = 1;
 	var elemCount = 1;
-	
+
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
 	//count lines and nodes
-	function count_elem() {
-		arr =  editor.scene.children
-		for (i=0; i < arr.length; i++){
-			if (arr[i].geometry.type=='SphereGeometry') {
-				nodeCount+=1
-			}else if (arr[i].type=='Line'){
-				elemCount+=1
-			}
-		}
-	}
+
 	
 	//labels for objects
-
-	function render() {
-
-		editor.sceneHelpers.updateMatrixWorld();
-		editor.scene.updateMatrixWorld();
-
-		editor.renderer.render( editor.scene, editor.camera );
-
-		if ( editor.renderer instanceof THREE.RaytracingRenderer === false ) {
-
-			editor.renderer.render( editor.sceneHelpers, editor.camera );
-
-		}
-
-	}
 
 	function makeTextSprite( message, parameters )
     {
@@ -253,7 +229,6 @@ Sidebar.Elements = function ( editor ) {
 		//label.name = line.name
 		
 
-		console.log(dirVector, yLocal, zLocal)
 		//console.log(middle)
 		
 		line.applyMatrix( transformMatrix )
@@ -279,6 +254,224 @@ Sidebar.Elements = function ( editor ) {
 
 	container.add( buttonRow );
 
+ function buildOption( object, draggable ) {
+
+		var option = document.createElement( 'div' );
+		option.draggable = draggable;
+		option.innerHTML = buildHTML( object );
+		option.value = object.id;
+
+		return option;
+
+	}
+
+	function escapeHTML( html ) {
+
+		return html
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' );
+
+	}
+
+	function getMaterialName( material ) {
+
+		if ( Array.isArray( material ) ) {
+
+			var array = [];
+
+			for ( var i = 0; i < material.length; i ++ ) {
+
+				array.push( material[ i ].name );
+
+			}
+
+			return array.join( ',' );
+
+		}
+
+		return material.name;
+
+	}
+
+	function getScript( uuid ) {
+
+		if ( editor.scripts[ uuid ] !== undefined ) {
+
+			return ' <span class="type Script"></span>';
+
+		}
+
+		return '';
+
+	}
+
+	var ignoreObjectSelectedSignal = false;
+
+	function buildHTML( object ) {
+
+		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
+
+		if ( object instanceof THREE.Mesh ) {
+
+			var geometry = object.geometry;
+			var material = object.material;
+
+			html += ' <span class="type ' + geometry.type + '"></span> ' + escapeHTML( geometry.name );
+			html += ' <span class="type ' + material.type + '"></span> ' + escapeHTML( getMaterialName( material ) );
+
+		}
+
+		html += getScript( object.uuid );
+
+		return html;
+
+	}
+
+	var outliner = new UI.Outliner( editor );
+	outliner.setId( 'outliner' );
+	outliner.onChange( function () {
+
+		ignoreObjectSelectedSignal = true;
+        valueId = parseInt( outliner.getValue())
+
+		 if (valueId == Nodes.id){
+
+        }else{
+           editor.selectById( valueId );
+           updateNodeProperties(editor.selected.userData)
+
+        }
+
+		ignoreObjectSelectedSignal = false;
+
+	} );
+
+	outliner.onDblClick( function () {
+        valueId = parseInt( outliner.getValue())
+        if (valueId == Nodes.id){
+
+        }else{
+           editor.focusById( valueId );
+        }
+
+	} );
+
+	container.add( outliner );
+	container.add( new UI.Break() );
+
+    var elementIdRow = new UI.Row();
+	var elementId = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	elementId.dom.disabled = true;
+	elementId.dom.value = '';
+
+	elementIdRow.add( new UI.Text( 'Element Id').setWidth( '90px' ) );
+	elementIdRow.add( elementId );
+
+	container.add( elementIdRow );
+
+    var sectIdRow = new UI.Row();
+	var sectId = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	sectId.dom.disabled = true;
+	sectId.dom.value = '';
+
+	sectIdRow.add( new UI.Text( 'Section Id').setWidth( '90px' ) );
+	sectIdRow.add( sectId );
+
+	container.add( elementIdRow );
+	// position
+
+	var nodeIRow = new UI.Row();
+	var nodeI = new UI.Number().setPrecision( 1 ).setWidth( '50px' )//.onChange( update );
+	nodeI.dom.disabled = true;
+	nodeI.dom.value = '';
+	nodeIRow.add( new UI.Text( 'Node i').setWidth( '90px' ) );
+	nodeIRow.add( nodeI );
+
+	container.add(nodeIRow)
+
+	var nodeJRow = new UI.Row();
+	var nodeJ = new UI.Number().setPrecision( 1 ).setWidth( '50px' )//.onChange( update );
+	nodeJ.dom.disabled = true;
+	nodeJ.dom.value = '';
+	nodeJRow.add( new UI.Text( 'Node j').setWidth( '90px' ) );
+	nodeJRow.add( nodeJ );
+
+    container.add(nodeJRow)
+
+    var lengthRow = new UI.Row();
+	var length = new UI.Number().setPrecision( 1 ).setWidth( '50px' )//.onChange( update );
+	length.dom.disabled = true;
+	length.dom.value = '';
+	lengthRow.add( new UI.Text( 'Node j').setWidth( '90px' ) );
+	lengthRow.add( length );
+
+    container.add(lengthRow)
+    /*
+	var nodeXRow = new UI.Row();
+	var nodeX = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+
+	} );
+
+
+	nodeXRow.add( new UI.Text('x').setWidth( '90px' ) );
+	nodeXRow.add( nodeX );
+
+	container.add( nodeXRow );
+	*/
+
+    var array = editor.scene.children
+    var len = array.length
+    var Nodes = new THREE.Object3D()
+    Nodes.name = 'Nodes'
+	function refreshUI() {
+	    nodes_ = []
+        for (i=0; i<len; i++){
+			obj = array[i]
+			if (obj.userData.type == 'node') {
+				nodes_.push( obj );
+			}
+		}
+
+		var options = [];
+
+
+		options.push( buildOption( Nodes, false ) );
+
+		( function addObjects( objects, pad ) {
+
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+				var object = objects[ i ];
+
+				var option = buildOption( object, true );
+				option.style.paddingLeft = ( pad * 10 ) + 'px';
+				options.push( option );
+
+				// addObjects( object.children, pad + 1 );
+
+			}
+
+		} )
+		(nodes_, 1 );
+
+		outliner.setOptions( options );
+
+		if ( editor.selected !== null ) {
+
+			outliner.setValue( editor.selected.id );
+
+		}
+
+
+
+
+	}
+	refreshUI();
 
 	return container;
 

@@ -129,7 +129,13 @@ Sidebar.Scene = function ( editor ) {
 	//
 
 	function refreshUI() {
-
+	    elements = []
+        for (i=0; i<editor.scene.children.length; i++){
+			obj = editor.scene.children[i]
+			if (obj.userData.type == 'element') {
+				elements.push( obj );
+			}
+		}
 		var camera = editor.camera;
 		var scene = editor.scene;
 
@@ -153,7 +159,7 @@ Sidebar.Scene = function ( editor ) {
 			}
 
 		} )
-		( scene.children, 1 );
+		(elements, 1 );
 
 		outliner.setOptions( options );
 

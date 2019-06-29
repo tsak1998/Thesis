@@ -200,179 +200,300 @@ Sidebar.Nodes = function ( editor ) {
 
 	container.add( buttonRow );
 
-	/*
-	var buttonRow = new UI.Row();
-	var btn = new UI.Button( 'Pick Nodes' ).onClick( function () {
-		nodes=[]
+    function buildOption( object, draggable ) {
 
-		{
-		
-		document.addEventListener( "click", onMouseUp, false );
-		
+		var option = document.createElement( 'div' );
+		option.draggable = draggable;
+		option.innerHTML = buildHTML( object );
+		option.value = object.id;
+
+		return option;
 
 	}
 
-	function onMouseUp(event){
-		if ( editor.selected == null ) {
+	function escapeHTML( html ) {
 
+		return html
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' );
 
-		}else if(nodes.length<2) {
-			if (nodes[0]==editor.selected){
-				
-			}else{
-				nodes.push(editor.selected)
-				console.log(nodes)
-				}
-				
+	}
+
+	function getMaterialName( material ) {
+
+		if ( Array.isArray( material ) ) {
+
+			var array = [];
+
+			for ( var i = 0; i < material.length; i ++ ) {
+
+				array.push( material[ i ].name );
+
 			}
-		else {
-			document.removeEventListener( "click", onMouseUp, false );
-		
-		
+
+			return array.join( ',' );
+
 		}
 
+		return material.name;
+
 	}
-		
-	} );
-	
 
-	buttonRow.add( btn );
+	function getScript( uuid ) {
 
-	container.add( buttonRow );
+		if ( editor.scripts[ uuid ] !== undefined ) {
 
-	//
+			return ' <span class="type Script"></span>';
 
-	var buttonRow = new UI.Row();
-	var btn = new UI.Button( 'Create Element' ).onClick( function () {
-		positions = []
-
-		var geometry = new THREE.BufferGeometry();
-		
-		positions.push(nodes[0].position.x, nodes[0].position.y, nodes[0].position.z,
-		nodes[1].position.x, nodes[1].position.y, nodes[1].position.z)
-
-		var line_width = 4.0;
-		
-		var resolution = new THREE.Vector2(viewport.clientWidth, viewport.clientHeight);
-		var matLine = new MeshLineMaterial({
-			color: (elements.data[i].elem_type === 'beam' ?  0x0000ff :  0x00aaaa),
-			lineWidth: line_width,
-			sizeAttenuation: false,
-			useMap: false,
-			resolution: resolution,
-			near: 0.1,
-			far: 200.0
-		 });
-	
-		
-				
-		var geometry = new THREE.Geometry();     
-		geometry.vertices.push(new THREE.Vector3( nodes[0].position.x, nodes[0].position.y,  nodes[0].position.z));
-		geometry.vertices.push(new THREE.Vector3( nodes[1].position.x, nodes[1].position.y,  nodes[1].position.z));
-		var line = new MeshLine();
-		line.setGeometry (geometry);
-
-		var mesh = new THREE.Mesh( line.geometry, matLine );
-		mesh.name = 'Element ' + elemCount;
-
-		editor.execute( new AddObjectCommand( mesh ) );
-		console.log('gamwww')
-		console.log(sprite.position)
-		editor.sceneHelpers.add( sprite );
-		
-		
-
-		elemCount+=1
-
-		
-	} );
-	
-
-	buttonRow.add( btn );
-
-	container.add( buttonRow );
-
-	//
-
-	var buttonRow = new UI.Row();
-	var btn = new UI.Button( 'Draw Nodes On Grid' ).onClick( function () {
-		var geometry = new THREE.PlaneGeometry( 20, 20, 20, 20 );
-		var material = new THREE.MeshBasicMaterial( {color: 0xff0000, side: THREE.DoubleSide, wireframe: true} );
-		var plane = new THREE.Mesh( geometry, material );
-		plane.position.set( 10,10,0 );
-		plane.visible = true;
-
-
-		editor.sceneHelpers.add( plane )
-
-
-		var hoverMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshStandardMaterial({ color: 0x0000ff}));
-		var markerMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshStandardMaterial({ color: 0xff0000}));
-		
-		let snapRadius = 0.5; // How big radius we search for vertices near the mouse click
-		let snap = new GridSnap(editor, editor.scene, editor.renderer, editor.camera, plane, snapRadius, hoverMesh, markerMesh);
-		
-		
-		document.addEventListener('mousemove', onMouseMove, false );
-		document.addEventListener('mousedown', onMouseDown, false );
-		document.addEventListener('mouseup', onMouseUp, false );
-
-		function onMouseDown( event ) {
-			snap.mouseDown(event);
 		}
 
-		function onMouseUp( event ) {
-			snap.mouseUp(event);
+		return '';
+
+	}
+
+	var ignoreObjectSelectedSignal = false;
+
+	function buildHTML( object ) {
+
+		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
+
+		if ( object instanceof THREE.Mesh ) {
+
+			var geometry = object.geometry;
+			var material = object.material;
+
+			html += ' <span class="type ' + geometry.type + '"></span> ' + escapeHTML( geometry.name );
+			html += ' <span class="type ' + material.type + '"></span> ' + escapeHTML( getMaterialName( material ) );
+
 		}
 
-		function onMouseMove( event ) {
-			snap.mouseMove(event);
+		html += getScript( object.uuid );
+
+		return html;
+
+	}
+
+	var outliner = new UI.Outliner( editor );
+	outliner.setId( 'outliner' );
+	outliner.onChange( function () {
+
+		ignoreObjectSelectedSignal = true;
+        valueId = parseInt( outliner.getValue())
+
+		 if (valueId == Nodes.id){
+
+        }else{
+           editor.selectById( valueId );
+           updateNodeProperties(editor.selected.userData)
+
+        }
+
+		ignoreObjectSelectedSignal = false;
+
+	} );
+
+	outliner.onDblClick( function () {
+        valueId = parseInt( outliner.getValue())
+        if (valueId == Nodes.id){
+
+        }else{
+           editor.focusById( valueId );
+        }
+
+	} );
+
+	container.add( outliner );
+	container.add( new UI.Break() );
+
+
+    /*
+	var nodeXRow = new UI.Row();
+	var nodeX = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+
+	} );
+
+
+	nodeXRow.add( new UI.Text('x').setWidth( '90px' ) );
+	nodeXRow.add( nodeX );
+
+	container.add( nodeXRow );
+	*/
+
+
+    var Nodes = new THREE.Object3D()
+    Nodes.name = 'Nodes'
+	function refreshUI() {
+	    nodes_ = []
+        for (i=0; i<editor.scene.children.length; i++){
+			obj = editor.scene.children[i]
+			if (obj.userData.type == 'node') {
+				nodes_.push( obj );
+			}
+		}
+		var camera = editor.camera;
+		var scene = editor.scene;
+
+		var options = [];
+
+
+		options.push( buildOption( Nodes, false ) );
+
+		( function addObjects( objects, pad ) {
+
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+				var object = objects[ i ];
+
+				var option = buildOption( object, true );
+				option.style.paddingLeft = ( pad * 10 ) + 'px';
+				options.push( option );
+
+				// addObjects( object.children, pad + 1 );
+
+			}
+
+		} )
+		(nodes_, 1 );
+
+		outliner.setOptions( options );
+
+		if ( editor.selected !== null ) {
+
+			outliner.setValue( editor.selected.id );
+
 		}
 
-		
-		
+		if ( scene.background ) {
+
+			//backgroundColor.setHexValue( scene.background.getHex() );
+
+		}
+
+
+
+	}
+
+	var nodeIdRow = new UI.Row();
+	var nodeId = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	nodeId.dom.disabled = true;
+	nodeId.dom.value = '';
+
+	nodeIdRow.add( new UI.Text( 'Node Id').setWidth( '90px' ) );
+	nodeIdRow.add( nodeId );
+
+	container.add( nodeIdRow );
+
+	// position
+
+	var objectPositionRow = new UI.Row();
+	var objectPositionX = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	objectPositionX.dom.disabled = true;
+	objectPositionX.dom.value = '';
+	var objectPositionY = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	objectPositionY.dom.disabled = true;
+	objectPositionY.dom.value = '';
+	var objectPositionZ = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+    objectPositionZ.dom.disabled = true;
+    objectPositionZ.dom.value = '';
+	objectPositionRow.add(  new UI.Text( 'Coordinates').setWidth( '90px' ) );
+	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
+
+    container.add(objectPositionRow)
+
+    //dofs
+
+    var dofsRow = new UI.Row();
+	var dofX = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	dofX.dom.disabled = true;
+	dofX.max = 1;
+	dofX.min = 0;
+	dofX.dom.value = '';
+	var dofY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+	dofY.dom.disabled = true;
+	dofY.max = 1;
+	dofY.min = 0;
+	dofY.dom.value = '';
+	var dofZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+    dofZ.dom.disabled = true;
+    dofZ.max = 1;
+	dofZ.min = 0;
+	dofZ.dom.value = '';
+    var dofRX = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+	dofRX.dom.disabled = true;
+    dofRX.max = 1;
+	dofRX.min = 0;
+	dofRX.dom.value = '';
+	var dofRY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+	dofRY.dom.disabled = true;
+	dofRY.max = 1;
+	dofRY.min = 0;
+	dofRY.dom.value = '';
+	var dofRZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
+    dofRZ.dom.disabled = true;
+    dofRZ.max = 1;
+	dofRZ.min = 0;
+	dofRZ.dom.value = '';
+	dofsRow.add(  new UI.Text( 'Dofs').setWidth( '90px' ) );
+	dofsRow.add( dofX, dofY, dofZ, dofRX, dofRY, dofRZ);
+
+    container.add(dofsRow)
+
+    refreshUI();
+
+    var updateNodeProperties = function(values){
+        nodeId.dom.value = values.nn
+        objectPositionX.dom.value = values.coord_x
+        objectPositionY.dom.value = values.coord_y
+        objectPositionZ.dom.value = values.coord_z
+        dofX.dom.value = values.dof_dx
+        dofY.dom.value = values.dof_dy
+        dofZ.dom.value = values.dof_dz
+        dofRX.dom.value = values.dof_rx
+        dofRY.dom.value = values.dof_ry
+        dofRZ.dom.value = values.dof_rz
+    }
+
+    signals.editorCleared.add( refreshUI );
+
+	signals.sceneGraphChanged.add( refreshUI );
+
+	signals.objectChanged.add( function ( object ) {
+
+		var options = outliner.options;
+
+		for ( var i = 0; i < options.length; i ++ ) {
+
+			var option = options[ i ];
+
+			if ( option.value === object.id ) {
+
+				option.innerHTML = buildHTML( object );
+				return;
+
+			}
+
+		}
+
 	} );
-	
 
-	buttonRow.add( btn );
+	signals.objectSelected.add( function ( object ) {
 
-	container.add( buttonRow );
+	    if (object!=null){
 
-	var buttonRow = new UI.Row();
-	var btn = new UI.Button( 'Done' ).onClick( function () {
+	        if(object.userData.type == 'node'){
+                updateNodeProperties(object.userData)
+            }
+        }
+		if ( ignoreObjectSelectedSignal === true ) return;
 
-	var selectedObject = editor.sceneHelpers.getObjectByName('yellow');
-	editor.sceneHelpers.remove( selectedObject );
+		outliner.setValue( object !== null ? object.id : null );
 
-
-	function onMouseDown( event ) {
-	snap.mouseDown(event);
-	}
-
-	function onMouseUp( event ) {
-		snap.mouseUp(event);
-	}
-
-	function onMouseMove( event ) {
-		snap.mouseMove(event);
-	}
-		
-	document.removeEventListener('mousemove', onMouseMove, false );
-	document.removeEventListener('mousedown', onMouseDown, false );
-	document.removeEventListener('mouseup', onMouseUp, false );
-	
-		
 	} );
-	
-
-	buttonRow.add( btn );
-
-	container.add( buttonRow );
-*/
-	
-
-
-	//
 
 	function updateRenderer() {
 

@@ -115,7 +115,8 @@ var Editor = function () {
 	// create THREE.Object3D and add it to the scene
 	// query the database for the sections
 	this.sections = {'sections': []};
-	
+	this.sectMaterials = {'sectMaterials': []};
+
 	
 	
 
@@ -539,7 +540,8 @@ Editor.prototype = {
 		this.scripts = json.scripts;
 
 		this.setScene( loader.parse( json.scene ) );
-
+		this.sections = json.sections;
+        this.sectMaterials = json.sectMaterials;
 	},
 
 	toJSON: function () {
@@ -575,7 +577,9 @@ Editor.prototype = {
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
-			history: this.history.toJSON()
+			history: this.history.toJSON(),
+			sections: this.sections,
+			sectMaterials: this.sectMaterials,
 
 		};
 
