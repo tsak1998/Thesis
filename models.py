@@ -83,6 +83,7 @@ class Sections(db.Model):
     user_id = Column('user_id', String(45), nullable=False)
     section_id = Column('section_id', Integer)
     type = Column('type', String(10))
+    dimensions = Column('dimensions', String(10))
     E = Column('E', Float)
     G = Column('G', Float)
     A = Column('A', Float)
@@ -139,7 +140,7 @@ class Displacements(db.Model):
 
 def create_table():
     Base = declarative_base()
-    engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+    engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
     db.Model.metadata.create_all(bind=engine)
 
-# create_table()
+#create_table()

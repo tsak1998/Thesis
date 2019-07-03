@@ -111,8 +111,9 @@ def plot_mqn(user_id, mqn):
     plot_html = plot_html.replace('require(["plotly"], function(Plotly) ', '')
     plot_html = plot_html[146:len(plot_html)-11]
     plot_html = plot_html.replace(id, 'mqn')
-    f_name = r'C:\Users\tsaka\Desktop\thesis_repo\static\js\results\mqn_'+user_id+'.js'
+    f_name = '/home/tsakalis/Desktop/thesis_repo/static/js/results/mqn_'+user_id+'.js'
     f = open(f_name,'w')
+    print(f)
     f.write(plot_html)
     f.close()
 
@@ -194,7 +195,7 @@ def plot_displacements(user_id, displacements):
     plot_html = plot_html.replace('require(["plotly"], function(Plotly) ', '')
     plot_html = plot_html[146:len(plot_html)-11]
     plot_html = plot_html.replace(id, 'displacements')
-    f_name = r'C:\Users\tsaka\Desktop\thesis_repo\static\js\results\displacements_'+user_id+'.js'
+    f_name = '/home/tsakalis/Desktop/thesis_repo/static/js/results/displacements_'+user_id+'.js'
     f = open(f_name,'w')
     f.write(plot_html)
     f.close()
