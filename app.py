@@ -196,12 +196,6 @@ def autosave():
         save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials)
 
 
-@app.route('/loadsections', methods=['POST'])
-def load_sections():
-    user_id = session['username']
-    sect = pd.read_sql("SELECT material, sect_type, section_id from sections WHERE user_id='" + user_id + "'", engine)
-    return sect.to_json(orient='table', index=False)
-
 
 @app.route('/yellow', methods=["GET", "POST"])
 def run_analysis():
