@@ -117,9 +117,9 @@ Sidebar.Supports = function ( editor ) {
 	var buttonRow = new UI.Row();
 	var btn = new UI.Button( 'Define Support' ).onClick( function () {
 		nodes = node.getValue().split(",");
-
-		for(i=0; i<nodes.length; i++){
-			name = 'Node '+nodes[i];
+		console.log(nodes)
+		for(j=0; j<nodes.length; j++){
+			name = 'Node '+nodes[j];
 			node_ = editor.scene.getObjectByName( name );
 			editor.scene.remove( node_ );
 

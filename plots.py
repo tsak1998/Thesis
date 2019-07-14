@@ -70,7 +70,7 @@ def plot_mqn(user_id, mqn):
         
         show = np.array([True, True, True, True, True, True])
         
-        visible = np.zeros((13*6), dtype=bool)
+        visible = np.zeros((306*6), dtype=bool)
         visible[i:j] = show
         
         element_id = df2.iloc[0].en
@@ -111,7 +111,8 @@ def plot_mqn(user_id, mqn):
     plot_html = plot_html.replace('require(["plotly"], function(Plotly) ', '')
     plot_html = plot_html[146:len(plot_html)-11]
     plot_html = plot_html.replace(id, 'mqn')
-    f_name = '/home/tsakalis/Desktop/thesis_repo/static/js/results/mqn_'+user_id+'.js'
+    #f_name = '/home/tsakalis/Desktop/thesis_repo/static/js/results/mqn_'+user_id+'.js'
+    f_name = 'static/js/results/mqn_' + user_id + '.js'
     f = open(f_name,'w')
     print(f)
     f.write(plot_html)
@@ -154,7 +155,7 @@ def plot_displacements(user_id, displacements):
         
         show = np.array([True, True])
         
-        visible = np.zeros((13*6), dtype=bool)
+        visible = np.zeros((306*6), dtype=bool)
         visible[i:j] = show
         
         element_id = df2.iloc[0].en
@@ -195,7 +196,7 @@ def plot_displacements(user_id, displacements):
     plot_html = plot_html.replace('require(["plotly"], function(Plotly) ', '')
     plot_html = plot_html[146:len(plot_html)-11]
     plot_html = plot_html.replace(id, 'displacements')
-    f_name = '/home/tsakalis/Desktop/thesis_repo/static/js/results/displacements_'+user_id+'.js'
+    f_name = 'static/js/results/displacements_'+user_id+'.js'
     f = open(f_name,'w')
     f.write(plot_html)
     f.close()

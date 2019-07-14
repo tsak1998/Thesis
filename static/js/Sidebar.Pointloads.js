@@ -108,15 +108,15 @@ Sidebar.PointLoads = function ( editor ) {
     var buttonRow = new UI.Row();
     
     var btn = new UI.Button( 'Add Load' ).onClick( function () {
-        elements = object.getValue().split(",");
+        elements_ = object.getValue().split(",");
 
-        for ( var i = 0, l = elements.length; i < l; i ++ ) {
+        for ( var j = 0; j < elements_.length; j ++ ) {
             load_id+=1;
             value = parseFloat(loadInp.getValue());
             
             if (loadType.getValue()=='onNode'){
-                name = 'Node '+String( elements[i] );
-                
+                name = 'Node '+String( elements_[j] );
+                console.log(j, elements_[j])
                 obj = editor.scene.getObjectByName( name );
                 objectId = obj.userData.nn
                 xDir = new THREE.Vector3()
@@ -129,7 +129,7 @@ Sidebar.PointLoads = function ( editor ) {
                 positionOffset = new THREE.Vector3( xDir.x*c*obj.userData.length, xDir.z*c*obj.userData.length, xDir.y*c*obj.userData.length)
                 c =99999
             }else{
-                name = 'Element '+String( elements[i] );
+                name = 'Element '+String( elements_[j] );
                 obj = editor.scene.getObjectByName( name );
                 objectId = obj.userData.en
                 // direction vector
