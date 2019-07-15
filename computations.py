@@ -284,6 +284,8 @@ def transformation_array(element, nodei, nodej):
 
 
 def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs, elements):
+    t = time.time()
+
     P_nodal = np.zeros((len(arranged_dofs), 1))
     S = np.zeros((len(arranged_dofs), 1))
     fixed_forces = np.zeros((12, len(elements)))
@@ -360,7 +362,7 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         S[dofc:dofd] += np.transpose(rot).dot(A_j)
         fixed_forces[:6, elm.index[0]] = np.reshape(A_i, 6)
         fixed_forces[6:, elm.index[0]] = np.reshape(A_j, 6)
-
+    print('nodal forces: ', time.time()-t)
     return P_nodal, S, fixed_forces
 
 
@@ -835,7 +837,7 @@ def main(user_id, engine):
     print('not plots: ', time.time() - t_whole)
     #plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)
-    # MQN_values.to_csv('model_test/test_1/mqn.csv')
+    MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
 
 

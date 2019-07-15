@@ -3,16 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment=".......">
       <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/C:/Users/tsaka/Desktop/thesis_repo/static/js/results/displacements_cv13116.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/C:/Users/tsaka/Desktop/thesis_repo/static/js/results/mqn_cv13116.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/plots-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/plots-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Untitled.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Untitled.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/home/tsakalis/Desktop/thesis_repo/static/js/results/mqn_cv13116.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Pointloads.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Pointloads.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Supports.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Supports.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/mqn.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/plots.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/displacements_cv13116.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/results/mqn_cv13116.js" afterDir="false" />
     </list>
@@ -27,7 +22,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
+            <state relative-caret-position="102">
               <caret line="19" column="66" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
               <folding>
                 <element signature="e#0#108#0" expanded="true" />
@@ -39,8 +34,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/computations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="842" column="17" lean-forward="true" selection-start-line="842" selection-start-column="17" selection-end-line="842" selection-end-column="17" />
+            <state relative-caret-position="245">
+              <caret line="822" column="53" lean-forward="true" selection-start-line="822" selection-start-column="53" selection-end-line="822" selection-end-column="53" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -51,7 +46,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/save_db.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
+            <state relative-caret-position="238">
               <caret line="14" selection-start-line="14" selection-end-line="14" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -63,7 +58,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/parser_.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
+            <state relative-caret-position="425">
               <caret line="25" selection-start-line="25" selection-end-line="25" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
@@ -75,11 +70,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plots.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="198" column="32" selection-start-line="198" selection-start-column="32" selection-end-line="198" selection-end-column="32" />
-              <folding>
-                <element signature="e#0#26#0" expanded="true" />
-              </folding>
+            <state>
+              <caret column="10" selection-start-column="10" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -209,8 +201,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="Scope" />
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -386,6 +378,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.033490937" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -718,22 +711,12 @@
     </entry>
     <entry file="file://$USER_HOME$/Downloads/v1.00/v1.00/model1.dat.out" />
     <entry file="file://$USER_HOME$/anaconda3/lib/python2.7/site-packages/werkzeug/serving.py" />
-    <entry file="file://$PROJECT_DIR$/save_db.py">
+    <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        <state relative-caret-position="102">
+          <caret line="19" column="66" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/parser_.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#108#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -769,30 +752,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.py">
+    <entry file="file://$PROJECT_DIR$/parser_.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="66" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
+        <state relative-caret-position="425">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
           <folding>
-            <element signature="e#0#108#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/save_db.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/plots.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="198" column="32" selection-start-line="198" selection-start-column="32" selection-end-line="198" selection-end-column="32" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
+        <state>
+          <caret column="10" selection-start-column="10" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/computations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="842" column="17" lean-forward="true" selection-start-line="842" selection-start-column="17" selection-end-line="842" selection-end-column="17" />
+        <state relative-caret-position="245">
+          <caret line="822" column="53" lean-forward="true" selection-start-line="822" selection-start-column="53" selection-end-line="822" selection-end-column="53" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
