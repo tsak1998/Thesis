@@ -84,7 +84,7 @@ Sidebar.PointLoads = function ( editor ) {
 
     //Load values (Px,Py,Pz,...)
 	var loadRow = new UI.Row();
-	var loadInp = new UI.Input( '' ).setLeft( '100px' ).setWidth( '150px' ).onChange( function () {
+	var loadInp = new UI.Input( '' ).setLeft( '100px' ).setWidth( '50px' ).onChange( function () {
 
     } );
     // load.value = 'Px,Py,Pz,Mx,My,Mz'
@@ -95,7 +95,7 @@ Sidebar.PointLoads = function ( editor ) {
     container.add(loadRow)
 
     var objectRow = new UI.Row();
-	var object = new UI.Input( '' ).setLeft( '100px' ).setWidth( '40px' ).onChange( function () {
+	var object = new UI.Input( '' ).setLeft( '100px' ).setWidth( '100px' ).onChange( function () {
 
 	} );
     
@@ -145,15 +145,11 @@ Sidebar.PointLoads = function ( editor ) {
             }
             
             
-            
-            
             if (loadType2.getValue()=='load') {
                 
              
                 var positions = [0, 0, 0, -0.07, -0.05, 0, 0.07, -0.05, 0, 0, 0, 0, 0, -1, 0];
-                var material = new THREE.LineBasicMaterial({
-                    color: 0x0000ff
-                });
+                var material = new THREE.LineBasicMaterial( { color : 0xff0000 });
                 
                 var geometry = new THREE.BufferGeometry();
 
@@ -162,20 +158,20 @@ Sidebar.PointLoads = function ( editor ) {
                 geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
                 geometry.computeBoundingSphere();
                 
-                line = new THREE.Line( geometry, member_material );
+                line = new THREE.Line( geometry, material );
                 line.name = 'Point Load '+String(load_id)
-                line.material.linewidth = 3
-                line.applyMatrix(obj.matrix)
-                line.position.x += positionOffset.x
-                line.position.y += positionOffset.y
-                line.position.z += positionOffset.z
-                if (direction.getValue()=='y') {
+                line.material.linewidth = 1
+                line.applyMatrix(m);
+                line.position.x += positionOffset.x;
+                line.position.y += positionOffset.y;
+                line.position.z += positionOffset.z;
+                if (direction.getValue()=='x') {
                     if (value>0) {
                         line.rotateZ( -Math.PI/2 )
                     }else{
                         line.rotateZ( Math.PI/2 )
                     }
-                } else if (direction.getValue()=='x') {
+                } else if (direction.getValue()=='y') {
                     if (value>0) {
                         line.rotateX( Math.PI/2 )
                     }else{
@@ -241,9 +237,9 @@ Sidebar.PointLoads = function ( editor ) {
                                 'direction' : direction.getValue(),
                                 'value': parseFloat(loadInp.getValue())}
             }
-            
+           
             editor.execute( new AddObjectCommand(line) )
-            console
+            
         }
 
 	} );
@@ -252,18 +248,8 @@ Sidebar.PointLoads = function ( editor ) {
 
 	buttonRow.add( btn );
 
-    container.add( buttonRow );
-    var outliner = new UI.Outliner( editor );
-	outliner.onChange( function () {
-
-		//ignoreObjectSelectedSignal = true;
-
-		//editor.history.goToState( parseInt( outliner.getValue() ) );
-
-		//ignoreObjectSelectedSignal = false;
-
-    } );
-    
+	container.add( buttonRow );
+	
     function buildOption( object, draggable ) {
 
 		var option = document.createElement( 'div' );
@@ -343,11 +329,13 @@ Sidebar.PointLoads = function ( editor ) {
 	var outliner = new UI.Outliner( editor );
 	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
-
+		if ( editor.selected != null){
+			signals.objectDeselected.dispatch( editor.selected )
+		};
 		ignoreObjectSelectedSignal = true;
         valueId = parseInt( outliner.getValue())
 
-		 if (valueId == pLoads.id){
+		if (valueId == pLoads.id){
 
         }else{
            editor.selectById( valueId );
@@ -364,29 +352,17 @@ Sidebar.PointLoads = function ( editor ) {
         if (valueId == pLoads.id){
 
         }else{
-           editor.focusById( valueId );
+			
+		   editor.focusById( valueId );
+		   if ( editor.selected != null){
+			signals.objectSelected.dispatch( editor.selected )
+		};
         }
 
 	} );
 
-	container.add( outliner );
-	container.add( new UI.Break() );
 
-
-    /*
-	var nodeXRow = new UI.Row();
-	var nodeX = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
-
-
-
-	} );
-
-
-	nodeXRow.add( new UI.Text('x').setWidth( '90px' ) );
-	nodeXRow.add( nodeX );
-
-	container.add( nodeXRow );
-	*/
+   container.add( outliner );
 
 
     var pLoads = new THREE.Object3D()
@@ -398,7 +374,7 @@ Sidebar.PointLoads = function ( editor ) {
 			if (obj.userData.type == 'p_load') {
 				p_loads.push( obj );
 			}
-		}
+		};
 		var camera = editor.camera;
 		var scene = editor.scene;
 
@@ -417,8 +393,7 @@ Sidebar.PointLoads = function ( editor ) {
 				option.style.paddingLeft = ( pad * 10 ) + 'px';
 				options.push( option );
 
-				// addObjects( object.children, pad + 1 );
-
+				
 			}
 
 		} )
@@ -443,114 +418,72 @@ Sidebar.PointLoads = function ( editor ) {
 	}
 
 	var nodeIdRow = new UI.Row();
-	var nodeId = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	var nodeId = new UI.Number().setPrecision( 0 ).setLeft('30px').setWidth( '30px' )//.onChange( update );
 	nodeId.dom.disabled = true;
 	nodeId.dom.value = '';
 
-	nodeIdRow.add( new UI.Text( 'Node Id').setWidth( '90px' ) );
+	nodeIdRow.add( new UI.Text( 'Node/Elmnt').setWidth( '90px' ) );
 	nodeIdRow.add( nodeId );
 
 	container.add( nodeIdRow );
 
-	// position
+    var dirRow = new UI.Row();
+	var dir = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	dir.dom.disabled = true;
+    dir.dom.value = '';
+        
+    dirRow.add( new UI.Text( 'direction' ).setWidth( '90px' )  );
 
-	var objectPositionRow = new UI.Row();
-	var objectPositionX = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
-	objectPositionX.dom.disabled = true;
-	objectPositionX.dom.value = '';
-	var objectPositionY = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
-	objectPositionY.dom.disabled = true;
-	objectPositionY.dom.value = '';
-	var objectPositionZ = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
-    objectPositionZ.dom.disabled = true;
-    objectPositionZ.dom.value = '';
-	objectPositionRow.add(  new UI.Text( 'Coordinates').setWidth( '90px' ) );
-	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
+	dirRow.add( dir );
 
-    container.add(objectPositionRow)
+    container.add( dirRow )
+	
+    var cRow = new UI.Row();
+	var c_ = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	c_.dom.disabled = true;
+    c_.dom.value = '';
+    
+    
+    cRow.add( new UI.Text( 'c (x/L)' ).setWidth( '90px' )  );
+
+	cRow.add( c_ );
+
+    container.add(cRow)
+
+    var valueRow = new UI.Row();
+	var val = new UI.Number().setPrecision( 3 ).setWidth( '50px' )//.onChange( update );
+	val.dom.disabled = true;
+    val.dom.value = '';
+    
+    valueRow.add( new UI.Text( 'Value' ).setWidth( '90px' )  );
+	
+	valueRow.add( val );
+
+    container.add(valueRow)
 
     //dofs
 
-    var dofsRow = new UI.Row();
-	var dofX = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
-	dofX.dom.disabled = true;
-	dofX.max = 1;
-	dofX.min = 0;
-	dofX.dom.value = '';
-	var dofY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-	dofY.dom.disabled = true;
-	dofY.max = 1;
-	dofY.min = 0;
-	dofY.dom.value = '';
-	var dofZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-    dofZ.dom.disabled = true;
-    dofZ.max = 1;
-	dofZ.min = 0;
-	dofZ.dom.value = '';
-    var dofRX = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-	dofRX.dom.disabled = true;
-    dofRX.max = 1;
-	dofRX.min = 0;
-	dofRX.dom.value = '';
-	var dofRY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-	dofRY.dom.disabled = true;
-	dofRY.max = 1;
-	dofRY.min = 0;
-	dofRY.dom.value = '';
-	var dofRZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-    dofRZ.dom.disabled = true;
-    dofRZ.max = 1;
-	dofRZ.min = 0;
-	dofRZ.dom.value = '';
-	dofsRow.add(  new UI.Text( 'Dofs').setWidth( '90px' ) );
-	dofsRow.add( dofX, dofY, dofZ, dofRX, dofRY, dofRZ);
-
-    container.add(dofsRow)
-
+    
     refreshUI();
 
     var updatePloadProperties = function(values){
         nodeId.dom.value = values.nn
-        objectPositionX.dom.value = values.coord_x
-        objectPositionY.dom.value = values.coord_y
-        objectPositionZ.dom.value = values.coord_z
-        dofX.dom.value = values.dof_dx
-        dofY.dom.value = values.dof_dy
-        dofZ.dom.value = values.dof_dz
-        dofRX.dom.value = values.dof_rx
-        dofRY.dom.value = values.dof_ry
-        dofRZ.dom.value = values.dof_rz
+        dir.dom.value = values.direction
+        c_.dom.value = values.c
+        val.dom.value = values.value
     }
 
     signals.editorCleared.add( refreshUI );
 
 	signals.sceneGraphChanged.add( refreshUI );
 
-	signals.objectChanged.add( function ( object ) {
-
-		var options = outliner.options;
-
-		for ( var i = 0; i < options.length; i ++ ) {
-
-			var option = options[ i ];
-
-			if ( option.value === object.id ) {
-
-				option.innerHTML = buildHTML( object );
-				return;
-
-			}
-
-		}
-
-	} );
 
 	signals.objectSelected.add( function ( object ) {
 
 	    if (object!=null){
 
-	        if(object.userData.type == 'node'){
-                updatePloadProperties(object.userData)
+	        if(object.userData.type == 'p_load'){
+                //updateElementProperties(object.userData)
             }
         }
 		if ( ignoreObjectSelectedSignal === true ) return;
@@ -558,12 +491,8 @@ Sidebar.PointLoads = function ( editor ) {
 		outliner.setValue( object !== null ? object.id : null );
 
 	} );
-
-	function updateRenderer() {
-
-		createRenderer( THREE.WebGLRenderer, true, false, false, false);
-
-	}
+	
+	
 
 	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
 
@@ -584,23 +513,6 @@ Sidebar.PointLoads = function ( editor ) {
 	}
 
     refreshUI(); 
-
-	
-/*
-    var ballGeo = new THREE.SphereGeometry(10,35,35);
-    var material = new THREE.MeshPhongMaterial({color: 0xF7FE2E}); 
-    var ball = new THREE.Mesh(ballGeo, material);
-
-    var pendulumGeo = new THREE.CylinderGeometry(1, 1, 50, 16);
-    ball.updateMatrix();
-    pendulumGeo.merge(ball.geometry, ball.matrix);
-
-    var pendulum = new THREE.Mesh(pendulumGeo, material);
-    editor.execute( new AddObjectCommand(pendulum) );
-*/
-	//console.log(Viewport.transformControls.object)
-	
-	nodes = [];
 
 	buttonRow.add( btn );
 

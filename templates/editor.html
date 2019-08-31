@@ -95,6 +95,8 @@
 		<script src="{{ url_for('static', filename='js/Sidebar.Results.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Sections.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Pointloads.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Distloads.js') }}"></script>
+
 		<script src="{{ url_for('static', filename='js/Sidebar.Settings.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Settings.Shortcuts.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Settings.Viewport.js') }}"></script>
@@ -161,6 +163,13 @@
 		<script src="{{ url_for('static', filename='js/drawNodes.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/drawElements.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/drawPointLoads.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/drawDistLoads.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/addSections.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/customSignals.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/resultsMqn.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/resusltsDisplacements.js') }}"></script>
+		
+
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
 		<link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
 		<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
@@ -286,9 +295,79 @@
 					modal.show( content );
 
 				} );
+				
+				// custom signal functions 
+				labels = editor.labels
+				axes = editor.axes
+				//labels.name = 'Labels'
+				editor.sceneHelpers.add(labels)
+				editor.sceneHelpers.add(axes)
+
+				signals.objectRemoved.add( function ( object ) {
+					axis = editor.sceneHelpers.getObjectByName(object.name+'axis')
+					editor.sceneHelpers.remove(axis)
+					lbl = editor.sceneHelpers.getObjectByName(object.name+'lbl')
+					editor.sceneHelpers.remove(lbl)
+					
+				} );
+			
+				signals.objectAdded.add( function ( object ) {
+					if (object.userData.type == 'element'){
+						var label = new SpriteText(object.userData.en, 0.015);
+						x = object.userData.label_position.x+0.1
+						y = object.userData.label_position.y+0.1
+						z = object.userData.label_position.z+0.1
+						label.position.set(x, y, z);
+				
+						label.name = object.name+'lbl';
+						labels.add(label);
+
+						var localAxes = new THREE.Object3D();
+						var origin = object.userData.label_position;        
+						var alength = 0.6;
+						var hex;
+
+						
+						hex = 0xff0000;
+						arrowHelper = new THREE.ArrowHelper( object.userData.xLocal, origin, alength, hex );
+						localAxes.add ( arrowHelper );
+						
+						hex = 0x0000ff;
+						arrowHelper = new THREE.ArrowHelper( object.userData.yLocal, origin, alength, hex );
+						localAxes.add ( arrowHelper );
+
+						//var yDir = new THREE.Vector3().crossVectors( xDir, zDir );
+					
+						hex = 0x00ff00;
+						arrowHelper = new THREE.ArrowHelper( object.userData.zLocal, origin, alength, hex );
+						localAxes.add ( arrowHelper );
+						localAxes.name = object.name+'axis'
+						editor.axes.add(localAxes)
+						editor.sceneHelpers.add(localAxes)
+						editor.sceneHelpers.add(label);
+
+					} else if (object.userData.type == 'node'){
+						var label = new SpriteText(object.userData.nn, 0.018);
+						x = object.userData.label_position.x+0.1
+						y = object.userData.label_position.y+0.1
+						z = object.userData.label_position.z+0.1
+						label.position.set(x, y, z);
+				
+						label.name = object.name+'lbl';
+						labels.add(label)
+						editor.sceneHelpers.add(label)
+					}
+					
+				} );
+				signals.editorCleared.add( function (  ) {
+					editor.label = new THREE.Object3D();
+					editor.label.name = 'Labels'
+					
+				} );
 
 			} );
 
+			
 			//
 
 			document.addEventListener( 'dragover', function ( event ) {
@@ -345,7 +424,13 @@
 		
 	</div>
 	<script>
+		console.log(editor)
 		function buildTable(data, headers, id) {
+			check = document.getElementById(id);
+			console.log(check)
+			if (check != undefined ){
+				//document.dom.removeChild(check)
+			}
 			var table = document.createElement("table");
 			table.className="gridtable";
 			var thead = document.createElement("thead");
@@ -384,8 +469,8 @@
 				}
 			});	
 	</script>
-	
 	<script>
+		
 		MOUNTAINS =  [{"user_id":"cv13116","nn":1,"f_x":-49.352,"f_y":-0.578,"f_z":-35.821,"m_x":3.745,"m_y":-122.859,"m_z":0.464},{"user_id":"cv13116","nn":6,"f_x":-50.99,"f_y":-3.367,"f_z":-26.298,"m_x":7.656,"m_y":-128.082,"m_z":0.402},{"user_id":"cv13116","nn":7,"f_x":-50.9,"f_y":0.797,"f_z":30.223,"m_x":-3.684,"m_y":-127.694,"m_z":0.536},{"user_id":"cv13116","nn":8,"f_x":-48.759,"f_y":3.147,"f_z":31.895,"m_x":-6.684,"m_y":-120.654,"m_z":0.615}]
 		
 		$(function () {
@@ -397,8 +482,7 @@
 			});
 			
 			$("#openerMqn").click(function() {
-				var file = 'static/js/results/mqn_'.concat(user, '.js')
-				$.getScript(file)
+				
 				$("#mqn").dialog('open')
 				
 					
@@ -414,11 +498,9 @@
 			});
 			
 			$("#openerDisplacements").click(function() {
-				var file = 'static/js/results/displacements_'.concat(user, '.js')
-				$.getScript(file)
+				
 				$("#displacements").dialog('open');
-				
-				
+								
 			});
 		});
 
@@ -439,10 +521,10 @@
 				dataType: 'text',
 				success: function (e) {
 					var data = JSON.parse(e)
-					console.log(data)
+					
 					headers = ['id', 'user_id', 'Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
 					
-					reactDiv.appendChild(buildTable( data.data, headers, 'react-table' ));
+					reactDiv.appendChild(buildTable( data.data, headers, 'react_table' ));
 					$("#reactions").dialog('open');
 				},
 				error: function(xhr, status, error) {
@@ -481,8 +563,67 @@
 	<div id="reactions" title="Reactions">
 		<div id='react-table'></div>
 	</div>
-	<div id="mqn" title="MQN"></div>
-	<div id="displacements" title="Displacements"></div>
+	
+	<div id="mqn" title="MQN">
+			<div>
+				<select name='element' id='element'>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+					<option value="13">13</option>
+				  </select>
+					 <select name='value' id='value'>
+					<option value="Fx">Fx</option>
+					<option value="Fy">Fy</option>
+					<option value="Fz">Fz</option>
+					<option value="Mx">Mx</option>
+					<option value="My">My</option>
+					<option value="Mz">Mz</option>
+				  </select>
+				</div> 
+			<div id="selectionsMqn">
+						
+			</div>  
+			<div id="graphMqn">
+			</div>
+		</div>
+		<div id="displacements" title="Displacements">
+				<div>
+						<select name='element2' id='element2'>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="12">12</option>
+							<option value="13">13</option>
+						  </select>
+							 <select name='value2' id='value2'>
+							<option value="uy">uy</option>
+							<option value="uz">uz</option>
+						<select>
+						</div> 
+			<div id="selectionsDisplacements">
+						
+			</div>  
+			<div id="graphDisplacements">
+			</div>
+		</div>
 	<div id="sections" title="Sections" style="background-color: LightGray">
 		<ul>
 			<li><a href="#material-tab">Material</a></li>
@@ -494,13 +635,6 @@
 		<div id="section-tab">
 		</div>
 	</div>
-	<script>
-
-		reactDiv = document.getElementById( 'react-table' )
-		headers = ['id', 'user_id', 'Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
-		data = []
-		
-	</script>
 
 	<style>
 			table.gridtable {

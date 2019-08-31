@@ -85,6 +85,7 @@ var Editor = function () {
 
 
 	};
+	
 
 	this.config = new Config();
 	this.history = new History( this );
@@ -114,12 +115,16 @@ var Editor = function () {
 	//look  if the object is created
 	// create THREE.Object3D and add it to the scene
 	// query the database for the sections
-	this.sections = {'sections': []};
-	this.sectMaterials = {'sectMaterials': []};
-
-	
-	
-
+	this.sections = new THREE.Scene();
+	this.sectMaterials = new THREE.Scene();
+	this.labels = new THREE.Object3D();
+	this.labels.name = 'Labels'
+	this.axes = new THREE.Object3D();
+	this.axes.name = 'Axes'
+	this.sceneHelpers.add(this.axes)
+		
+	// custom signlas functions need to add elsewhere
+	customSignals(editor)
 };
 
 Editor.prototype = {
@@ -466,7 +471,7 @@ Editor.prototype = {
 	deselect: function () {
 
 		this.select( null );
-
+		
 	},
 
 	focus: function ( object ) {
@@ -508,7 +513,21 @@ Editor.prototype = {
 		this.materials = {};
 		this.textures = {};
 		this.scripts = {};
+		this.sections = new THREE.Scene();
+		this.sectMaterials = new THREE.Scene();
+		
+		// clear labels
+		lbls = this.labels.children
+		axs = this.axes.children
+		while ( lbls.length > 0 ) {
+			this.removeObject( lbls[ 0 ] );
+		};
 
+		while ( axs.length > 0 ) {
+			this.removeObject( axs[ 0 ] );
+		};
+		
+		
 		this.deselect();
 
 		this.signals.editorCleared.dispatch();
@@ -518,7 +537,7 @@ Editor.prototype = {
 	//
 
 	fromJSON: function ( json ) {
-
+		console.log(json)
 		var loader = new THREE.ObjectLoader();
 
 		// backwards
@@ -540,8 +559,8 @@ Editor.prototype = {
 		this.scripts = json.scripts;
 
 		this.setScene( loader.parse( json.scene ) );
-		this.sections = json.sections;
-        this.sectMaterials = json.sectMaterials;
+		this.sections = loader.parse(json.sections);
+        this.sectMaterials = loader.parse(json.sectMaterials);
 	},
 
 	toJSON: function () {
@@ -578,8 +597,9 @@ Editor.prototype = {
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),
-			sections: this.sections,
-			sectMaterials: this.sectMaterials,
+			sections: this.sections.toJSON(),
+			sectMaterials: this.sectMaterials.toJSON(),
+			axes: this.axes.toJSON(),
 
 		};
 

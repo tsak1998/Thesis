@@ -92,7 +92,9 @@ Sidebar.Scene = function ( editor ) {
 	var outliner = new UI.Outliner( editor );
 	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
-
+		if ( editor.selected != null){
+			signals.objectDeselected.dispatch( editor.selected )
+		};
 		ignoreObjectSelectedSignal = true;
 
 		editor.selectById( parseInt( outliner.getValue() ) );
@@ -164,7 +166,7 @@ Sidebar.Scene = function ( editor ) {
 		outliner.setOptions( options );
 
 		if ( editor.selected !== null ) {
-
+			
 			outliner.setValue( editor.selected.id );
 
 		}
@@ -208,11 +210,11 @@ Sidebar.Scene = function ( editor ) {
 	} );
 
 	signals.objectSelected.add( function ( object ) {
-
+		
 		if ( ignoreObjectSelectedSignal === true ) return;
-
+		
 		outliner.setValue( object !== null ? object.id : null );
-
+		
 	} );
 
 	return container;

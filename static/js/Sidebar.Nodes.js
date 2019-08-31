@@ -279,7 +279,9 @@ Sidebar.Nodes = function ( editor ) {
 	var outliner = new UI.Outliner( editor );
 	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
-
+		if ( editor.selected != null){
+			signals.objectDeselected.dispatch( editor.selected )
+		};
 		ignoreObjectSelectedSignal = true;
         valueId = parseInt( outliner.getValue())
 
@@ -300,7 +302,10 @@ Sidebar.Nodes = function ( editor ) {
         if (valueId == Nodes.id){
 
         }else{
-           editor.focusById( valueId );
+		   editor.focusById( valueId );
+		   if ( editor.selected != null){
+				signals.objectSelected.dispatch( editor.selected )
+			};
         }
 
 	} );
@@ -409,39 +414,58 @@ Sidebar.Nodes = function ( editor ) {
 
     var dofsRow = new UI.Row();
 	var dofX = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
-	dofX.dom.disabled = true;
 	dofX.max = 1;
 	dofX.min = 0;
+	dofX.step = 1;
 	dofX.dom.value = '';
-	var dofY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-	dofY.dom.disabled = true;
+	var dofY = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
 	dofY.max = 1;
 	dofY.min = 0;
+	dofY.step = 1;
 	dofY.dom.value = '';
-	var dofZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-    dofZ.dom.disabled = true;
+	var dofZ = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+    dofZ.step = 1;
     dofZ.max = 1;
 	dofZ.min = 0;
 	dofZ.dom.value = '';
-    var dofRX = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-	dofRX.dom.disabled = true;
+    var dofRX = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	dofRX.step = 1;
     dofRX.max = 1;
 	dofRX.min = 0;
 	dofRX.dom.value = '';
-	var dofRY = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-	dofRY.dom.disabled = true;
+	var dofRY = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+	dofRY.step = 1;
 	dofRY.max = 1;
 	dofRY.min = 0;
 	dofRY.dom.value = '';
-	var dofRZ = new UI.Number().setPrecision( 1 ).setWidth( '30px' )//.onChange( update );
-    dofRZ.dom.disabled = true;
+	var dofRZ = new UI.Number().setPrecision( 0 ).setWidth( '30px' )//.onChange( update );
+    dofRZ.step = 1;
     dofRZ.max = 1;
 	dofRZ.min = 0;
 	dofRZ.dom.value = '';
 	dofsRow.add(  new UI.Text( 'Dofs').setWidth( '90px' ) );
 	dofsRow.add( dofX, dofY, dofZ, dofRX, dofRY, dofRZ);
 
-    container.add(dofsRow)
+	container.add(dofsRow)
+	
+	var buttonRow = new UI.Row();
+	var btn = new UI.Button( 'Update Supports' ).onClick( function () {
+		valueId = parseInt( outliner.getValue());
+		nod = editor.scene.getObjectById( valueId );
+		nod.userData.dof_dx = dofX.dom.value
+		nod.userData.dof_dy = dofY.dom.value
+		nod.userData.dof_dz = dofZ.dom.value
+		nod.userData.dof_rx = dofRX.dom.value
+		nod.userData.dof_ry = dofRY.dom.value
+		nod.userData.dof_rz = dofRZ.dom.value
+		
+		editor.storage.set( editor.toJSON() );
+        editor.signals.savingFinished.dispatch();
+	});
+
+	buttonRow.add( btn );
+	
+	container.add( buttonRow );
 
     refreshUI();
 
@@ -486,6 +510,21 @@ Sidebar.Nodes = function ( editor ) {
 	    if (object!=null){
 
 	        if(object.userData.type == 'node'){
+                updateNodeProperties(object.userData)
+            }
+        }
+		if ( ignoreObjectSelectedSignal === true ) return;
+
+		outliner.setValue( object !== null ? object.id : null );
+
+	} );
+
+
+	signals.objectSelected.add( function ( object ) {
+
+	    if (object!=null){
+
+	        if(object.userData.type == 'element'){
                 updateNodeProperties(object.userData)
             }
         }

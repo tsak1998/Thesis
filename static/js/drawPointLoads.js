@@ -1,9 +1,10 @@
 function drawPointLoads( editor, pointLoads ){
-    for (i=0; i<pointLoads.length; i++) {
-        var pLoad = pointLoads[i];
+    for (a=0; a<pointLoads.length; a++) {
+        
+        var pLoad = pointLoads[a];
         var c = pLoad.c;
         
-        var load_id = i+1;
+        var load_id = a+1;
         if (pLoad.p_x != 0){
             type = 'p_load';
             direction = 'x';
@@ -31,16 +32,17 @@ function drawPointLoads( editor, pointLoads ){
         }
 
         if (c==99999) {
-            // null stands for load on noad
             var object = editor.scene.getObjectByName( 'Node '+String(pLoad.nn) );
             objectId = object.nn;
             m = new THREE.Matrix4();
             m.copyPosition( object.matrix );
             positionOffset = new THREE.Vector3( 0, 0, 0)
-            console.log(m)
+            
         }else {
+           
             var object = editor.scene.getObjectByName( 'Element '+String(pLoad.nn) );
             objectId = object.en;
+                    
             xDir = new THREE.Vector3()
             yDir = new THREE.Vector3()
             zDir = new THREE.Vector3()
@@ -50,7 +52,6 @@ function drawPointLoads( editor, pointLoads ){
             positionOffset = new THREE.Vector3( xDir.x*c*object.userData.length, xDir.y*c*object.userData.length, xDir.z*c*object.userData.length)
 
         }
-       
         
 
             if (type=='p_load') {
@@ -92,7 +93,8 @@ function drawPointLoads( editor, pointLoads ){
                         line.rotateX( Math.PI )
                     }
                 }
-                line.userData = {'nn' : objectId,
+                console.log( pLoad.nn );
+                line.userData = {'nn' : pLoad.nn,
                             'type': 'p_load',
                             'c': c,
                             'direction' : direction,
@@ -139,7 +141,7 @@ function drawPointLoads( editor, pointLoads ){
                         line.rotateX( -Math.PI/2 )
                     }
                 }
-                line.userData = {'nn' : objectId,
+                line.userData = {'nn' : pLoad.nn,
                                 'type': 'p_moment',
                                 'c': c,
                                 'direction' : direction,

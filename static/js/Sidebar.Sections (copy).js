@@ -192,7 +192,7 @@ Sidebar.Sections = function ( editor ) {
 		}
 		sections.push(section)
 		editor.userData = {'sections': sections}
-		refreshUI();
+		
 	});
 
 	buttonRow.add( btn );
@@ -236,54 +236,6 @@ Sidebar.Sections = function ( editor ) {
 
 
 	
-	var refreshUI = function () {
-
-		var options = [];
-		var enumerator = 1;
-
-		function buildOption( object ) {
-
-			var option = document.createElement( 'div' );
-			option.value = object;
-			return option;
-
-		}
-
-		( function addObjects( objects ) {
-
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-				var object = '  ' + String(objects[ i ].section_id) + '  ' + String(objects[ i ].sect_mat) + '  ' + String(objects[ i ].sect_type);
-				var option = buildOption( object );
-				option.innerHTML = '&nbsp;' + object;
-
-				options.push( option );
-
-			}
-
-		} )( sections );
-
-
-
-		outliner.setOptions( options );
-
-	};
-
-	refreshUI();
-
-
-	refreshUI();
-
-	// events
-
-	signals.editorCleared.add( refreshUI );
-
-	signals.historyChanged.add( refreshUI );
-	signals.historyChanged.add( function ( cmd ) {
-
-		outliner.setValue( cmd !== undefined ? cmd.id : null );
-
-	} );
 
 
     //

@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -26,7 +26,7 @@ app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # set global engine
-engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
 
 
 @app.route('/')
@@ -62,9 +62,23 @@ def load():
         del elements['id'], elements['user_id']
         point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user + "'", engine)
         del point_loads['id'], point_loads['user_id']
+        dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user + "'", engine)
+        del dist_loads['id'], dist_loads['user_id']
+        materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user + "'", engine)
+        del materials['id'], materials['user_id']
+        sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user + "'", engine)
+        del sections['id'], sections['user_id']
+        elements.rename(columns={'number': 'en'}, inplace=True)
+        nodes.rename(columns={'number': 'nn'}, inplace=True)
+        point_loads.rename(columns={'number': 'nn'}, inplace=True)
+        # materials.rename(columns={'en': 'number'}, inplace=True)
+        dist_loads.rename(columns={'number': 'en'}, inplace=True)
+
+        mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user+ "'", engine)
+        group = mqn.groupby('number').apply(lambda x: x.to_json(orient='records'))
         return nodes.to_json(orient='table', index=False) + '|' + elements.to_json(orient='table',
                                                                                    index=False) + '|' + point_loads.to_json(
-            orient='table', index=False)
+            orient='table', index=False)+ '|' + dist_loads.to_json(orient='table', index=False)+ '|' + materials.to_json(orient='table', index=False)+ '|' + sections.to_json(orient='table', index=False)+ '|' + group.to_json(orient='table', index='False')
 
 
 @app.route('/readDXF', methods=['GET', 'POST'])
@@ -177,10 +191,11 @@ def logout():
 def save():
     if request.method == 'POST':
         data = request.get_json()
-        user_id = session['username']
-        elements, nodes, point_loads, sections, materials = parser(user_id, data, engine)
 
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials)
+        user_id = session['username']
+        elements, nodes, point_loads, sections, materials, dist_loads = parser(user_id, data, engine)
+
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials, dist_loads=dist_loads)
     return render_template('editor.html')
 
 
@@ -192,8 +207,8 @@ def autosave():
         # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
         data = request.get_json()
         user_id = session['username']
-        elements, nodes, point_loads, sections, materials = parser(user_id, data, engine)
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials)
+        elements, nodes, point_loads, sections, materials, dist_loads = parser(user_id, data, engine)
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials, dist_loads=dist_loads)
 
 
 
@@ -203,7 +218,33 @@ def run_analysis():
         data = request.get_json()
         user_id = session['username']
         main(user_id, engine)
-    return render_template('editor.html')
+
+        # get results
+        mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user_id + "'", engine)
+        group = mqn.groupby('number')
+        elements_results = {}
+        for index, g in group:
+            elements_results[index] = {'x': list(g.x.get_values()),
+                                       'Fx': list(g.Fx.get_values()),
+                                       'Fy': list(g.Fy.get_values()),
+                                       'Fz': list(g.Fz.get_values()),
+                                       'Mx': list(g.Fx.get_values()),
+                                       'My': list(g.Fy.get_values()),
+                                       'Mz': list(g.Fz.get_values())}
+
+        displacements = pd.read_sql("SELECT * from displacements WHERE user_id='" + user_id + "'", engine)
+        group = displacements.groupby('number')
+
+        displacements_results = {}
+        for index, g in group:
+            displacements_results[index] = {'x': list(g.x.get_values()),
+                                            'uy': list(g.uy.get_values()),
+                                            'uz': list(g.uz.get_values())}
+
+
+    return jsonify({'mqn': elements_results, 'displ' : displacements_results}) #jsonify(elements_results)+ '|' + jsonify(displacements_results)
+    #render_template('editor.html')
+
 
 
 @app.route('/getReactions', methods=["POST"])
@@ -211,8 +252,12 @@ def get_reactions():
     if request.method == 'POST':
         data = pd.DataFrame(columns=['nn', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz'])
         user_id = session['username']
-        reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
-    return reactions.to_json(orient='table', index=False)
+        #reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
+        mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user_id + "'", engine)
+        print(mqn.to_json(orient='table', index=False))
+        print('')
+        print('alooooo')
+    return mqn.to_json(orient='table', index=False)
 
 
 if __name__ == '__main__':

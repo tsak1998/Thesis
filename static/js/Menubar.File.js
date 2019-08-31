@@ -69,9 +69,18 @@ Menubar.File = function ( editor ) {
 					var nodes = JSON.parse(data[0]);
 					var elements = JSON.parse(data[1]);
 					var pointLoads = JSON.parse(data[2]);
+					var distLoads = JSON.parse(data[3]);
+					var materials = JSON.parse(data[4]);
+					var sections = JSON.parse(data[5]);
+					console.log(JSON.parse(data[6]).data[1])
+					
 					drawNodes( editor, nodes.data );
 					drawElements( editor, elements.data );
-					drawPointLoads( editor, pointLoads.data );		
+					drawPointLoads( editor, pointLoads.data );
+					drawDistLoads( editor, distLoads.data );
+					addSections( editor, sections.data );
+
+					editor.signals.savingFinished.dispatch();	
 				},
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);	
@@ -97,6 +106,10 @@ Menubar.File = function ( editor ) {
 		nodes = [];
 		elements = [];
 		loads = [];
+		dLoads = [];
+		sections = [];
+		materials = [];
+
 		for (i=0; i<editor.scene.children.length; i++){
 			obj = editor.scene.children[i]
 			if (obj.userData.type == 'element') {
@@ -105,25 +118,34 @@ Menubar.File = function ( editor ) {
 				nodes.push( obj.userData );
 			} else if (obj.userData.type == 'p_load' || obj.userData.type == 'p_moment') {
 				loads.push( obj.userData );
+			} else if( obj.userData.type == 'd_load'){
+				dLoads.push(obj.userData);
 			}
 		}
-		data1.push(elements);
-		data1.push(nodes);
-		data1.push(loads);
-		var sections = editor.sections.sections;
-		data1.push(sections )
-		data1.push( editor.sectMaterials.sectMaterials )
+		for (i=0;i<editor.sections.children.length; i++){
+			obj = editor.sections.children[i]
+			sections.push( obj.userData );
+		};
+		for (i=0; i<editor.sectMaterials.children.length; i++){
+			obj = editor.sectMaterials.children[i]
+			materials.push( obj.userData );
+		};
 
-
+		data1.push( elements );
+		data1.push( nodes );
+		data1.push( loads );
+		data1.push( sections );
+		data1.push( materials );
+		data1.push( dLoads );
+		
 		data1 = JSON.stringify( data1 );
-		console.log(data1)
+		console.log( data1 )
 		$.ajax({
 			type: "POST",
 			url: '/save',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			data: data1,
-
 		});
 	});
 	options.add( option );

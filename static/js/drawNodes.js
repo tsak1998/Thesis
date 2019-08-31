@@ -18,16 +18,20 @@ function drawNodes( editor, nodes ){
             j++
         };
         if (supported==false){
-            var geometry = new THREE.SphereGeometry( 0.05, 12, 12, 0, Math.PI * 2, 0, Math.PI );
+            var geometry = new THREE.SphereGeometry( 0.03, 12, 12, 0, Math.PI * 2, 0, Math.PI );
             var node_material = new THREE.MeshStandardMaterial();
-            var mesh = new THREE.Mesh( geometry, node_material );
+            node_material.color.setHex( 0x000066 );
+            node_material.emissive.setHex( 0x000066 );
+            var mesh = new THREE.Mesh( geometry, node_material);
+            
             //mesh.matrixAutoUpdate = false;
             mesh.name = 'Node ' + String(node.nn);
             mesh.userData = {'nn' : node.nn,
                                 'type': 'node',
                                 'coord_x': node.coord_x,
                                 'coord_y' : node.coord_y, 
-                                'coord_z' : node.coord_z};
+                                'coord_z' : node.coord_z,
+                                'label_position' : new THREE.Vector3(node.coord_y,  node.coord_z, node.coord_x)};
 
             mesh.userData.dof_dx = 1;
             mesh.userData.dof_dy = 1;
@@ -38,21 +42,19 @@ function drawNodes( editor, nodes ){
             
 
             mesh.position.set(node.coord_y, node.coord_z, node.coord_x);
-            let label = new makeTextSprite(mesh.userData.nn, );
-            label.name = mesh.name
-            mesh.add(label)
             editor.execute( new AddObjectCommand( mesh ) );
         }else {
             var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
             var node_material = new THREE.MeshStandardMaterial();
-            var mesh = new THREE.Mesh( geometry, node_material );
+            var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial({ color : 0x000066}) );
             //mesh.matrixAutoUpdate = false;
             mesh.name = 'Node ' + String(node.nn);
             mesh.userData = {'nn' : node.nn,
                                 'type': 'node',
                                 'coord_x': node.coord_x,
                                 'coord_y' : node.coord_y, 
-                                'coord_z' : node.coord_z};
+                                'coord_z' : node.coord_z,
+                                'label_position' : new THREE.Vector3(node.coord_y,  node.coord_z, node.coord_x) };
 
             mesh.userData.dof_dx = node.dof_dx;
             mesh.userData.dof_dy = node.dof_dy;
@@ -61,10 +63,8 @@ function drawNodes( editor, nodes ){
             mesh.userData.dof_ry = node.dof_ry;
             mesh.userData.dof_rz = node.dof_rz;
 
-            mesh.position.set(node.coord_x, node.coord_y, node.coord_z);
-            let label = new makeTextSprite(mesh.userData.nn, );
-            label.name = mesh.name
-            mesh.add(label)
+            mesh.position.set(node.coord_y,  node.coord_z, node.coord_x);
+            
             editor.execute( new AddObjectCommand( mesh ) );
         }
    };

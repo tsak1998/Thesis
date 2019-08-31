@@ -141,30 +141,22 @@ Menubar.Run = function ( editor ) {
 	option.setId( 'run' );
     option.onClick( function () {
 
-        if ( confirm( 'Run analysis' ) ) {
-                        
-			data1 = []
-			var model = editor.scene.children;
-	
-			//model = JSON.stringify( model );
-	
-			var sections = editor.sections;
-	
-			//sections = JSON.stringify( sections );
-	
-			data1.push( model )
-			data1.push( sections )
-	
-	
-			data1 = JSON.stringify( data1 );
-	
+        if ( confirm( 'Run analysis' ) ) {			
 			$.ajax({
-				type: "POST",
+				type: 'POST',
 				url: '/yellow',
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				data: data1,
-	
+				data: {},
+				processData: false,
+				dataType: 'text',
+				success: function(e) {
+					alert('yellooooow')
+					data = JSON.parse(e)
+					drawMqn(data['mqn'])
+					drawDisplacements(data['displ'])
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
 			});
 
         }

@@ -26,11 +26,28 @@ var Viewport = function ( editor ) {
 
     var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
 	//sceneHelpers.add( grid );
+	var arrowHelper;
+	var localAxes = new THREE.Object3D();
+	var origin = new THREE.Vector3( 0,0,0 );        
+	var alength = 2;
+	var hex;
+
 	
-    var axes = new THREE.AxesHelper(2);
-    axes.material.linewidth = 5;
-    axes.position = (0,0,0);
-    sceneHelpers.add(axes);
+	hex = 0xff0000;
+	arrowHelper = new THREE.ArrowHelper( new THREE.Vector3( 1,0,0 ), origin, alength, hex );
+	localAxes.add ( arrowHelper );
+	
+	hex = 0x0000ff;
+	arrowHelper = new THREE.ArrowHelper( new THREE.Vector3( 0,1,0 ), origin, alength, hex );
+	localAxes.add ( arrowHelper );
+
+	//var yDir = new THREE.Vector3().crossVectors( xDir, zDir );
+
+	hex = 0x00ff00;
+	arrowHelper = new THREE.ArrowHelper( new THREE.Vector3( 0,0,1 ), origin, alength, hex );
+	localAxes.add ( arrowHelper );
+	sceneHelpers.add(localAxes);
+	
 	
     var gridXZ = new THREE.GridHelper(20, 20);
     //gridXZ.setColors( new THREE.Color(0x006600), new THREE.Color(0x006600) );
@@ -128,27 +145,27 @@ var Viewport = function ( editor ) {
 			if ( intersects.length > 0 ) {
 
 				var object = intersects[ 0 ].object;
-				
-					if ( object.userData.object !== undefined ) {
-
-						// helper
-
-						//editor.select( object.userData.object );
-						
-					} else if (object.parent.name=="Scene") {
-
-						editor.select( object );
-
+				if (editor.selected!=null){
+					if(object != editor.selected ){
+						signals.objectDeselected.dispatch( editor.selected )
 					}
+					
+				}
+				editor.select( object );
+				
+					
 				
 
 			} else {
-
+				if (editor.selected != null) {
+					signals.objectDeselected.dispatch( editor.selected )
+				}
+				
 				editor.select( null );
 				
 			}
 			
-			render();
+		
 
 		}
 
@@ -304,57 +321,19 @@ var Viewport = function ( editor ) {
 	signals.objectSelected.add( function ( object ) {
 		
 		if ( object !== null && object !== scene && object !== camera ) {
-
-			box.setFromObject( object );
-
-			if ( box.isEmpty() === false ) {
-				del = sceneHelpers.getObjectByName( 'Selection Box' );
-				sceneHelpers.remove ( del );
-				var selectionBox = new THREE.BoxHelper();
-				selectionBox.material.depthTest = false;
-				selectionBox.material.transparent = true;
-				selectionBox.visible = false;
-				selectionBox.name = 'Selection Box'
-				selectionBox.matrixAutoUpdate = true
-				sceneHelpers.add( selectionBox );
-				
-				if (object.name.slice(0,7)=='Element'){
-					length = object.userData.length
-					var positions = [];
-					positions.push(0, 0, 0, length, 0, 0)
-					var material = new THREE.LineBasicMaterial();
-					var geometry = new THREE.BufferGeometry();
-					geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) )
-					
-					line = new THREE.Line( geometry, material );
-					selectionBox.setFromObject( line );
-					m = object.matrix.clone()
-					selectionBox.applyMatrix(m)
-					
-				} else {
-					selectionBox.setFromObject( object );
-					
-				
-				}
-				//
-				selectionBox.visible = true;
-				
-
+			if (object.userData.type=='element'){
+				object.material.color.setHex( 0x00CCFF );
+			}else if (object.userData.type=='node'){
+				object.material.emissive.setHex( 0x00CCFF );
+			}else if (object.userData.type=='p_load'){
+				object.material.color.setHex( 0x00CCFF );
+			}else {
+				object.material.color.setHex( 0x00CCFF );
 			}
-
-			transformControls.attach( object );
 
 		} else if ( editor.selected == null) {
 
-			del = sceneHelpers.getObjectByName( 'Selection Box' );
-			sceneHelpers.remove ( del );
-			var selectionBox = new THREE.BoxHelper();
-			selectionBox.material.depthTest = false;
-			selectionBox.material.transparent = true;
-			selectionBox.visible = false;
-			selectionBox.name = 'Selection Box'
-			selectionBox.matrixAutoUpdate = true
-			sceneHelpers.add( selectionBox );
+			
 			
 		}
 
@@ -363,11 +342,17 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectDeselected.add( function ( object ) {
-		if (editor.selected == null){
-			sec
-			selectionBox.visible = false
-		}
-
+			if(editor.selected.name!='Scene'){
+				if (object.userData.type=='element'){
+					object.material.color.setHex( 0x383838 );
+				}else if (object.userData.type=='node'){
+					object.material.emissive.setHex( 0x000066 );
+				}else if (object.userData.type=='p_load'){
+					object.material.color.setHex( 0xff0000 );
+				}else {
+					object.material.color.setHex( 0xD3D3D3 );
+				}
+			}
 		render();
 
 	} );

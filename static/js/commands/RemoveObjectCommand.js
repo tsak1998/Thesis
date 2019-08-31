@@ -79,12 +79,7 @@ RemoveObjectCommand.prototype = {
         this.editor.signals.objectAdded.dispatch( this.object );
         this.editor.signals.sceneGraphChanged.dispatch();
 
-		label = this.editor.sceneHelpers.getObjectByName( this.object.name )
-        if (label!=undefined){
-            label.visible = true;
-            render();
-
-        };
+		
 		
     },
 

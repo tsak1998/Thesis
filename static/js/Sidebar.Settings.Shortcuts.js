@@ -109,20 +109,11 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 				var parent = object.parent;
 				if ( parent !== null )
-				/*
-					for (i = 0; i<object.extra.length; i++){
-						editor.sceneHelpers.remove( object.extra[i] );
-					}
-				 */
+				
 				
 				editor.execute( new RemoveObjectCommand( object ) );
 				
-				label = editor.sceneHelpers.getObjectByName( object.name )
-				if (label!=undefined){
-					label.visible = false;
-		
-				};
-
+			
 				break;
 
 			case config.getKey( 'settings/shortcuts/translate' ):

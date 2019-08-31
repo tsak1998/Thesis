@@ -78,6 +78,23 @@ Sidebar.Settings = function ( editor ) {
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );
 
+	var showAxesRow = new UI.Row();
+	var showAxes = new UI.Checkbox().onChange( function () {
+		ax = editor.sceneHelpers.getObjectByName('Axes')
+		ax.visible = false;
+		editor.axes.visible = false;
+		console.log(editor)
+	} );
+
+		
+	
+	showAxes.dom.value = true;
+
+	showAxesRow.add( new UI.Text( 'Show Local Axes' ).setWidth( '90px' ) );
+	showAxesRow.add( showAxes );
+
+	container.add( showAxesRow );
+
 	return container;
 
 };
