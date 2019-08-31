@@ -11,11 +11,77 @@ Sidebar.Sections = function ( editor ) {
 	container.setPaddingTop( '20px' );
 	container.setPaddingBottom( '20px' );
 
+	
+	
+	var materialRow_ = new UI.Row();
+	var material_ = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+
+	} );
+
+	materialRow_.add( new UI.Text('Material Id').setWidth( '90px' ) );
+	materialRow_.add( material_ );
+	container.add(materialRow_)
+
+	var ARow_ = new UI.Row();
+	var A_ = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+	} );
+
+	ARow_.add( new UI.Text('A').setWidth( '90px' ) );
+	ARow_.add( A_ );
+	container.add(ARow_)
+
+
+	var IxRow_ = new UI.Row();
+	var Ix_ = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+	} );
+
+	IxRow_.add( new UI.Text('Ix').setWidth( '90px' ) );
+	IxRow_.add( Ix_ );
+	container.add(IxRow_)
+
+	var IyRow_ = new UI.Row();
+	var Iy_ = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+	} );
+
+	IyRow_.add( new UI.Text('Iy').setWidth( '90px' ) );
+	IyRow_.add( Iy_ );
+	container.add(IyRow_)
+
+	var IzRow_ = new UI.Row();
+	var Iz_ = new UI.Input( '' ).setLeft( '100px' ).onChange( function () {
+
+	} );
+
+	IzRow_.add( new UI.Text('Iz').setWidth( '90px' ) );
+	IzRow_.add( Iz_ );
+	container.add(IzRow_);
+
 	var buttonRow = new UI.Row();
-    btn = new UI.Button('Build Section')
-    btn.setId('openerSections')
-    buttonRow.add(btn)
-    container.add( buttonRow );
+    btn = new UI.Button('Define Section').onClick( function (){
+		console.log(';akiii')
+		sect = new THREE.Object3D();
+        sect.name = 'Section ' + String(editor.sections.children.length+1)
+        sect.userData = {'id': editor.sections.children.length+1,
+                        'section_id': editor.sections.children.length+1,
+                        'material': parseInt(material_.getValue()),
+                        'dimensions': 'custom',
+                        'type': 'custom',
+                        'A': parseFloat(A_.getValue()),
+                        'Ix': parseFloat(Ix_.getValue()),
+                        'Iy': parseFloat(Iy_.getValue()),
+                        'Iz': parseFloat(Iz_.getValue())};
+
+		editor.sections.add( sect );
+		refreshUI();
+	});
+    buttonRow.add(btn);
+	container.add( buttonRow );
+		
+		
 	
 	function buildOption( object, draggable ) {
 
