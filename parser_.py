@@ -15,7 +15,7 @@ def parser(user_id, data, engine):
     sections['user_id'] = user_id
     sections['section_id'] = sections['id']
     sections = sections.rename(columns={'Material Id': 'material'})
-    materials = pd.DataFrame(data[4])
+    materials = pd.DataFrame(data[4], columns = ['material_id', 'E', 'G', 'n'])
     materials['user_id'] = user_id
     materials = materials.rename(columns={'id': 'material_id'})
     # for loads and sections data needs to be created
