@@ -1,6 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+
 Sidebar.Sections = function ( editor ) {
 	
 	signals = editor.signals
@@ -62,7 +60,7 @@ Sidebar.Sections = function ( editor ) {
 
 	var buttonRow = new UI.Row();
     btn = new UI.Button('Define Section').onClick( function (){
-		console.log(';akiii')
+		
 		sect = new THREE.Object3D();
         sect.name = 'Section ' + String(editor.sections.children.length+1)
         sect.userData = {'id': editor.sections.children.length+1,
@@ -76,7 +74,10 @@ Sidebar.Sections = function ( editor ) {
                         'Iz': parseFloat(Iz_.getValue())};
 
 		editor.sections.add( sect );
+		editor.storage.set( editor.toJSON() );
+        editor.signals.savingFinished.dispatch();
 		refreshUI();
+		
 	});
     buttonRow.add(btn);
 	container.add( buttonRow );
@@ -162,7 +163,12 @@ Sidebar.Sections = function ( editor ) {
 	var outliner = new UI.Outliner( editor );
 	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
-		editor.selected = null
+		
+		if (editor.selected!=null){
+			signals.objectDeselected.dispatch( editor.selected )
+			editor.selected = null
+		}
+		
 		outliner.value = null
 		ignoreObjectSelectedSignal = true;
         valueId = parseInt( outliner.getValue() );

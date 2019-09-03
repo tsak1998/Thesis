@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -26,7 +26,7 @@ app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # set global engine
-engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
 
 
 @app.route('/')
@@ -228,9 +228,9 @@ def run_analysis():
                                        'Fx': list(g.Fx.get_values()),
                                        'Fy': list(g.Fy.get_values()),
                                        'Fz': list(g.Fz.get_values()),
-                                       'Mx': list(g.Fx.get_values()),
-                                       'My': list(g.Fy.get_values()),
-                                       'Mz': list(g.Fz.get_values())}
+                                       'Mx': list(g.Mx.get_values()),
+                                       'My': list(g.My.get_values()),
+                                       'Mz': list(g.Mz.get_values())}
 
         displacements = pd.read_sql("SELECT * from displacements WHERE user_id='" + user_id + "'", engine)
         group = displacements.groupby('number')
@@ -241,8 +241,8 @@ def run_analysis():
                                             'uy': list(g.uy.get_values()),
                                             'uz': list(g.uz.get_values())}
 
-
-    return jsonify({'mqn': elements_results, 'displ' : displacements_results}) #jsonify(elements_results)+ '|' + jsonify(displacements_results)
+        reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
+    return jsonify({'mqn': elements_results, 'displ': displacements_results, 'reactions': reactions.to_json(orient='table', index=False)})
     #render_template('editor.html')
 
 

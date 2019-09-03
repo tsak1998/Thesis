@@ -94,6 +94,7 @@
 		<script src="{{ url_for('static', filename='js/Sidebar.Supports.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Results.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Sections.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/Sidebar.Materials.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Pointloads.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/Sidebar.Distloads.js') }}"></script>
 
@@ -493,7 +494,7 @@
 			$( "#displacements" ).dialog({
 				autoOpen: false,
 				resizable: false,
-				height: 420,
+				height: 600,
 				width: 780
 			});
 			
@@ -513,25 +514,9 @@
 			});
 			
 			$("#openerReactions").click(function() {
-				reactDiv = document.getElementById( 'react-table' )
-				$.ajax({
-				type: "POST",
-				url: "/getReactions",
-				data: {},
-				dataType: 'text',
-				success: function (e) {
-					var data = JSON.parse(e)
-					
-					headers = ['id', 'user_id', 'Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
-					
-					reactDiv.appendChild(buildTable( data.data, headers, 'react_table' ));
-					$("#reactions").dialog('open');
-				},
-				error: function(xhr, status, error) {
-					console.log(xhr, status, error);
-				}
-			});
 				
+				$("#reactions").dialog('open');
+							
 				
 				
 			});
@@ -603,15 +588,7 @@
 							<option value="2">2</option>
 							<option value="3">3</option>
 							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-							<option value="9">9</option>
-							<option value="10">10</option>
-							<option value="11">11</option>
-							<option value="12">12</option>
-							<option value="13">13</option>
+						
 						  </select>
 							 <select name='value2' id='value2'>
 							<option value="uy">uy</option>

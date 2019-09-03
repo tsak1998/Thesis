@@ -8,7 +8,6 @@ from sqlalchemy import create_engine
 
 
 def load_data(user_id, engine):
-
     # elements = pd.read_csv('model_test/test_1/elements.csv')
     truss_elements = pd.read_csv('model_test/test_1/truss_elements.csv')
     # nodes = pd.read_csv('model_test/test_1/nodes.csv')
@@ -82,9 +81,8 @@ def stifness_array(dofs, elements, nodes, sections, materials, node_dofs, truss_
         k = local_stif(elm, sect, material)
         # for releases will just make the stifness zero
         # 1 stands for released
-        check = np.zeros(12)
         fixity = elm.iloc[8:].get_values()
-        released_indices = np.where(check!=fixity)
+        released_indices = np.where(fixity != 0)
 
         k[:, released_indices] = 0
         k[released_indices, :] = 0
@@ -259,7 +257,6 @@ def transformation_array(element, nodei, nodej):
             Lambda[2, 2] = (CYx * CZx * SINY + CXx * COSY) / SQ
     '''
     LAMDA = np.zeros((12, 12))
-    zeroes = np.array([0, 0, 0])
 
     LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
     LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
@@ -289,7 +286,7 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             L = elm.length.get_values()[0]
 
             fixity = elm.iloc[8:].get_values()
-            released_indices = np.where(fixity!=0)
+            released_indices = np.where(fixity != 0)
 
             nodei = elm.nodei.get_values()[0]
             nodej = elm.nodej.get_values()[0]
@@ -316,8 +313,8 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             A[11] = p[1] * a ** 2 * b / L ** 2  # Mz_j
 
             # element forces from to local to global
+            A[released_indices] = 0
             rot = tranf_arrays[elm.index[0]][:6, :6]
-
 
             S[dofa:dofb] += np.transpose(rot).dot(A[:6])
             S[dofc:dofd] += np.transpose(rot).dot(A[6:])
@@ -332,7 +329,6 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
         fixity = elm.iloc[0][8:].get_values()
         released_indices = np.where(fixity != 0)
         L = elm.length.get_values()[0]
-
 
         nodei = elm.nodei.get_values()[0]
         nodej = elm.nodej.get_values()[0]
@@ -510,7 +506,8 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
         p1 = rot.dot(P1)
         p2 = rot.dot(P2)
         dist_loads_loc.append(
-            (index + 1, d_load.user_id, d_load.number, p1[0], p2[0], p1[1], p2[1], p1[2], p2[2], d_load.c, d_load.l, 'd_load'))
+            (index + 1, d_load.user_id, d_load.number, p1[0], p2[0], p1[1], p2[1], p1[2], p2[2], d_load.c, d_load.l,
+             'd_load'))
 
     dist_loads_local = pd.DataFrame(dist_loads_loc, columns=dist_loads.columns)
 
@@ -561,7 +558,7 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads, n):
 
         p = np.linspace(d_loads.p_1_z.get_values() * seg / n, d_loads.p_1_z.get_values() * seg / n, n)
 
-        x_dist = x_dist.flatten('F')*L
+        x_dist = x_dist.flatten('F') * L
         p = p.flatten('F')
 
         number = len(p)
@@ -613,16 +610,16 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads, n):
         dx = np.diff(x, n=1)
 
         my = np.zeros(len(pz) + 2)
-        my[:-1] = dx*Qz[:-1]
+        my[0] = Myi
+        my[1:] += dx * Qz[1:]
         my = np.cumsum(my)
-        my[-1] = Myj
+        # my[-1] = Myj
 
         temp = np.zeros(len(pz) + 2)
         temp[0] = Mzi
-        #temp[1:-1] = (Qy[1:-1] * dx[1:-1])
-
+        temp[1:] += Qy[1:] * dx
         mz = np.cumsum(temp)
-        mz[-1] = Mzj
+        # mz[-1] = Mzj
 
         t = np.zeros((len(x), 8))
         t[:, 0] = element.number
@@ -651,51 +648,109 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
     for index, element in elements.iterrows():
         # local displacements
 
-        node_i = nodes.loc[nodes.number == int(element.nodei)]
-        node_j = nodes.loc[nodes.number == int(element.nodej)]
+        nodei = nodes.loc[nodes.number == int(element.nodei)]
+        nodej = nodes.loc[nodes.number == int(element.nodej)]
+        L = element.length
+        x1, x2 = nodei.coord_x.get_values()[0], nodej.coord_x.get_values()[0]
+        y1, y2 = nodei.coord_y.get_values()[0], nodej.coord_y.get_values()[0]
+        z1, z2 = nodei.coord_z.get_values()[0], nodej.coord_z.get_values()[0]
+        # need to find what works for the random case
+        #
+
+        cx = (x2 - x1) / L
+        cy = (y2 - y1) / L
+        cz = (z2 - z1) / L
+
+        global_x = np.linspace(nodei.coord_x, nodej.coord_x, n)
+        global_y = np.linspace(nodei.coord_y, nodej.coord_y, n)
+        global_z = np.linspace(nodei.coord_z, nodej.coord_z, n)
+
         rot = transf_arrays[index][:3]
         d_local = np.zeros((n, 4))
         L = element.length
         x = np.linspace(0, L, n)
 
         # z
-        d = 1000 * local_displacements[index]
+        d = local_displacements[index]
+        d_global = np.transpose(transf_arrays[index]).dot(d)
 
         # test sto z
-        dx = 0.25
+        dx = 0.2
         xA = 0
-        yA = d[2]
+        yA = d_global[2]
         xA_ = dx
-        yA_ = yA - dx * math.tan(d[4])
+        yA_ = yA - dx * math.tan(d_global[4])
         xB = L
-        yB = d[7]
+        yB = d_global[8]
         xB_ = L - dx
-        yB_ = yB + dx * math.tan(d[10])
+        yB_ = yB + dx * math.tan(d_global[10])
         # fit me 3rd order polyonimial
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        d_z_global = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
 
-        # y
-        dx = 0.15
+
+        # test sto z
+        dx = 0.2
+        xA = 0
+        yA = d_global[2]
+        xA_ = dx
+        yA_ = yA - dx * math.tan(d_global[4])
+        xB = L
+        yB = d_global[8]
+        xB_ = L - dx
+        yB_ = yB + dx * math.tan(d_global[10])
+        # fit me 3rd order polyonimial
+        coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
+        d_y_global = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+
+        coords_deformed_y = global_y+d_y_global
+        coords_deformed_z = global_z + d_z_global
+
+        import matplotlib as mpl
+        from mpl_toolkits.mplot3d import Axes3D
+
+        import matplotlib.pyplot as plt
+
+        mpl.rcParams['legend.fontsize'] = 10
+
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
+        z = np.linspace(-2, 2, 100)
+        r = z ** 2 + 1
+        x = r * np.sin(theta)
+        y = r * np.cos(theta)
+        #plt.plot(global_x, coords_deformed_y, coords_deformed_z, label='parametric curve')
+        ax.plot3D(global_x.flatten('F'), coords_deformed_y.flatten('F'), coords_deformed_z.flatten('F'), 'gray')
+        ax.legend()
+
+        plt.show()
+
+        # ym
+        dx = 0.2
         xA = 0
         yA = d[1]
         xA_ = dx
         yA_ = yA + dx * math.tan(d[5])
         xB = L
-        yB = d[6]
+        yB = d[7]
         xB_ = L - dx
-        yB_ = yB + dx * math.tan(d[11])
+        yB_ = yB - dx * math.tan(d[11])
         # fit me 3rd order polyonimial
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
         d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
-        d_local[:, 2] = d_y
+        d_local[:, 2] = g
         d_local[:, 3] = d_z
         slic1 = index * n
         slic2 = slic1 + n
         dd[slic1:slic2] = d_local
+
+        #global deformations
+
+
 
         # df = pd.DataFrame(d_local, columns=['number', 'x', 'u_y', 'u_z'])
         # D_LOCAL = pd.concat([D_LOCAL, df], axis=0).reset_index(drop=True)
@@ -772,7 +827,7 @@ def save_results(user_id, engine, **kwargs):
     for key in kwargs.keys():
         sql_stmt = "DELETE FROM " + key + " WHERE user_id='" + user_id + "'"
         with engine.connect() as con:
-           con.execute(sql_stmt)
+            con.execute(sql_stmt)
         kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True,
                            chunksize=None, dtype=None)
 
@@ -820,7 +875,7 @@ def main(user_id, engine):
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
-    save_results(user_id, engine,  mqn=MQN_values, displacements=d_local)
+    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions)
     print('not plots: ', time.time() - t_whole)
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)

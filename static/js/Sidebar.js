@@ -23,6 +23,9 @@ var Sidebar = function ( editor ) {
 	var supportsTab = new UI.Text( 'supports' ).setTextTransform( 'uppercase' );
 	supportsTab.onClick( function () { select( 'SUPPORTS' ) } );
 
+	var materialsTab = new UI.Text( 'materials' ).setTextTransform( 'uppercase' );
+	materialsTab.onClick( function () { select( 'MATERIALS' ) } );
+
 	var sectionsTab = new UI.Text( 'sections' ).setTextTransform( 'uppercase' );
 	sectionsTab.onClick( function () { select( 'SECTIONS' ) } );
 
@@ -40,7 +43,7 @@ var Sidebar = function ( editor ) {
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( modelTab, nodesTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, distLoadsTab, resultsTab, settingsTab );
+	tabs.add( modelTab, nodesTab, materialsTab, sectionsTab, elementsTab, supportsTab, pointLoadsTab, distLoadsTab, resultsTab, settingsTab );
 	container.add( tabs );
 
 	//
@@ -57,6 +60,11 @@ var Sidebar = function ( editor ) {
 		new Sidebar.Nodes( editor )
 	);
 	container.add( nodes );
+
+	var materials = new UI.Span().add(
+		new Sidebar.Materials( editor )
+	);
+	container.add( materials );
 
 	var sections = new UI.Span().add(
 		new Sidebar.Sections( editor )
@@ -105,6 +113,7 @@ var Sidebar = function ( editor ) {
 		nodesTab.setClass( '' );
 		elementsTab.setClass( '' );
 		supportsTab.setClass( '' );
+		materialsTab.setClass( '' );
 		sectionsTab.setClass( '' );
 		pointLoadsTab.setClass( '' );
 		distLoadsTab.setClass( '' );
@@ -115,6 +124,7 @@ var Sidebar = function ( editor ) {
 		nodes.setDisplay( 'none' );
 		elements.setDisplay( 'none' );
 		supports.setDisplay( 'none' );
+		materials.setDisplay( 'none' );
 		sections.setDisplay( 'none' );
 		pointLoads.setDisplay( 'none' );
 		distLoads.setDisplay( 'none' );
@@ -129,6 +139,10 @@ var Sidebar = function ( editor ) {
 			case 'NODES':
 				nodesTab.setClass( 'selected' );
 				nodes.setDisplay( '' );
+				break;
+			case 'MATERIALS':
+				materialsTab.setClass( 'selected' );
+				materials.setDisplay( '' );
 				break;
 			case 'SECTIONS':
 				sectionsTab.setClass( 'selected' );
