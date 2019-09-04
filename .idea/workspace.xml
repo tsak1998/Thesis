@@ -3,13 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment=".......">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/mqn.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Menubar.Run.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Menubar.Run.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Sections.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Sections.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/drawElements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/drawElements.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -258,7 +254,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>993</line>
+          <line>953</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -308,28 +304,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>882</line>
+          <line>842</line>
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>739</line>
+          <line>699</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>729</line>
+          <line>689</line>
           <option name="timeStamp" value="77" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>722</line>
-          <option name="timeStamp" value="79" />
+          <line>676</line>
+          <option name="timeStamp" value="84" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>721</line>
-          <option name="timeStamp" value="80" />
+          <line>262</line>
+          <option name="timeStamp" value="88" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

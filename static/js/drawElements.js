@@ -38,10 +38,18 @@ function drawElements( editor, elements ){
 			yLocal.crossVectors(dirVector, zLocal)
 		}
 		transformMatrix = new THREE.Matrix4()
-		transformMatrix.makeBasis(dirVector, yLocal, zLocal)	
-		transformMatrix.setPosition(new THREE.Vector3(xi, yi, zi)) 
+		 
+		matrixTemp = transform(xi, yi, zi, xj, yj, zj, 0, length)
+		console.log(matrixTemp.elements[0])
+		dirVector1 = new THREE.Vector3(matrixTemp.elements[0],matrixTemp.elements[3],matrixTemp.elements[6])
+		dirVector2 = new THREE.Vector3(matrixTemp.elements[1],matrixTemp.elements[4],matrixTemp.elements[7])
+		dirVector3 = new THREE.Vector3(matrixTemp.elements[2],matrixTemp.elements[5],matrixTemp.elements[8])
 
-		
+		//transformMatrix.makeBasis(dirVector, yLocal, zLocal)
+		transformMatrix.makeBasis(dirVector1, dirVector2, dirVector3)	
+		transformMatrix.setPosition(new THREE.Vector3(xi, yi, zi))
+		console.log(dirVector)
+
 		
 		var positions = [];
 		positions.push(0, 0, 0, length, 0, 0)
@@ -63,17 +71,17 @@ function drawElements( editor, elements ){
 		axesMatrix.setPosition(new THREE.Vector3(xm, ym, zm)) 
 		
         hex = 0xff0000;
-        arrowHelper = new THREE.ArrowHelper( dirVector, origin, alength, hex );
+        arrowHelper = new THREE.ArrowHelper( dirVector1, origin, alength, hex );
         localAxes.add ( arrowHelper );
          
         hex = 0x0000ff;
-        arrowHelper = new THREE.ArrowHelper( yLocal, origin, alength, hex );
+        arrowHelper = new THREE.ArrowHelper( dirVector2, origin, alength, hex );
         localAxes.add ( arrowHelper );
 
         //var yDir = new THREE.Vector3().crossVectors( xDir, zDir );
        
         hex = 0x00ff00;
-        arrowHelper = new THREE.ArrowHelper( zLocal, origin, alength, hex );
+        arrowHelper = new THREE.ArrowHelper( dirVector3, origin, alength, hex );
 		localAxes.add ( arrowHelper );
 		//axes matrix
 		
@@ -105,9 +113,9 @@ function drawElements( editor, elements ){
 						  'fixity_rz_j': 0,
 
 						  'label_position' : new THREE.Vector3( xm, ym, zm),
-						  'xLocal' : dirVector,
-						  'yLocal' : yLocal,
-						  'zLocal': zLocal,
+						  'xLocal' : dirVector1,
+						  'yLocal' : dirVector2,
+						  'zLocal': dirVector3,
 
 						 };
 
@@ -121,3 +129,52 @@ function drawElements( editor, elements ){
 		
     }
 };
+
+function transform( xi, yi, zi, xj, yj, zj, bt, length ) {
+
+    var mt3 = new THREE.Matrix3();
+   
+    var xl = xj - xi;
+    var yl = yj - yi;
+    var zl = zj - zi;
+
+    var cx = xl / length;
+    var cy = yl / length;
+    var cz = zl / length;
+    
+    coa = Math.cos( bt );
+    sia = -Math.pow( Math.pow( 1 - coa, 2 ) ,0.5 );
+
+    var up = Math.pow ( Math.pow( cx,2 ) + Math.pow( cz, 2 ) ,0.5 );
+
+    var m11, m12, m13, m21, m22, m23, m31, m32, m33
+
+    if (up !== 0 )
+    {
+        m11 = cx;
+        m12 = cy;
+        m13 = cz;
+        m21 = (-cx * cy * coa - cz * sia) / up;
+        m22 = up * coa;
+        m23 = (-cy * cz * coa + cx * sia) / up;
+        m31 = (cx * cy * sia - cz * coa) / up;
+        m32 = -up * sia;
+        m33 = (cy * cz * sia + cx * coa) / up;
+    } else {
+        m11 = 0;
+        m12 = cy;
+        m13 = 0;
+        m21 = -cy * coa;
+        m22 = 0;
+        m23 = sia;
+        m31 = cy * sia;
+        m32 = 0;
+        m33 = coa;
+        }  
+
+    mt3.set( m11, m12, m13,
+             m21, m22, m23,
+             m31, m32, m33);
+
+    return mt3;
+}

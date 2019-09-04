@@ -672,61 +672,21 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
 
         # z
         d = local_displacements[index]
-        d_global = np.transpose(transf_arrays[index]).dot(d)
 
-        # test sto z
+        # local
         dx = 0.2
         xA = 0
-        yA = d_global[2]
+        yA = d[2]
         xA_ = dx
-        yA_ = yA - dx * math.tan(d_global[4])
+        yA_ = yA - dx * math.tan(d[4])
         xB = L
-        yB = d_global[8]
+        yB = d[8]
         xB_ = L - dx
-        yB_ = yB + dx * math.tan(d_global[10])
+        yB_ = yB + dx * math.tan(d[10])
         # fit me 3rd order polyonimial
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_z_global = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
 
-
-        # test sto z
-        dx = 0.2
-        xA = 0
-        yA = d_global[2]
-        xA_ = dx
-        yA_ = yA - dx * math.tan(d_global[4])
-        xB = L
-        yB = d_global[8]
-        xB_ = L - dx
-        yB_ = yB + dx * math.tan(d_global[10])
-        # fit me 3rd order polyonimial
-        coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_y_global = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
-
-        coords_deformed_y = global_y+d_y_global
-        coords_deformed_z = global_z + d_z_global
-
-        import matplotlib as mpl
-        from mpl_toolkits.mplot3d import Axes3D
-
-        import matplotlib.pyplot as plt
-
-        mpl.rcParams['legend.fontsize'] = 10
-
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')
-        theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
-        z = np.linspace(-2, 2, 100)
-        r = z ** 2 + 1
-        x = r * np.sin(theta)
-        y = r * np.cos(theta)
-        #plt.plot(global_x, coords_deformed_y, coords_deformed_z, label='parametric curve')
-        ax.plot3D(global_x.flatten('F'), coords_deformed_y.flatten('F'), coords_deformed_z.flatten('F'), 'gray')
-        ax.legend()
-
-        plt.show()
-
-        # ym
         dx = 0.2
         xA = 0
         yA = d[1]
@@ -742,7 +702,7 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
-        d_local[:, 2] = g
+        d_local[:, 2] = d_y
         d_local[:, 3] = d_z
         slic1 = index * n
         slic2 = slic1 + n
