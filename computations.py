@@ -797,6 +797,40 @@ def plot_results(user_id, mqn, displacements):
     plot_mqn(user_id, mqn)
     plot_displacements(user_id, displacements)
 
+def calculate_denco(d, nodes):
+    nodei = nodes.loc[nodes.number==1]
+    nodej = nodes.loc[nodes.number ==2]
+
+    xi = nodei.coord_x.get_values()+d[0]
+    yi = nodei.coord_y.get_values() + d[1]
+    zi = nodei.coord_z.get_values() + d[2]
+    xj = nodej.coord_x.get_values() + d[6]
+    yj = nodej.coord_y.get_values() + d[7]
+    zj = nodej.coord_z.get_values() + d[8]
+
+    cos1 = math.cos(d[3])
+    cos2 = math.cos(d[4])
+    cos3 = math.cos(d[5])
+    cos4 = math.cos(d[9])
+    cos5 = math.cos(d[10])
+    cos6 = math.cos(d[11])
+
+    sin1 = math.sin(d[3])
+    sin2 = math.sin(d[4])
+    sin3 = math.sin(d[5])
+    sin4 = math.sin(d[9])
+    sin5 = math.sin(d[10])
+    sin6 = math.sin(d[11])
+
+    a = (xj*cos3-yj*sin3)+(xj*cos2+zj*sin2)+xj
+    b = (xj * sin3 - yj * cos3) + (yj * cos1 - zj * sin1) + yj
+    c = (-xj * sin2 - zj * cos2) + (yj * sin1 + zj * cos1) + zj
+
+    e = (xi * cos6 - yi * sin6) + (xi * cos5 + zi * sin5) + xi
+    f = (xi * sin6 - yi * cos6) + (yi * cos4 - zi * sin4) + yi
+    dd = (-xi * sin5 - zi * cos5) + (yi * sin4 + zi * cos4) + zi
+    print()
+    return None
 
 def main(user_id, engine):
     t_whole = time.time()
@@ -840,6 +874,7 @@ def main(user_id, engine):
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)
 
+    calculate_denco(global_dispalecements[:12], nodes)
     MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
 

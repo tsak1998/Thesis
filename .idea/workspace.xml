@@ -4,8 +4,6 @@
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment=".......">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/drawElements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/drawElements.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -254,7 +252,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>953</line>
+          <line>988</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -304,28 +302,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>842</line>
+          <line>877</line>
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>699</line>
-          <option name="timeStamp" value="76" />
+          <line>832</line>
+          <option name="timeStamp" value="89" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>689</line>
-          <option name="timeStamp" value="77" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>676</line>
-          <option name="timeStamp" value="84" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>262</line>
-          <option name="timeStamp" value="88" />
+          <line>831</line>
+          <option name="timeStamp" value="90" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
