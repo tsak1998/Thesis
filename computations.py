@@ -22,7 +22,7 @@ def load_data(user_id, engine):
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
-    del point_loads['id']
+#    del point_loads['id']
     # sections = pd.read_csv('model_test/test_1/sections.csv')
     dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user_id + "'", engine)
     temp_loads_group = point_loads.groupby(['number', 'c'])
@@ -798,10 +798,11 @@ def plot_results(user_id, mqn, displacements):
     plot_displacements(user_id, displacements)
 
 def calculate_denco(d, nodes):
+
     nodei = nodes.loc[nodes.number==1]
     nodej = nodes.loc[nodes.number ==2]
 
-    xi = nodei.coord_x.get_values()+d[0]
+    xi = nodei.coord_x.get_values() + d[0]
     yi = nodei.coord_y.get_values() + d[1]
     zi = nodei.coord_z.get_values() + d[2]
     xj = nodej.coord_x.get_values() + d[6]
@@ -822,14 +823,16 @@ def calculate_denco(d, nodes):
     sin5 = math.sin(d[10])
     sin6 = math.sin(d[11])
 
-    a = (xj*cos3-yj*sin3)+(xj*cos2+zj*sin2)+xj
+    a = (xj * cos3 - yj * sin3) + (xj * cos2 + zj * sin2) + xj
     b = (xj * sin3 - yj * cos3) + (yj * cos1 - zj * sin1) + yj
-    c = (-xj * sin2 - zj * cos2) + (yj * sin1 + zj * cos1) + zj
+    c = (-xj * sin2 + zj * cos2) + (yj * sin1 + zj * cos1) + zj
 
     e = (xi * cos6 - yi * sin6) + (xi * cos5 + zi * sin5) + xi
     f = (xi * sin6 - yi * cos6) + (yi * cos4 - zi * sin4) + yi
-    dd = (-xi * sin5 - zi * cos5) + (yi * sin4 + zi * cos4) + zi
-    print()
+    dd = (-xi * sin5 + zi * cos5) + (yi * sin4 + zi * cos4) + zi
+
+    K = np.array([a,b,c])
+    L = np.array([e,f,dd])
     return None
 
 def main(user_id, engine):
@@ -869,12 +872,13 @@ def main(user_id, engine):
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
+    calculate_denco(global_dispalecements[:12], nodes)
     save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions)
     print('not plots: ', time.time() - t_whole)
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)
 
-    calculate_denco(global_dispalecements[:12], nodes)
+
     MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
 

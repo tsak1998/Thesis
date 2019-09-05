@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123"
 
 # Config MySQL-SQLAchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/yellow'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pass@localhost/yellow'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -26,7 +26,7 @@ app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # set global engine
-engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
 
 
 @app.route('/')
@@ -57,17 +57,17 @@ def load():
     if request.method == 'POST':
         user = session['username']
         nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
-        del nodes['id'], nodes['user_id']
+#        del nodes['id'], nodes['user_id']
         elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
-        del elements['id'], elements['user_id']
+       # del elements['id'], elements['user_id']
         point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user + "'", engine)
-        del point_loads['id'], point_loads['user_id']
+       # del point_loads['id'], point_loads['user_id']
         dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user + "'", engine)
-        del dist_loads['id'], dist_loads['user_id']
+       # del dist_loads['id'], dist_loads['user_id']
         materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user + "'", engine)
-        del materials['id'], materials['user_id']
+       # del materials['id'], materials['user_id']
         sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user + "'", engine)
-        del sections['id'], sections['user_id']
+       # del sections['id'], sections['user_id']
         elements.rename(columns={'number': 'en'}, inplace=True)
         nodes.rename(columns={'number': 'nn'}, inplace=True)
         point_loads.rename(columns={'number': 'nn'}, inplace=True)

@@ -1,14 +1,18 @@
  function drawDisplacements(elementsResults){
-    
+    uxi = [0, -0.115,-0.0737,0.005]
+    uxj = [0.005, -0.115,-0.0737,0]
     for (j=1; j<5; j++){
 
       
       vertices = []
-      for (i=0; i<50; i++){
+      vec = new THREE.Vector3(elementsResults[j].x[0]+uxi[j],elementsResults[j].uz[0], elementsResults[j].uy[0])
+      vertices.push(vec)
+      for (i=1; i<49; i++){
         vec = new THREE.Vector3(elementsResults[j].x[i],elementsResults[j].uz[i], elementsResults[j].uy[i])
         vertices.push(vec)
       }
-
+      vec = new THREE.Vector3(elementsResults[j].x[49]+uxj[j],elementsResults[j].uz[49], elementsResults[j].uy[49])
+      vertices.push(vec)
       var curve = new THREE.SplineCurve( vertices );
 
       var points = curve.getPoints( 50 );
@@ -23,6 +27,25 @@
       curveObject.applyMatrix(elmnt.matrix)
       editor.sceneHelpers.add(curveObject)
     }
+    veci =  new THREE.Vector3(0,0,0)
+    veci_ =  new THREE.Vector3(0.09514121916372137,0, 0.030792018706813248 )
+    vecj_ = new THREE.Vector3(3.988195873785236, -0.3292969600376067,1.3887318170349765 )
+    vecj = new THREE.Vector3(3.998724521260001,-0.3338,1.39107724697  )
+
+    var curve = new THREE.SplineCurve( [veci, veci_, vecj_, vecj_] );
+
+      var points = curve.getPoints( 50 );
+
+      var geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+      var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+      // Create the final object to add to the scene
+      curveObject = new THREE.Line( geometry, material );
+      elmnt = editor.scene.getObjectByName('Element '+String(j))
+      //curveObject.applyMatrix(elmnt.matrix)
+      editor.sceneHelpers.add(curveObject)
+
     // Original Trace to select (heatmap)
     elm = parseInt(document.getElementById('element2').value)
     type = document.getElementById('value2').value
