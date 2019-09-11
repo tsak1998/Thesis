@@ -6,7 +6,7 @@
       vertices = []
      
       for (i=0; i<50; i++){
-        vec = new THREE.Vector3(elementsResults[j].uy[i] ,elementsResults[j].uz[i], elementsResults[j].ux[i])
+        vec = new THREE.Vector3(elementsResults[j].x[i] ,elementsResults[j].uz[i], elementsResults[j].uy[i])
         vertices.push(vec)
       }
       
@@ -21,7 +21,7 @@
       // Create the final object to add to the scene
       curveObject = new THREE.Line( geometry, material );
       elmnt = editor.scene.getObjectByName('Element '+String(j))
-      //curveObject.applyMatrix(elmnt.matrix)
+      curveObject.applyMatrix(elmnt.matrix)
       editor.sceneHelpers.add(curveObject)
     }
    

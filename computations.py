@@ -650,43 +650,46 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
 
         nodei = nodes.loc[nodes.number == int(element.nodei)]
         nodej = nodes.loc[nodes.number == int(element.nodej)]
-        L = element.length# +local_displacements[index][6]
+
         x1, x2 = nodei.coord_x.get_values()[0], nodej.coord_x.get_values()[0]
         y1, y2 = nodei.coord_y.get_values()[0], nodej.coord_y.get_values()[0]
         z1, z2 = nodei.coord_z.get_values()[0], nodej.coord_z.get_values()[0]
         # need to find what works for the random case
         #
 
-        cx = (x2 - x1) / L
-        cy = (y2 - y1) / L
-        cz = (z2 - z1) / L
+        #cx = (x2 - x1) / L
+        #cy = (y2 - y1) / L
+        #cz = (z2 - z1) / L
 
-        global_x = np.linspace(x1, x2, n)
-        global_y = np.linspace(y1, y2, n)
-        global_z = np.linspace(z1, z2, n)
+
 
         rot = transf_arrays[index][:3]
         d_local = np.zeros((n, 5))
-        L = element.length
-        x = np.linspace(0, L, n)
+
+
 
         # z
-        d = np.transpose(transf_arrays[index]).dot(local_displacements[index])
-        #d_x = np.linspace(x1+d[0][0],x2+d[6][0], n)
+        d =local_displacements[index] #np.transpose(transf_arrays[index]).dot(local_displacements[index])
+        global_x = np.linspace(x1, x2 , n)
+        global_y = np.linspace(y1, y2, n)
+        global_z = np.linspace(z1, z2, n)
         d_x = np.linspace(d[0][0],d[6][0] , n)
+
+        L = element.length+local_displacements[index][6][0]  # +local_displacements[index][6]
+        x = np.linspace(0, L, n)
         # local
         dx = 0.2
         xA = 0
         yA = d[2]
         xA_ = dx
-        yA_ = yA - dx * math.tan(d[4])
+        yA_ = yA + dx * math.tan(d[4])
         xB = L
         yB = d[8]
         xB_ = L - dx
-        yB_ = yB + dx * math.tan(d[10])
+        yB_ = yB - dx * math.tan(d[10])
         # fit me 3rd order polyonimial
-        coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        #coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
+        #d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
 
         dx = 0.2
         xA = 0
@@ -696,10 +699,38 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         xB = L
         yB = d[7]
         xB_ = L - dx
-        yB_ = yB - dx * math.tan(d[11])
+        yB_ = yB + dx * math.tan(d[11])
         # fit me 3rd order polyonimial
-        coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        #coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
+        #d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+
+        v1 = d[1]
+        v2 = d[7]
+        theta1 = d[5]
+        theta2 = d[11]
+        q = x / L
+        N1 = 1 - 3 * q ** 2 + 2 * q ** 3
+
+        N2 = L * q * (1 - 2 * q + q ** 2)
+
+        N3 = q ** 2 * (3 - 2 * q)
+
+        N4 = L * q ** 2 * (q - 1)
+        d_y = N1 * v1 + N2 * theta1 + N3 * v2 + N4 * theta2
+
+        v1 = d[2]
+        v2 = d[8]
+        theta1 = d[4]
+        theta2 = -d[10]
+        q = x / L
+        N1 = 1 - 3 * q ** 2 + 2 * q ** 3
+
+        N2 = L * q * (1 - 2 * q + q ** 2)
+
+        N3 = q ** 2 * (3 - 2 * q)
+
+        N4 = L * q ** 2 * (q - 1)
+        d_z = N1 * v1 + N2 * theta1 + N3 * v2 + N4 * theta2
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
@@ -707,6 +738,7 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         d_local[:, 3] = global_y+d_y
         d_local[:, 4] = global_z+d_z
         slic1 = index * n
+        d_local[:, 2]+=d_x
         slic2 = slic1 + n
         dd[slic1:slic2] = d_local
 
