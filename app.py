@@ -238,6 +238,7 @@ def run_analysis():
         displacements_results = {}
         for index, g in group:
             displacements_results[index] = {'x': list(g.x.get_values()),
+                                            'ux': list(g.ux.get_values()),
                                             'uy': list(g.uy.get_values()),
                                             'uz': list(g.uz.get_values())}
 
