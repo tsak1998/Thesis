@@ -12,7 +12,7 @@ def save_db(user_id, engine, **kwargs):
         with engine.connect() as con:
             rs = con.execute(sql_stmt)  
         print(key)
-        kwargs[key].to_sql(key, engine, schema='yellow', if_exists='append', index=False, index_label=True, chunksize=None, dtype=None)
+        kwargs[key].to_sql(key, engine, schema='yellow', )
     
     
     

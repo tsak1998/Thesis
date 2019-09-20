@@ -22,7 +22,7 @@ def load_data(user_id, engine):
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
-#    del point_loads['id']
+    #del point_loads['id']
     # sections = pd.read_csv('model_test/test_1/sections.csv')
     dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user_id + "'", engine)
     temp_loads_group = point_loads.groupby(['number', 'c'])
@@ -38,7 +38,7 @@ def load_data(user_id, engine):
             m_x += load.m_x
             m_y += load.m_y
             m_z += load.m_z
-        temp_load.append((user_id, number, c, p_x, p_y, p_z, m_x, m_y, m_z))
+        temp_load.append((1, user_id, number, c, p_x, p_y, p_z, m_x, m_y, m_z))
         # df = pd.DataFrame([temp_load], columns=point_loads.columns)
     point_loads_new = pd.DataFrame(temp_load, columns=point_loads.columns)
     return elements, nodes, sections, materials, point_loads_new, dist_loads, truss_elements
@@ -201,61 +201,6 @@ def transformation_array(element, nodei, nodej):
                        [m21, m22, m23],
                        [m31, m32, m33]])
 
-    '''
-    plane = 'xyz'
-    helpVector = np.array([0, 1, 0])
-    dirVector = np.array([CXx, CYx, CZx])
-    if (CXx != 0 and CYx == 0):
-        zLocal = np.cross(dirVector, helpVector)
-        yLocal = np.cross(zLocal, dirVector)
-    elif (CXx == 0 and CYx != 0):
-        plane = 'yz'
-    elif (CZx == 0 and CXx != 0 and CYx != 0):
-        plane = 'xy'
-    elif (CXx == 0 and CYx == 0):
-        zLocal = np.array([-1, 0, 0])
-        yLocal = np.array([0, 1, 0])
-    xR, yR, zR = 0, 1, 0
-
-    Lambda = np.zeros((3, 3))
-    if element.elem_type == 'beam':
-        if CXx == 0 and CZx == 0:
-            Y = -xR + x1
-            Z = zR - z1
-            if y1 > y2:
-                Y = -Y
-
-        else:
-            SQ = math.sqrt(CXx * CXx + CZx * CZx)
-            Y = -CXx * CYx * (xR - x1) / SQ + SQ * (yR - y1) - CYx * CZx * (zR - z1) / SQ
-            Z = -CZx * (xR - x1) / SQ + CXx * (zR - z1) / SQ
-
-        SQyz = math.sqrt(Y * Y + Z * Z)
-        SINY = Z / SQyz
-        COSY = Y / SQyz
-
-        Lambda[0, 0] = CXx
-        Lambda[0, 1] = CYx
-        Lambda[0, 2] = CZx
-        if CXx == 0 and CZx == 0:
-
-            Lambda[1, 0] = -COSY
-            Lambda[1, 1] = 0
-            Lambda[1, 2] = SINY
-            Lambda[2, 0] = SINY
-            Lambda[2, 1] = 0
-            Lambda[2, 2] = COSY
-            if y1 >= y2:
-                Lambda[1, 0] = COSY
-                Lambda[2, 0] = -SINY
-        else:
-            Lambda[1, 0] = -(CXx * CYx * COSY + CZx * SINY) / SQ
-            Lambda[1, 1] = SQ * COSY
-            Lambda[1, 2] = -(CYx * CZx * COSY - CXx * SINY) / SQ
-            Lambda[2, 0] = (CXx * CYx * SINY - CZx * COSY) / SQ
-            Lambda[2, 1] = -SQ * SINY
-            Lambda[2, 2] = (CYx * CZx * SINY + CXx * COSY) / SQ
-    '''
     LAMDA = np.zeros((12, 12))
 
     LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
@@ -483,6 +428,8 @@ def nodal_mqn(K, Lamda, displacments, elements, node_dofs, S, nodes, point_loads
 def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
     point_loads_loc = []
     dist_loads_loc = []
+    nodal_point_loads = point_loads.loc[(point_loads.c == 99999)]
+    point_loads = point_loads.loc[(point_loads.c != 99999)]
     for index, p_load in point_loads.iterrows():
         check = (elements['number'] == p_load.number) & (p_load.c != 99999)
         elm = elements.loc[check]
@@ -493,7 +440,7 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
 
     point_loads_local = pd.DataFrame(point_loads_loc, columns=point_loads.columns)
 
-    nodal_point_loads = point_loads.loc[(point_loads.c == 99999)]
+
     point_loads_local = pd.concat([point_loads_local, nodal_point_loads])
 
     for index, d_load in dist_loads.iterrows():
@@ -643,53 +590,49 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads, n):
 def displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays, node_dofs):
     n = 50
 
-    dd = np.zeros((n * len(elements), 5))
+    dd = np.zeros((n * len(elements), 4))
 
     for index, element in elements.iterrows():
         # local displacements
 
         nodei = nodes.loc[nodes.number == int(element.nodei)]
         nodej = nodes.loc[nodes.number == int(element.nodej)]
-
+        L = element.length
         x1, x2 = nodei.coord_x.get_values()[0], nodej.coord_x.get_values()[0]
         y1, y2 = nodei.coord_y.get_values()[0], nodej.coord_y.get_values()[0]
         z1, z2 = nodei.coord_z.get_values()[0], nodej.coord_z.get_values()[0]
         # need to find what works for the random case
         #
 
-        #cx = (x2 - x1) / L
-        #cy = (y2 - y1) / L
-        #cz = (z2 - z1) / L
+        cx = (x2 - x1) / L
+        cy = (y2 - y1) / L
+        cz = (z2 - z1) / L
 
-
+        global_x = np.linspace(nodei.coord_x, nodej.coord_x, n)
+        global_y = np.linspace(nodei.coord_y, nodej.coord_y, n)
+        global_z = np.linspace(nodei.coord_z, nodej.coord_z, n)
 
         rot = transf_arrays[index][:3]
-        d_local = np.zeros((n, 5))
-
-
+        d_local = np.zeros((n, 4))
+        L = element.length
+        x = np.linspace(0, L, n)
 
         # z
-        d =local_displacements[index] #np.transpose(transf_arrays[index]).dot(local_displacements[index])
-        global_x = np.linspace(x1, x2 , n)
-        global_y = np.linspace(y1, y2, n)
-        global_z = np.linspace(z1, z2, n)
-        d_x = np.linspace(d[0][0],d[6][0] , n)
+        d = local_displacements[index]
 
-        L = element.length+local_displacements[index][6][0]  # +local_displacements[index][6]
-        x = np.linspace(0, L, n)
         # local
         dx = 0.2
         xA = 0
         yA = d[2]
         xA_ = dx
-        yA_ = yA + dx * math.tan(d[4])
+        yA_ = yA - dx * math.tan(d[4])
         xB = L
         yB = d[8]
         xB_ = L - dx
-        yB_ = yB - dx * math.tan(d[10])
+        yB_ = yB + dx * math.tan(d[10])
         # fit me 3rd order polyonimial
-        #coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        #d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
+        d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
 
         dx = 0.2
         xA = 0
@@ -699,46 +642,16 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         xB = L
         yB = d[7]
         xB_ = L - dx
-        yB_ = yB + dx * math.tan(d[11])
+        yB_ = yB - dx * math.tan(d[11])
         # fit me 3rd order polyonimial
-        #coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        #d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
-
-        v1 = d[1]
-        v2 = d[7]
-        theta1 = d[5]
-        theta2 = d[11]
-        q = x / L
-        N1 = 1 - 3 * q ** 2 + 2 * q ** 3
-
-        N2 = L * q * (1 - 2 * q + q ** 2)
-
-        N3 = q ** 2 * (3 - 2 * q)
-
-        N4 = L * q ** 2 * (q - 1)
-        d_y = N1 * v1 + N2 * theta1 + N3 * v2 + N4 * theta2
-
-        v1 = d[2]
-        v2 = d[8]
-        theta1 = d[4]
-        theta2 = -d[10]
-        q = x / L
-        N1 = 1 - 3 * q ** 2 + 2 * q ** 3
-
-        N2 = L * q * (1 - 2 * q + q ** 2)
-
-        N3 = q ** 2 * (3 - 2 * q)
-
-        N4 = L * q ** 2 * (q - 1)
-        d_z = N1 * v1 + N2 * theta1 + N3 * v2 + N4 * theta2
+        coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
+        d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
-        d_local[:, 2] = global_x +d_x
-        d_local[:, 3] = global_y+d_y
-        d_local[:, 4] = global_z+d_z
+        d_local[:, 2] = d_y
+        d_local[:, 3] = d_z
         slic1 = index * n
-        d_local[:, 2]+=d_x
         slic2 = slic1 + n
         dd[slic1:slic2] = d_local
 
@@ -749,7 +662,7 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         # df = pd.DataFrame(d_local, columns=['number', 'x', 'u_y', 'u_z'])
         # D_LOCAL = pd.concat([D_LOCAL, df], axis=0).reset_index(drop=True)
 
-    D_LOCAL = pd.DataFrame(dd, columns=['number', 'x', 'ux', 'uy', 'uz'])
+    D_LOCAL = pd.DataFrame(dd, columns=['number', 'x', 'uy', 'uz'])
 
     D_GLOBAL = []
     return D_LOCAL, D_GLOBAL
@@ -817,6 +730,66 @@ def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
     return reactions
 
 
+def length(x1,x2,y1,y2,z1,z2):
+    return math.sqrt((x1-x2)**2+(y1-y2)**2+(z1-z2)**2)
+
+
+def calculate_deformed(elements, nodes, nodal_displacements):
+    tmp = []
+    for index, elmnt in elements.iterrows():
+
+        nodei = nodes.loc[nodes.number == elmnt.nodei].get_values()[0]
+        nodej = nodes.loc[nodes.number == elmnt.nodej].get_values()[0]
+
+        x1 = nodei[3]
+        y1 = nodei[4]
+        z1 = nodei[5]
+
+        x2 = nodej[3]
+        y2 = nodej[4]
+        z2 = nodej[5]
+
+        d_i = nodal_displacements.loc[nodal_displacements.number == nodei[2]].get_values()[0]
+        d_j = nodal_displacements.loc[nodal_displacements.number == nodej[2]].get_values()[0]
+
+        L = length(x1 + d_i[3], x2 + d_j[3], y1 + d_i[4], y2 + d_j[4], z1 + d_i[5], z2 + d_j[5])
+        x = np.linspace(0, L, 50)
+        X = np.linspace(x1, x2, 50)
+        Y = np.linspace(y1, y2, 50)
+        Z = np.linspace(z1, z2, 50)
+        # plot normal structure
+        # ax.plot(X, Y, Z, color='b')
+
+        dX = np.linspace(d_i[3], d_j[3], 50)
+
+        q = x / L
+        dY = shape_function(q, d_i[4], d_j[4], d_i[8], d_j[8], L)
+
+        q = x / L
+
+        dZ = shape_function(q, d_i[5], d_j[5], d_i[7], d_j[7], L)
+
+        # ax.plot(X+dX, Y+dY, Z+dZ, color='g')
+
+        t = np.zeros((50, 5))
+        t[:, 0] = index
+        t[:, 1] = elmnt.number
+        t[:, 2] = X + dX
+        t[:, 3] = Y + dY
+        t[:, 4] = Z + dZ
+        tmp.append(t)
+        # plt.plot([nodei[3]+d_i[3],nodej[3]+d_j[3]], [nodei[4]+d_i[4],nodej[4]+d_j[4]], [nodei[5]+d_i[5],nodej[5]+d_j[5]], color='r')
+        if elmnt.number == 2 or elmnt.number == 3 or elmnt.number == 4 or elmnt.number == 5:
+            pass
+        else:
+            print(elmnt.number)
+            print(d_i[7], d_j[7])
+            print(max(dY))
+            plt.plot(x, dY, label=str(elmnt.number))
+
+    deformed = pd.DataFrame(np.concatenate(tmp[:]), columns=['id', 'number', 'x', 'y', 'z'])
+
+
 def save_results(user_id, engine, **kwargs):
     for key in kwargs.keys():
         sql_stmt = "DELETE FROM " + key + " WHERE user_id='" + user_id + "'"
@@ -831,12 +804,19 @@ def plot_results(user_id, mqn, displacements):
     plot_mqn(user_id, mqn)
     plot_displacements(user_id, displacements)
 
-def calculate_denco(d, nodes):
 
+def shape_function(q, v1, v2, theta1, theta2, L):
+    N1 = 1 - 3 * q ** 2 + 2 * q ** 3
+    N2 = L * q * (1 - 2 * q + q ** 2)
+    N3 = q ** 2 * (3 - 2 * q)
+    N4 = L * q ** 2 * (q - 1)
+    return N1 * v1 + N2 * theta1 + N3 * v2 + N4 * theta2
+
+def calculate_denco(d, nodes):
     nodei = nodes.loc[nodes.number==1]
     nodej = nodes.loc[nodes.number ==2]
 
-    xi = nodei.coord_x.get_values() + d[0]
+    xi = nodei.coord_x.get_values()+d[0]
     yi = nodei.coord_y.get_values() + d[1]
     zi = nodei.coord_z.get_values() + d[2]
     xj = nodej.coord_x.get_values() + d[6]
@@ -857,16 +837,14 @@ def calculate_denco(d, nodes):
     sin5 = math.sin(d[10])
     sin6 = math.sin(d[11])
 
-    a = (xj * cos3 - yj * sin3) + (xj * cos2 + zj * sin2) + xj
+    a = (xj*cos3-yj*sin3)+(xj*cos2+zj*sin2)+xj
     b = (xj * sin3 - yj * cos3) + (yj * cos1 - zj * sin1) + yj
-    c = (-xj * sin2 + zj * cos2) + (yj * sin1 + zj * cos1) + zj
+    c = (-xj * sin2 - zj * cos2) + (yj * sin1 + zj * cos1) + zj
 
     e = (xi * cos6 - yi * sin6) + (xi * cos5 + zi * sin5) + xi
     f = (xi * sin6 - yi * cos6) + (yi * cos4 - zi * sin4) + yi
-    dd = (-xi * sin5 + zi * cos5) + (yi * sin4 + zi * cos4) + zi
-
-    K = np.array([a,b,c])
-    L = np.array([e,f,dd])
+    dd = (-xi * sin5 - zi * cos5) + (yi * sin4 + zi * cos4) + zi
+    print()
     return None
 
 def main(user_id, engine):
@@ -902,18 +880,22 @@ def main(user_id, engine):
     d_local, d_global = displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays,
                                      node_dofs)
     print('displacements: ', time.time() - t)
+
     MQN_values['user_id'] = user_id
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
+
+    nodal_displacements = pd.DataFrame(np.reshape(global_dispalecements, (len(nodes),6)), columns=['ux', 'uy', 'uz', 'rx', 'ry', 'rz'])
+    nodal_displacements['user_id'] = user_id
+    nodal_displacements['number'] = nodes.number
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
-    calculate_denco(global_dispalecements[:12], nodes)
-    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions)
-    np.savetxt("foo.csv", global_dispalecements, delimiter=",")
+
+    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions, nodal_displacements=nodal_displacements)
     print('not plots: ', time.time() - t_whole)
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)
 
-
+    calculate_denco(global_dispalecements[:12], nodes)
     MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
 
@@ -931,7 +913,6 @@ def main(user_id, engine):
         x1, x2 = node_i.coord_x.get_values()[0], node_j.coord_x.get_values()[0]
         y1, y2 = node_i.coord_y.get_values()[0], node_j.coord_y.get_values()[0]
         z1, z2 = node_i.coord_z.get_values()[0], node_j.coord_z.get_values()[0]
-
         CXx = (x2 - x1) / L
         CYx = (y2 - y1) / L
         CZx = (z2 - z1) / L
@@ -940,20 +921,15 @@ def main(user_id, engine):
         dof_b = number_i*6
         dof_c = (number_j-1)*6
         dof_d = number_j*6
-
         d_global = np.zeros((n, 4))
-
         x = np.linspace(0,L,n)
         # z
-
         d = global_dispalecements
         print(len(d))
         print(dof_a,dof_b)
         print(dof_c,dof_d)
-
         m2_A = d[dof_a:dof_b]
         m2_B = d[dof_c:dof_d]
-
         #
         # test sto z
         if index>0:
@@ -967,7 +943,6 @@ def main(user_id, engine):
             xB_ = xB-dx
             yB_ = yB + dx*math.tan(m2_B[4][0])
             # fit me 3rd order polyonimial
-
             coef = np.polyfit([xA, xA_, xB_, xB],[yA, yA_, yB_, yB], 3)
             d_z = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
             print(m2_A[4][0], m2_B[4][0])
@@ -995,10 +970,8 @@ def main(user_id, engine):
             xB_ = xB-dx
             yB_ = yB - dx*math.tan(m2_B[4][0])
             # fit me 3rd order polyonimial
-
             coef = np.polyfit([xA, xA_, xB_, xB],[yA, yA_, yB_, yB], 3)
             d_z = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
-
             # y
             dx = 0.2
             xA = 0+100*m2_A[0][0]
@@ -1012,14 +985,11 @@ def main(user_id, engine):
             # fit me 3rd order polyonimial
             coef = np.polyfit([xA, xA_, xB_, xB ],[yA, yA_, yB_, yB], 3)
             d_y = x**3*coef[0]+x**2*coef[1]+x*coef[2]+coef[3]
-
-
         x_real = x1+CXx*x
         # x_real[n-1] +=100*m2_B[0][0]
         # x_real[0] +=100*m2_A[0][0]
         y_real = y1+CYx*x+100*d_y
         z_real = z1+CZx*x+100*d_z
-
         d_global[:, 0] = index+1
         d_global[:, 1] = x_real
         d_global[:, 2] = y_real

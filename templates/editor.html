@@ -478,8 +478,8 @@
 			$( "#mqn" ).dialog({
 				autoOpen: false,
 				resizable: false,
-				height: 570,
-				width: 780
+				height: 480,
+				width: 680
 			});
 			
 			$("#openerMqn").click(function() {
@@ -494,8 +494,8 @@
 			$( "#displacements" ).dialog({
 				autoOpen: false,
 				resizable: false,
-				height: 600,
-				width: 780
+				height: 480,
+				width: 680
 			});
 			
 			$("#openerDisplacements").click(function() {
@@ -509,13 +509,30 @@
 			$( "#reactions" ).dialog({
 				autoOpen: false,
 				resizable: false,
-				height: 500,
-				width: 600
+				height: 300,
+				width: 450
 			});
 			
 			$("#openerReactions").click(function() {
 				
 				$("#reactions").dialog('open');
+							
+				
+				
+			});
+		});
+
+		$(function () {
+			$( "#nodal_displ" ).dialog({
+				autoOpen: false,
+				resizable: false,
+				height: 300,
+				width: 650
+			});
+			
+			$("#openerNodalDispl").click(function() {
+				
+				$("#nodal_displ").dialog('open');
 							
 				
 				
@@ -548,10 +565,14 @@
 	<div id="reactions" title="Reactions">
 		<div id='react-table'></div>
 	</div>
+
+	<div id="nodal_displ" title="Nodal Displacements">
+		<div id='nodal_displ-table'></div>
+	</div>
 	
 	<div id="mqn" title="MQN">
 			<div>
-				<select name='element' id='element'>
+				<select name='element' id='element' style='width: 60px'>
 					<option value="1">1</option>
 					<option value="2">2</option>
 					<option value="3">3</option>
@@ -566,7 +587,7 @@
 					<option value="12">12</option>
 					<option value="13">13</option>
 				  </select>
-					 <select name='value' id='value'>
+					 <select name='value' id='value' style='width: 60px'>
 					<option value="Fx">Fx</option>
 					<option value="Fy">Fy</option>
 					<option value="Fz">Fz</option>
@@ -583,14 +604,14 @@
 		</div>
 		<div id="displacements" title="Displacements">
 				<div>
-						<select name='element2' id='element2'>
+						<select name='element2' id='element2' style='width: 60px'>
 							<option value="1">1</option>
 							<option value="2">2</option>
 							<option value="3">3</option>
 							<option value="4">4</option>
 						
 						  </select>
-							 <select name='value2' id='value2'>
+							 <select name='value2' id='value2' style='width: 60px'>
 							<option value="uy">uy</option>
 							<option value="uz">uz</option>
 						<select>

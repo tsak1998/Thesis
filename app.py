@@ -57,28 +57,31 @@ def load():
     if request.method == 'POST':
         user = session['username']
         nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user + "'", engine)
-#        del nodes['id'], nodes['user_id']
+        #        del nodes['id'], nodes['user_id']
         elements = pd.read_sql("SELECT * from elements WHERE user_id='" + user + "'", engine)
-       # del elements['id'], elements['user_id']
+        # del elements['id'], elements['user_id']
         point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user + "'", engine)
-       # del point_loads['id'], point_loads['user_id']
+        # del point_loads['id'], point_loads['user_id']
         dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user + "'", engine)
-       # del dist_loads['id'], dist_loads['user_id']
+        # del dist_loads['id'], dist_loads['user_id']
         materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user + "'", engine)
-       # del materials['id'], materials['user_id']
+        # del materials['id'], materials['user_id']
         sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user + "'", engine)
-       # del sections['id'], sections['user_id']
+        # del sections['id'], sections['user_id']
         elements.rename(columns={'number': 'en'}, inplace=True)
         nodes.rename(columns={'number': 'nn'}, inplace=True)
         point_loads.rename(columns={'number': 'nn'}, inplace=True)
         # materials.rename(columns={'en': 'number'}, inplace=True)
         dist_loads.rename(columns={'number': 'en'}, inplace=True)
 
-        mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user+ "'", engine)
+        mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user + "'", engine)
         group = mqn.groupby('number').apply(lambda x: x.to_json(orient='records'))
         return nodes.to_json(orient='table', index=False) + '|' + elements.to_json(orient='table',
                                                                                    index=False) + '|' + point_loads.to_json(
-            orient='table', index=False)+ '|' + dist_loads.to_json(orient='table', index=False)+ '|' + materials.to_json(orient='table', index=False)+ '|' + sections.to_json(orient='table', index=False)+ '|' + group.to_json(orient='table', index='False')
+            orient='table', index=False) + '|' + dist_loads.to_json(orient='table',
+                                                                    index=False) + '|' + materials.to_json(
+            orient='table', index=False) + '|' + sections.to_json(orient='table', index=False) + '|' + group.to_json(
+            orient='table', index='False')
 
 
 @app.route('/readDXF', methods=['GET', 'POST'])
@@ -195,7 +198,8 @@ def save():
         user_id = session['username']
         elements, nodes, point_loads, sections, materials, dist_loads = parser(user_id, data, engine)
 
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials, dist_loads=dist_loads)
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections,
+                materials=materials, dist_loads=dist_loads)
     return render_template('editor.html')
 
 
@@ -208,8 +212,8 @@ def autosave():
         data = request.get_json()
         user_id = session['username']
         elements, nodes, point_loads, sections, materials, dist_loads = parser(user_id, data, engine)
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections, materials=materials, dist_loads=dist_loads)
-
+        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections,
+                materials=materials, dist_loads=dist_loads)
 
 
 @app.route('/yellow', methods=["GET", "POST"])
@@ -243,9 +247,23 @@ def run_analysis():
                                             'uz': list(g.uz.get_values())}
 
         reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
-    return jsonify({'mqn': elements_results, 'displ': displacements_results, 'reactions': reactions.to_json(orient='table', index=False)})
-    #render_template('editor.html')
+        del reactions['user_id'], reactions['id']
+        nodal_displacements = pd.read_sql("SELECT * from nodal_displacements WHERE user_id='" + user_id + "'", engine)
+        del nodal_displacements['user_id'], nodal_displacements['id']
 
+        deformed = pd.read_sql("SELECT * from deformed WHERE user_id='" + user_id + "'", engine)
+        group = deformed.groupby('number')
+        deformed = {}
+        for index, g in group:
+            deformed[int(index)] = {'x': list(g.x.get_values()),
+                                'y': list(g.y.get_values()),
+                                'z': list(g.z.get_values())}
+
+    return jsonify({'mqn': elements_results, 'displ': displacements_results,
+                    'reactions': reactions.to_json(orient='table', index=False),
+                    'nodal_displacements': nodal_displacements.to_json(orient='table', index=False),
+                    'deformed': deformed})
+    # render_template('editor.html')
 
 
 @app.route('/getReactions', methods=["POST"])
@@ -253,7 +271,7 @@ def get_reactions():
     if request.method == 'POST':
         data = pd.DataFrame(columns=['nn', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz'])
         user_id = session['username']
-        #reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
+        # reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
         mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user_id + "'", engine)
         print(mqn.to_json(orient='table', index=False))
         print('')

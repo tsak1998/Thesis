@@ -196,7 +196,7 @@ Sidebar.Elements = function ( editor ) {
 		line = new THREE.Line( geometry, member_material );
 		line.material.linewidth = 1
 		line.name = 'Element ' + String(elemCount);
-		line.userData = {'en' : 11,
+		line.userData = {'en' : 9,
 						 'type':  'element',
 						 'nodei' : node_I.userData.nn,
 						  'nodej' : node_J.userData.nn,
@@ -611,7 +611,7 @@ Sidebar.Elements = function ( editor ) {
 	
 
 	refreshUI();
-		
+	
 	
 	return container;
 

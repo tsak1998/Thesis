@@ -236,7 +236,7 @@ Sidebar.Materials = function ( editor ) {
     container.add( typeRow )
 
     var ERow = new UI.Row();
-	var E = new UI.Number().setPrecision( 2 ).setWidth( '50px' )//.onChange( update );
+	var E = new UI.Number().setPrecision( 2 ).setWidth( '120px' )//.onChange( update );
 	E.dom.disabled = true;
 	E.dom.value = '';
 	ERow.add( new UI.Text( 'E').setWidth( '90px' ) );
@@ -245,7 +245,7 @@ Sidebar.Materials = function ( editor ) {
 	container.add( ERow );
 
 	var GRow = new UI.Row();
-	var G = new UI.Number().setPrecision( 2 ).setWidth( '50px' )//.onChange( update );
+	var G = new UI.Number().setPrecision( 2 ).setWidth( '120px' )//.onChange( update );
 	G.dom.disabled = true;
 	G.dom.value = '';
 	GRow.add( new UI.Text( 'G').setWidth( '90px' ) );

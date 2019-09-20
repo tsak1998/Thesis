@@ -152,13 +152,21 @@ Menubar.Run = function ( editor ) {
 					alert('yellooooow')
 					data = JSON.parse(e)
 					drawMqn(data['mqn'])
-					drawDisplacements(data['displ'])
+					drawDisplacements(data['displ'], data['deformed'])
 
-					headers = ['id', 'user_id', 'Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
+					headers = ['Node', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
 					
 					reactDiv = document.getElementById( 'react-table' );
 					reactDiv.innerHTML = ''
 					reactDiv.appendChild(buildTable( JSON.parse(data['reactions']).data, headers, 'react-table' ));
+
+					headers = ['Node', 'ux', 'uy', 'uz', 'ux', 'uy', 'uz']
+					
+					reactDiv = document.getElementById( 'nodal_displ-table' );
+					reactDiv.innerHTML = ''
+					reactDiv.appendChild(buildTable( JSON.parse(data['nodal_displacements']).data, headers, 'react-table' ));
+
+					console.log(data['deformed'])
 				},
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);

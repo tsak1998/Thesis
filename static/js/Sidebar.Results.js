@@ -17,7 +17,7 @@ Sidebar.Results = function ( editor ) {
 	options.setClass( 'options' );
 	//container.add( options );
     //supports radio buttons
-    title = new UI.Text('Reactions').setWidth( '150px' ) 
+    title = new UI.Text('Nodal Results').setWidth( '150px' ) 
     container.add( title )
     container.add( new UI.Break() );
     container.add( new UI.Break() );
@@ -26,7 +26,15 @@ Sidebar.Results = function ( editor ) {
         
     mqnRow.add( mqn );
 
-	container.add( mqnRow );
+    container.add( mqnRow );
+    
+    container.add( new UI.Break() );
+    var nodalDRow = new UI.Row();
+    var nodalD = new UI.Button( 'Nodal Displacements', 'openerNodalDispl' )
+        
+    nodalDRow.add( nodalD );
+
+	container.add( nodalDRow );
 
     
     container.add( new UI.HorizontalRule() );

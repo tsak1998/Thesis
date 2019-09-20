@@ -1,12 +1,11 @@
- function drawDisplacements(elementsResults){
+ function drawDisplacements(elementsResults, deformed){
     
-    for (j=1; j<5; j++){
-
-      
-      vertices = []
+  for (j=1; j<11; j++){
+    elmnt = deformed[j]
+    vertices = []
+    for (i=0; i<20; i++){
      
-      for (i=0; i<50; i++){
-        vec = new THREE.Vector3(elementsResults[j].x[i] ,elementsResults[j].uz[i], elementsResults[j].uy[i])
+        vec = new THREE.Vector3(elmnt.y[i] ,elmnt.z[i], elmnt.x[i])
         vertices.push(vec)
       }
       
@@ -21,9 +20,10 @@
       // Create the final object to add to the scene
       curveObject = new THREE.Line( geometry, material );
       elmnt = editor.scene.getObjectByName('Element '+String(j))
-      curveObject.applyMatrix(elmnt.matrix)
+      //curveObject.applyMatrix(elmnt.matrix)
       editor.sceneHelpers.add(curveObject)
     }
+   
    
 
     
@@ -42,8 +42,8 @@
     var data = [orgTrace];
 
     var height = 100;
-    var layout = {width:730,
-                  height: 500,
+    var layout = {width:640,
+                  height: 400,
                   title: 'Element '+elm+' '+type,
                   displayModeBar: false};
 
@@ -62,8 +62,8 @@
           var data_update1 = {y: [y_],
                               x: [x_],
                               };
-          var layout_update = {width: 730,
-                                  height: 500,
+          var layout_update = {width:640,
+                                height: 400,
                                   title: 'Element '+elm+' '+val};
           Plotly.update('graphDisplacements', data_update1, layout_update, 0); 
     });
@@ -80,8 +80,8 @@
           var data_update1 = {y: [y_],
                               x: [x_],
                               };
-          var layout_update = {width: 730,
-                                  height: 500,
+          var layout_update = {width:640,
+                                height: 400,
                                   title: 'Element '+val+' '+type};
           Plotly.update('graphDisplacements', data_update1, layout_update, 0); 
       });

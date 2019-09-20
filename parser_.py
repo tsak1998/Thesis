@@ -21,7 +21,9 @@ def parser(user_id, data, engine):
     # for loads and sections data needs to be created
     # because computations take as argouments loads: P = [px,py,pz,mx,my,mz]
     # loads have to be parsed and saved in this structure
+
     point_loads = pd.DataFrame(columns=['user_id', 'nn', 'c', 'p_x', 'p_y', 'p_z', 'm_x', 'm_y', 'm_z'])
+
     temp_loads = pd.DataFrame(data[2])
     temp_loads_group = temp_loads.groupby(['nn', 'c'])
     for t in temp_loads_group:
@@ -46,6 +48,7 @@ def parser(user_id, data, engine):
         temp_load = {'nn': load.nn, 'c': load.c, 'p_x': p_x, 'p_y': p_y, 'p_z': p_z, 'm_x': m_x, 'm_y': m_y, 'm_z': m_z}
         df = pd.DataFrame([temp_load], columns=temp_load.keys())
         point_loads = pd.concat([point_loads, df], axis=0).reset_index(drop=True)
+
     point_loads['user_id'] = user_id
     d_loads = pd.DataFrame(data[5])
     d_loads['user_id'] = user_id
