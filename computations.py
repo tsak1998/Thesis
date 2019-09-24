@@ -589,9 +589,8 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads, n):
 
 def displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays, node_dofs):
     n = 50
-
-    dd = np.zeros((n * len(elements), 4))
-
+    dd = []
+    dg = []
     for index, element in elements.iterrows():
         # local displacements
 
@@ -608,18 +607,20 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         cy = (y2 - y1) / L
         cz = (z2 - z1) / L
 
-        global_x = np.linspace(nodei.coord_x, nodej.coord_x, n)
-        global_y = np.linspace(nodei.coord_y, nodej.coord_y, n)
-        global_z = np.linspace(nodei.coord_z, nodej.coord_z, n)
+        global_x = np.linspace(x1,x2, n)
+        global_y = np.linspace(y1, y2, n)
+        global_z = np.linspace(z1, z2, n)
 
         rot = transf_arrays[index][:3]
-        d_local = np.zeros((n, 4))
-        L = element.length
+        d_local = np.zeros((n, 5))
+        d = local_displacements[index]
+        L = element.length+(d[6][0]- d[0][0])
         x = np.linspace(0, L, n)
+
 
         # z
         d = local_displacements[index]
-
+        print(L + (d[6] - d[0]))
         # local
         dx = 0.2
         xA = 0
@@ -649,12 +650,18 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
-        d_local[:, 2] = d_y
-        d_local[:, 3] = d_z
-        slic1 = index * n
-        slic2 = slic1 + n
-        dd[slic1:slic2] = d_local
+        d_local[:, 2] = np.linspace(d[0][0], d[6][0])
+        d_local[:, 3] = d_y
+        d_local[:, 4] = d_z
 
+        d_global = np.zeros((n, 4))
+        d_global[:, 0] = element.number
+        d_global[:, 1] = global_x + np.linspace(d[0][0], d[6][0])
+        d_global[:, 2] = global_x - d_y
+        d_global[:, 3] = global_x + d_z
+
+        dd.append(d_local)
+        dg.append(d_global)
         #global deformations
 
 
@@ -662,9 +669,9 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         # df = pd.DataFrame(d_local, columns=['number', 'x', 'u_y', 'u_z'])
         # D_LOCAL = pd.concat([D_LOCAL, df], axis=0).reset_index(drop=True)
 
-    D_LOCAL = pd.DataFrame(dd, columns=['number', 'x', 'uy', 'uz'])
+    D_LOCAL = pd.DataFrame(np.concatenate(dd[:]), columns=['number', 'x', 'ux', 'uy', 'uz'])
 
-    D_GLOBAL = []
+    D_GLOBAL = pd.DataFrame(np.concatenate(dg[:]), columns=['number', 'x', 'y', 'z'])
     return D_LOCAL, D_GLOBAL
 
 
@@ -874,11 +881,14 @@ def main(user_id, engine):
                                                point_loads, fixed_forces)
     print('nodal_mqn: ', time.time() - t)
     t = time.time()
-    MQN_values = mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr, 300)
+    MQN_values = mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr, 400)
     print('member: ', time.time() - t)
     t = time.time()
     d_local, d_global = displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays,
                                      node_dofs)
+    d_global['user_id'] = user_id
+    d_global['id'] = range(1, len(d_global)+1)
+
     print('displacements: ', time.time() - t)
 
     MQN_values['user_id'] = user_id
@@ -890,7 +900,7 @@ def main(user_id, engine):
     nodal_displacements['number'] = nodes.number
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
 
-    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions, nodal_displacements=nodal_displacements)
+    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions, nodal_displacements=nodal_displacements, deformed = d_global)
     print('not plots: ', time.time() - t_whole)
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)

@@ -3,81 +3,76 @@
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment=".......">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Untitled.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Untitled.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Global deform-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Global deform-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled1-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled2-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled3-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/computations_notebook-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/loops_vs_large_array-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/plots-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Global deform.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Global deform.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Untitled.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Untitled1.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Untitled2.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Untitled3.ipynb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromedriver.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromedriver_win32 (1).zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromedriver_win32 (2).zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromedriver_win32.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/mqn.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser_.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/save_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/save_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/computations_notebook.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/daya/data.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/elements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/foo.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/atmp0a561bda" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/atmp5f85cfdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/atmp906e103b" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/benchmark_test1.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/dist_loads.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/elements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/nodes.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/point_loads.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/save4fd72537.tmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/save8473f526.tmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/savec467ebba.tmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/sections.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/.~lock.sections.csv#" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/d_global.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/d_global_nodes.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/d_local.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/displ.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/displacements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/dist_loads.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/dxf_test_2.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/dxf_test_2.rtd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/elements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/nodes.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/point_loads.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/point_loads_rotated.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/sections.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/truss_elements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_3.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/truss_elements.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots_js.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/Menubar.Run.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Menubar.Run.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Elements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Elements.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Materials.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Materials.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/Sidebar.Results.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Sidebar.Results.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/resultsMqn.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/resultsMqn.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/temp-plot.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web.config" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4301">
-              <caret line="266" selection-start-line="266" selection-end-line="266" />
-              <folding>
-                <element signature="e#0#108#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/parser_.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="25" selection-start-line="25" selection-end-line="25" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/save_db.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="14" column="57" selection-start-line="14" selection-start-column="57" selection-end-line="14" selection-end-column="57" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/computations.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="171" column="9" selection-start-line="171" selection-start-column="9" selection-end-line="171" selection-end-column="9" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dxf_import.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-306" />
-          </provider>
-        </entry>
-      </file>
-    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -86,25 +81,8 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>local</find>
-      <find>local_d</find>
-      <find>.dot(</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/parser_.py" />
-        <option value="$PROJECT_DIR$/save_db.py" />
-        <option value="$PROJECT_DIR$/app.py" />
-        <option value="$PROJECT_DIR$/computations.py" />
-      </list>
-    </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="-7" />
@@ -112,24 +90,8 @@
     <option name="height" value="1047" />
   </component>
   <component name="ProjectId" id="1OhhPIJXtbPbxV9UZwWHL3FOfLZ" />
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="thesis_repo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="thesis_repo" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -149,7 +111,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.app">
+  <component name="RunManager" selected="Python.computations_new">
     <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="thesis_repo" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -157,7 +119,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\tsaka\AppData\Local\Programs\Python\Python36\python.exe" />
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -192,7 +154,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="createdb" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="computations_new" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="thesis_repo" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -204,7 +166,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/createdb.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/computations_new.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -258,17 +220,17 @@
     <list>
       <item itemvalue="Python.app" />
       <item itemvalue="Python.computations" />
-      <item itemvalue="Python.createdb" />
       <item itemvalue="Python.models" />
       <item itemvalue="Python.tables" />
+      <item itemvalue="Python.computations_new" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.computations_new" />
         <item itemvalue="Python.app" />
         <item itemvalue="Python.models" />
         <item itemvalue="Python.tables" />
         <item itemvalue="Python.computations" />
-        <item itemvalue="Python.createdb" />
       </list>
     </recent_temporary>
   </component>
@@ -312,48 +274,6 @@
       <is-autoscroll-to-source value="true" />
     </todo-panel>
   </component>
-  <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="1294" height="1047" extended-state="0" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1767516" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33260393" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.40043762" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-    </layout>
-    <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1767516" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33260393" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.40086675" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-    </layout-to-restore>
-  </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.js" />
   </component>
@@ -373,12 +293,6 @@
         <entry key="MAIN">
           <value>
             <State>
-              <option name="RECENTLY_FILTERED_USER_GROUPS">
-                <collection />
-              </option>
-              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
-                <collection />
-              </option>
               <option name="COLUMN_ORDER" />
             </State>
           </value>
@@ -409,22 +323,22 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>276</line>
+          <line>277</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>277</line>
+          <line>278</line>
           <option name="timeStamp" value="35" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>274</line>
+          <line>275</line>
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>272</line>
+          <line>273</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -438,9 +352,19 @@
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>255</line>
-          <option name="timeStamp" value="43" />
+          <url>file://$PROJECT_DIR$/computations.py</url>
+          <line>658</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/computations_new.py</url>
+          <line>489</line>
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/computations.py</url>
+          <line>61</line>
+          <option name="timeStamp" value="48" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -451,105 +375,5 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
-  </component>
-  <component name="debuggerHistoryManager">
-    <expressions id="evaluateExpression">
-      <expression>
-        <expression-string>p_load.number</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>elements['number'] == p_load.number</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.reshape(global_dispalecements, (len(nodes),6))</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>1000*np.reshape(global_dispalecements, (len(nodes),6))</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>global_dispalecements</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.reshape(global_dispalecements,(len(nodes),6))</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.reshape(global_dispalecements,(len(nodes,6)))</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>d[4] if d[4]&lt;0 else -d[4]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>d_local[:, 2]+d_x</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-    </expressions>
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pandas/core/groupby/groupby.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="3290" selection-start-line="3280" selection-end-line="3291" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4301">
-          <caret line="266" selection-start-line="266" selection-end-line="266" />
-          <folding>
-            <element signature="e#0#108#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/parser_.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/save_db.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="14" column="57" selection-start-line="14" selection-start-column="57" selection-end-line="14" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dxf_import.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-306" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/computations.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="171" column="9" selection-start-line="171" selection-start-column="9" selection-end-line="171" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
   </component>
 </project>

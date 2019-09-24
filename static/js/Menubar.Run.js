@@ -166,7 +166,7 @@ Menubar.Run = function ( editor ) {
 					reactDiv.innerHTML = ''
 					reactDiv.appendChild(buildTable( JSON.parse(data['nodal_displacements']).data, headers, 'react-table' ));
 
-					console.log(data['deformed'])
+					drawDeformedStructure(JSON.parse(data['nodal_displacements']).data, data['displ'])
 				},
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);

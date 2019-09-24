@@ -1,18 +1,18 @@
  function drawDisplacements(elementsResults, deformed){
-    
-  for (j=1; j<11; j++){
-    elmnt = deformed[j]
+    console.log(deformed)
+  for (j=1; j<9; j++){
+    elmnt = elementsResults[j]
     vertices = []
-    for (i=0; i<20; i++){
+    for (i=0; i<50; i++){
      
-        vec = new THREE.Vector3(elmnt.y[i] ,elmnt.z[i], elmnt.x[i])
+        vec = new THREE.Vector3(elmnt['x'][i] ,10*elmnt['uz'][i], 10*elmnt['uy'][i])
         vertices.push(vec)
       }
       
       var curve = new THREE.CatmullRomCurve3( vertices );
 
       var points = curve.getPoints( 100 );
-      console.log(points)
+      
       var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
       var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
@@ -21,7 +21,7 @@
       curveObject = new THREE.Line( geometry, material );
       elmnt = editor.scene.getObjectByName('Element '+String(j))
       //curveObject.applyMatrix(elmnt.matrix)
-      editor.sceneHelpers.add(curveObject)
+      //editor.sceneHelpers.add(curveObject)
     }
    
    
