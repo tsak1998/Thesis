@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 
 def load_data(user_id, engine):
     # elements = pd.read_csv('model_test/test_1/elements.csv')
-    truss_elements = pd.read_csv('model_test/test_1/truss_elements.csv')
+    truss_elements = []
     # nodes = pd.read_csv('model_test/test_1/nodes.csv')
 
     # point_loads = pd.read_csv('model_test/test_1/point_loads.csv')
@@ -242,20 +242,29 @@ def nodal_forces(point_loads, dist_loads, node_dofs, tranf_arrays, arranged_dofs
             a = load.c * L
             b = (1 - load.c) * L
             # add the appropriate moment loads
-            p = load.iloc[[3, 4, 5, 6, 7, 8]].get_values()
+            p = load.iloc[[4, 5, 6, 7, 8, 9]].get_values()
 
-            A[0] = -p[0] * (1 - load.c)  # Fx_i
-            A[6] = -p[0] * load.c  # Fx_j
-            A[1] = -p[1] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fy_i
-            A[7] = -p[1] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fy_j
-            A[2] = -p[2] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fz_i
-            A[8] = -p[2] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fz_j
-            A[3] = -p[3] * (1 - load.c)  # Mx_i
-            A[9] = -p[3] * load.c  # Mx_j
-            A[4] = p[2] * a * b ** 2 / L ** 2  # My_i
-            A[10] = -p[2] * a ** 2 * b / L ** 2  # My_j
-            A[5] = -p[1] * a * b ** 2 / L ** 2  # Mz_i
-            A[11] = p[1] * a ** 2 * b / L ** 2  # Mz_j
+            a = load.c * L
+            b = (1 - load.c) * L
+            c = a / L
+            d = b / L
+            e = a ** 2 * b / L ** 2
+            f = a * b ** 2 / L ** 2
+            g = (d - e / L + f / L)
+            h = (c + e / L - f / L)
+
+            A[0] += -p[0] * (1 - load.c)
+            A[6] += -p[0] * load.c
+            A[1] += -p[1] * g
+            A[7] += -p[1] * h
+            A[2] += -p[2] * g
+            A[8] += -p[2] * h
+            A[3] += -p[3] * (1 - load.c)
+            A[9] += -p[3] * load.c
+            A[4] += p[2] * f
+            A[10] += -p[2] * e
+            A[5] += -p[1] * f
+            A[11] += p[1] * e
 
             # element forces from to local to global
             A[released_indices] = 0
@@ -436,7 +445,7 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
         P = np.array([p_load.p_x, p_load.p_y, p_load.p_z, p_load.m_x, p_load.m_y, p_load.m_z])
         rot = transf_arrays[elm.index.get_values()[0]][:6, :6]
         p = rot.dot(P)
-        point_loads_loc.append((p_load.user_id, p_load.number, p_load.c, p[0], p[1], p[2], p[3], p[4], p[5]))
+        point_loads_loc.append((1, p_load.user_id, p_load.number, p_load.c, p[0], p[1], p[2], p[3], p[4], p[5]))
 
     point_loads_local = pd.DataFrame(point_loads_loc, columns=point_loads.columns)
 
@@ -875,6 +884,7 @@ def main(user_id, engine):
     t = time.time()
     P_s, global_dispalecements = solver(K_ol, P_nodal, arranged_dofs, arranged_dofs, len(free_dofs), S)
     print('solver: ', time.time() - t)
+    print('progress :', time.time() - t_whole)
     t = time.time()
     MQN_nodes, local_displacements = nodal_mqn(local_stifness, transf_arrays, global_dispalecements, elements,
                                                node_dofs, S, nodes,

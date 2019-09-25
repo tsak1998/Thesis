@@ -4,7 +4,7 @@ import math
 from numba import jit
 from collections import defaultdict
 from sqlalchemy import create_engine
-
+from functions_new import *
 from time import time
 
 t1 = time()
@@ -21,35 +21,62 @@ class Model:
         self.p_loads_nodal = pLoads_nodal
         self.p_loads_elem = pLoads_element
         self.d_loads = d_loads
-        self.dofs = range(Node.nodes_N*6)
-        # self.stifness =
+        self.dofs = range(Node.nodes_N * 6)
 
     def __stifness__(self):
-        elements = self.elements
-        nodes_N = Node.nodes_N
-        step = nodes_N * 6
-        K_ol = np.zeros((step, step))
-        for number, element in elements.items():
-            slice1 = slice(element.dofi_1, element.dofi_2, 1)
-            slice2 = slice(element.dofj_1, element.dofj_2, 1)
-            k = element.stifness_glob
-            K_ol[slice1, slice1] += k[:6, :6]
-            K_ol[slice1, slice2] += k[:6, 6:]
-            K_ol[slice2, slice1] += k[6:, :6]
-            K_ol[slice2, slice2] += k[6:, 6:]
-
-        self.K_ol = K_ol
+        self.K_ol = global_stifness(Node.nodes_N, self.elements)
 
     def __orderDofs__(self):
         constraints = [d for key, value in self.nodes.items() for d in value.dofs]
-        indices = __argsort__(constraints)
+        indices = argsort(constraints)
         tmp = [self.dofs[i] for i in indices]
         slic = constraints.count(0)
         self.supported_dofs = tmp[:slic]
         self.free_dofs = tmp[slic:]
+        self.sorted_dofs = self.free_dofs + self.supported_dofs
+
+    def __nodalForceVector__(self):
+        P = np.zeros((len(self.dofs)))
+        for key, loads in self.p_loads_nodal.items():
+            for load in loads:
+                slic = slice(load.nn.dofs_numbered[0], load.nn.dofs_numbered[5] + 1)
+                P[slic] = [load.px, load.py, load.pz, load.mx, load.my, load.mz]
+
+        self.nodal_force_vector = P
+
+    def __fixedForceVector__(self):
+        S = np.zeros((len(self.dofs)))
+        for key, element in self.elements.items():
+            slice1 = slice(element.dofi_1, element.dofi_2)
+            slice2 = slice(element.dofj_1, element.dofj_2)
+            S[slice1] += np.transpose(element.transform[:6, :6]).dot(element.fixed_forces[:6])
+            S[slice2] += np.transpose(element.transform[:6, :6]).dot(element.fixed_forces[6:])
+
+        self.fixed_force_vector = S
+
+    def __rearrangement__(self):
+        dofs = self.sorted_dofs
+        step = len(dofs)
+        tmp = np.arange(step)  # [i for i in range(48)]
+        V = np.zeros((step, step))
+       # V[tmp, dofs] = 1
+        for i in range(len(dofs)):
+            V[i, dofs[i]] = 1
+
+        free = len(self.free_dofs)
+        self.K_m = V.dot(self.K_ol).dot(np.transpose(V))
+        self.P_m = V.dot(self.nodal_force_vector)
+        self.S_m = V.dot(self.fixed_force_vector)
+        self.rearrangement_array = V
+        self.P_f = self.P_m[:free] - self.S_m[:free]
+        self.Kff = self.K_m[:free, :free]
+        self.Ksf = self.K_m[free:, :free]
 
 
-
+    def __solver__(self):
+        free = len(self.free_dofs)
+        self.D_f = np.linalg.inv(self.Kff).dot(self.P_f)
+        self.P_s = np.dot(self.Ksf, self.D_f) + self.S_m[free:]
 
 '''
 Defining the Node class
@@ -78,8 +105,6 @@ class Node:
         tmp = self.__class__.nodes_N * 6 - 6
         self.dofs_numbered = range(tmp, tmp + 6)
 
-
-
     # get a specific node<aa
     @staticmethod
     def __node__(nn):
@@ -89,7 +114,6 @@ class Node:
     @staticmethod
     def __nodes__():
         return Node.nodes
-
 
 
 '''
@@ -142,10 +166,11 @@ class Element:
         bt = self.beta
         self.transform = transformation_array(L, x1, y1, z1, x2, y2, z2, bt)
 
-    def __startEndForces__(self):
+    def __fixedForces__(self):
         loads = pLoad.__pointLoad_el__(self.number)
-        print(loads)
-
+        d_loads = dLoad.__distLoad__(self.number)
+        self.fixed_forces = fixed_forces_point(self.transform[:6, :6], self.length, loads)
+        self.fixed_forces += dist_load_fixed_forces(d_loads, self.transform[:3, :3], self.length)
 
     # get a specific element
     @staticmethod
@@ -187,6 +212,7 @@ class Section:
     def __sections__():
         return Section.sections
 
+
 '''
 Defining the Material class
 Each material will be an instance of the class
@@ -214,8 +240,6 @@ class Material:
         return Material.materials
 
 
-
-
 '''
 Defining the Point Loads class
 Each point load will be an instance of the class
@@ -241,8 +265,8 @@ class pLoad:
     def __setNode__(self, nn):
         self.nn = Node.__node__(nn)
 
-    def update_pLoads(self):
-        self.__class__.point_loads_node[self.nn].append(self)
+    def update_pLoads(self, nn):
+        self.__class__.point_loads_node[nn].append(self)
 
     @staticmethod
     def __pointLoad_el__(number):
@@ -251,7 +275,6 @@ class pLoad:
     @staticmethod
     def __pointLoad_els__():
         return pLoad.point_loads_element
-
 
     @staticmethod
     def __pointLoad_node__(number):
@@ -278,11 +301,11 @@ point_loads is a dictionary with keys the element number
 '''
 
 
-class Dist_Loads:
-    dist_loads = defaultdict(int)
+class dLoad:
+    dist_loads = defaultdict(list)
 
-    def __init__(self, number, c, l, px1, px2, py1, py2, pz1, pz2):
-        self.number = number
+    def __init__(self, en, c, l, px1, px2, py1, py2, pz1, pz2):
+        self.en = Element.__element__(en)
         self.c = c
         self.l = l
         self.px1 = px1
@@ -291,100 +314,18 @@ class Dist_Loads:
         self.py2 = py2
         self.pz1 = pz1
         self.pz2 = pz2
-        self.__class__.dist_loads[self.number] = self
+        self.__class__.dist_loads[en].append(self)
 
     @staticmethod
-    def __distLoad__(number):
-        return Dist_Loads.dist_loads[number]
+    def __distLoad__(en):
+        return dLoad.dist_loads[en]
+
+    @staticmethod
+    def __distLoads__():
+        return dLoad.dist_loads
 
 
-def local_stifness(L, E, G, A, Ix, Iy, Iz):
-    w1 = E * A / L
-    w2 = 12 * E * Iz / (L * L * L)
-    w3 = 6 * E * Iz / (L * L)
-    w4 = 4 * E * Iz / L
-    w5 = 2 * E * Iz / L
-    w6 = 12 * E * Iy / (L * L * L)
-    w7 = 6 * E * Iy / (L * L)
-    w8 = 4 * E * Iy / L
-    w9 = 2 * E * Iy / L
-    w10 = G * Ix / L
-
-    y = np.array([[w1, 0, 0, 0, 0, 0, -w1, 0, 0, 0, 0, 0],
-                  [0, w2, 0, 0, 0, w3, 0, -w2, 0, 0, 0, w3],
-                  [0, 0, w6, 0, -w7, 0, 0, 0, -w6, 0, -w7, 0],
-                  [0, 0, 0, w10, 0, 0, 0, 0, 0, -w10, 0, 0],
-                  [0, 0, -w7, 0, w8, 0, 0, 0, w7, 0, w9, 0],
-                  [0, w3, 0, 0, 0, w4, 0, -w3, 0, 0, 0, w5],
-                  [-w1, 0, 0, 0, 0, 0, w1, 0, 0, 0, 0, 0],
-                  [0, -w2, 0, 0, 0, -w3, 0, w2, 0, 0, 0, -w3],
-                  [0, 0, -w6, 0, w7, 0, 0, 0, w6, 0, w7, 0],
-                  [0, 0, 0, -w10, 0, 0, 0, 0, 0, w10, 0, 0],
-                  [0, 0, -w7, 0, w9, 0, 0, 0, w7, 0, w8, 0],
-                  [0, w3, 0, 0, 0, w5, 0, -w3, 0, 0, 0, w4]])
-
-    return y
-
-
-def transformation_array(L, x1, y1, z1, x2, y2, z2, bt):
-    cx = (x2 - x1) / L
-    cy = (y2 - y1) / L
-    cz = (z2 - z1) / L
-
-    coa = math.cos(bt)
-    sia = (1 - coa) ** 2
-    up = (cx ** 2 + cz ** 2) ** 0.5
-
-    if up != 0:
-        m11 = cx
-        m12 = cy
-        m13 = cz
-        m21 = (-cx * cy * coa - cz * sia) / up
-        m22 = up * coa
-        m23 = (-cy * cz * coa + cx * sia) / up
-        m31 = (cx * cy * sia - cz * coa) / up
-        m32 = -up * sia
-        m33 = (cy * cz * sia + cx * coa) / up
-    else:
-        m11 = 0
-        m12 = cy
-        m13 = 0
-        m21 = -cy * coa
-        m22 = 0
-        m23 = sia
-        m31 = cy * sia
-        m32 = 0
-        m33 = coa
-
-    Lambda = np.array([[m11, m12, m13],
-                       [m21, m22, m23],
-                       [m31, m32, m33]])
-
-    LAMDA = np.zeros((12, 12))
-    LAMDA[:3, :3], LAMDA[3:6, 3:6] = Lambda, Lambda
-    LAMDA[6:9, 6:9], LAMDA[9:, 9:] = Lambda, Lambda
-    return LAMDA
-
-
-def global_stifness(nodes_N, elements):
-    step = nodes_N * 6
-    K_ol = np.zeros((step, step))
-    for number, element in elements.items():
-        slice1 = slice(element.dofi_1, element.dofi_2, 1)
-        slice2 = slice(element.dofj_1, element.dofj_2, 1)
-        k = element.stifness_glob
-        K_ol[slice1, slice1] += k[:6, :6]
-        K_ol[slice1, slice2] += k[:6, 6:]
-        K_ol[slice2, slice1] += k[6:, :6]
-        K_ol[slice2, slice2] += k[6:, 6:]
-
-    return K_ol
-
-def __argsort__(seq):
-    return sorted(range(len(seq)), key=seq.__getitem__)
-
-# def load_data(user_id, engine):
-engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
 user_id = 'cv13116'
 
 nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user_id + "'", engine).sort_values(
@@ -435,20 +376,6 @@ for index, section in sections.iterrows():
     Iz = section.Iz
     Section(sn, mn, A, Ix, Iy, Iz)
 
-for index, element in elements.iterrows():
-    en = element.number
-    ni = element.nodei
-    nj = element.nodej
-    sect = element.section_id
-    bt = 0
-    Element(en, ni, nj, sect, bt)
-    tmp = Element.__element__(en)
-    tmp.__length__()
-    tmp.__stifness_loc__()
-    tmp.__transform__()
-    tmp.__stifness_glob__()
-    tmp.__startEndForces__()
-
 for index, p_load in point_loads.iterrows():
     if p_load.c == 99999:
         nn = p_load.number
@@ -460,7 +387,7 @@ for index, p_load in point_loads.iterrows():
         mz = p_load.m_z
         tmp = pLoad(px, py, pz, mx, my, mz)
         tmp.__setNode__(p_load.number)
-        tmp.update_pLoads()
+        tmp.update_pLoads(nn)
     else:
         en = p_load.number
         c = p_load.c
@@ -473,51 +400,54 @@ for index, p_load in point_loads.iterrows():
         tmp = pLoadsElement(px, py, pz, mx, my, mx)
         tmp.__extend__(en, c)
 
+for index, load in dist_loads.iterrows():
+    en = load.number
+    c = load.c
+    l = load.l
+    px1 = load.p_1_x
+    px2 = load.p_2_x
+    py1 = load.p_1_y
+    py2 = load.p_2_y
+    pz1 = load.p_1_z
+    pz2 = load.p_2_z
+    dLoad(en, c, l, px1, px2, py1, py2, pz1, pz2)
+
+for index, element in elements.iterrows():
+    en = element.number
+    ni = element.nodei
+    nj = element.nodej
+    sect = element.section_id
+    bt = 0
+    Element(en, ni, nj, sect, bt)
+    tmp = Element.__element__(en)
+    tmp.__length__()
+    tmp.__stifness_loc__()
+    tmp.__transform__()
+    tmp.__stifness_glob__()
+    tmp.__fixedForces__()
+
 nodes_N = Node.nodes_N
-dofs = range(nodes_N*6)
+dofs = range(nodes_N * 6)
 elements = Element.__elements__()
 nodes = Node.__nodes__()
 pLoads_nodal = pLoad.__pointLoad_nodes__()
 pLoads_element = pLoad.__pointLoad_els__()
 sections = Section.__sections__()
 materials = Material.__materials__()
-#dist_loads = Dist_Loads.__distLoads__()
+dist_loads = dLoad.__distLoads__()
 
-#K = global_stifness(nodes_N, elements)
+# K = global_stifness(nodes_N, elements)
 model = Model(nodes, elements, dofs, sections, materials, pLoads_nodal, pLoads_element, dist_loads)
 model.__stifness__()
 model.__orderDofs__()
+model.__nodalForceVector__()
+model.__fixedForceVector__()
+model.__rearrangement__()
+model.__solver__()
+## rearrnge all of them
+## create Kee, ...
+##  solve
+
+
+
 print(time() - t1)
-
-'''
-            elm_id = load.number
-            elm = elements.loc[elements.number == elm_id]
-            L = elm.length.get_values()[0]
-
-            fixity = elm.iloc[8:].get_values()
-            released_indices = np.where(fixity != 0)
-
-            nodei = elm.nodei.get_values()[0]
-            nodej = elm.nodej.get_values()[0]
-            dofa, dofb = node_dofs.loc[node_dofs.number == nodei]['dof_dx'].get_values()[0], \
-                         node_dofs.loc[node_dofs.number == nodei]['dof_rz'].get_values()[0] + 1
-            dofc, dofd = node_dofs.loc[node_dofs.number == nodej]['dof_dx'].get_values()[0], \
-                         node_dofs.loc[node_dofs.number == nodej]['dof_rz'].get_values()[0] + 1
-            a = load.c * L
-            b = (1 - load.c) * L
-            # add the appropriate moment loads
-            p = load.iloc[[3, 4, 5, 6, 7, 8]].get_values()
-
-            A[0] = -p[0] * (1 - load.c)  # Fx_i
-            A[6] = -p[0] * load.c  # Fx_j
-            A[1] = -p[1] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fy_i
-            A[7] = -p[1] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fy_j
-            A[2] = -p[2] * (b / L - a ** 2 * b / L ** 3 + a * b ** 2 / L ** 3)  # Fz_i
-            A[8] = -p[2] * (a / L + a ** 2 * b / L ** 3 - a * b ** 2 / L ** 3)  # Fz_j
-            A[3] = -p[3] * (1 - load.c)  # Mx_i
-            A[9] = -p[3] * load.c  # Mx_j
-            A[4] = p[2] * a * b ** 2 / L ** 2  # My_i
-            A[10] = -p[2] * a ** 2 * b / L ** 2  # My_j
-            A[5] = -p[1] * a * b ** 2 / L ** 2  # Mz_i
-            A[11] = p[1] * a ** 2 * b / L ** 2  # Mz_j
-    '''
