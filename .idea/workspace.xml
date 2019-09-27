@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment=".......">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Global deform-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Global deform-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Global deform.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Global deform.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations_new.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,8 +17,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/computations_new.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="181">
-                  <caret line="30" column="26" selection-start-line="30" selection-start-column="26" selection-end-line="30" selection-end-column="26" />
+                <state relative-caret-position="714">
+                  <caret line="42" column="25" selection-start-line="42" selection-start-column="25" selection-end-line="42" selection-end-column="25" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -49,7 +43,7 @@
             <entry file="file://$PROJECT_DIR$/functions_new.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="438">
-                  <caret line="191" column="11" lean-forward="true" selection-start-line="191" selection-start-column="11" selection-end-line="191" selection-end-column="11" />
+                  <caret line="191" column="11" selection-start-line="191" selection-start-column="11" selection-end-line="191" selection-end-column="11" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -61,7 +55,7 @@
             <entry file="file://$PROJECT_DIR$/computations.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="714">
-                  <caret line="347" column="26" lean-forward="true" selection-start-line="312" selection-end-line="353" selection-end-column="25" />
+                  <caret line="347" column="26" selection-start-line="312" selection-end-line="353" selection-end-column="25" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -103,7 +97,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1294" />
@@ -314,7 +308,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="2576" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.12371946" />
@@ -537,7 +531,7 @@
     <entry file="file://$PROJECT_DIR$/computations.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="714">
-          <caret line="347" column="26" lean-forward="true" selection-start-line="312" selection-end-line="353" selection-end-column="25" />
+          <caret line="347" column="26" selection-start-line="312" selection-end-line="353" selection-end-column="25" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -547,7 +541,7 @@
     <entry file="file://$PROJECT_DIR$/functions_new.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="438">
-          <caret line="191" column="11" lean-forward="true" selection-start-line="191" selection-start-column="11" selection-end-line="191" selection-end-column="11" />
+          <caret line="191" column="11" selection-start-line="191" selection-start-column="11" selection-end-line="191" selection-end-column="11" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -556,8 +550,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/computations_new.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="30" column="26" selection-start-line="30" selection-start-column="26" selection-end-line="30" selection-end-column="26" />
+        <state relative-caret-position="714">
+          <caret line="42" column="25" selection-start-line="42" selection-start-column="25" selection-end-line="42" selection-end-column="25" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

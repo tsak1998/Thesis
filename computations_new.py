@@ -40,7 +40,7 @@ class Model:
         for key, loads in self.p_loads_nodal.items():
             for load in loads:
                 slic = slice(load.nn.dofs_numbered[0], load.nn.dofs_numbered[5] + 1)
-                P[slic] = [load.px, load.py, load.pz, load.mx, load.my, load.mz]
+                P[slic] += [load.px, load.py, load.pz, load.mx, load.my, load.mz]
 
         self.nodal_force_vector = P
 
