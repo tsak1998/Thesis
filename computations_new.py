@@ -57,12 +57,9 @@ class Model:
     def __rearrangement__(self):
         dofs = self.sorted_dofs
         step = len(dofs)
-        tmp = np.arange(step)  # [i for i in range(48)]
         V = np.zeros((step, step))
-       # V[tmp, dofs] = 1
         for i in range(len(dofs)):
             V[i, dofs[i]] = 1
-
         free = len(self.free_dofs)
         self.K_m = V.dot(self.K_ol).dot(np.transpose(V))
         self.P_m = V.dot(self.nodal_force_vector)
@@ -72,11 +69,28 @@ class Model:
         self.Kff = self.K_m[:free, :free]
         self.Ksf = self.K_m[free:, :free]
 
-
     def __solver__(self):
         free = len(self.free_dofs)
         self.D_f = np.linalg.inv(self.Kff).dot(self.P_f)
         self.P_s = np.dot(self.Ksf, self.D_f) + self.S_m[free:]
+
+    def __displacementVector__(self):
+        D = np.zeros((len(self.sorted_dofs), 1))
+        for i, r in enumerate(self.free_dofs):
+            D[r] = self.D_f[i]
+        self.D = D
+
+    def __elementResults__(self):
+        for key, element in self.elements.items():
+            d = np.zeros((12, 1))
+            slice1 = slice(element.dofi_1, element.dofi_2)
+            slice2 = slice(element.dofj_1, element.dofj_2)
+            d[:6] = self.D[slice1]
+            d[6:] = self.D[slice2]
+            element.__localDispl__(d)
+            element.__mqn__()
+
+
 
 '''
 Defining the Node class
@@ -84,7 +98,6 @@ Each Node will be an instance of the class
 array = number,x,y,z
 nodes is a dictionary with keys the node number
 '''
-
 
 class Node:
     # a dictionary that holds all nodes(instance) with key the respective number
@@ -171,6 +184,15 @@ class Element:
         d_loads = dLoad.__distLoad__(self.number)
         self.fixed_forces = fixed_forces_point(self.transform[:6, :6], self.length, loads)
         self.fixed_forces += dist_load_fixed_forces(d_loads, self.transform[:3, :3], self.length)
+
+    def __localDispl__(self, d):
+        self.d = self.transform.dot(d)
+
+    def __mqn__(self):
+        self.mqn = self.stifness_loc.dot(self.d)
+
+    def __deformed__(self):
+        pass
 
     # get a specific element
     @staticmethod
@@ -325,7 +347,7 @@ class dLoad:
         return dLoad.dist_loads
 
 
-engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+engine = create_engine('mysql+pymysql://root:password@localhost/yellow')
 user_id = 'cv13116'
 
 nodes = pd.read_sql("SELECT * from nodes WHERE user_id='" + user_id + "'", engine).sort_values(
@@ -426,6 +448,7 @@ for index, element in elements.iterrows():
     tmp.__stifness_glob__()
     tmp.__fixedForces__()
 
+print('prep time :', time() -t1)
 nodes_N = Node.nodes_N
 dofs = range(nodes_N * 6)
 elements = Element.__elements__()
@@ -444,10 +467,12 @@ model.__nodalForceVector__()
 model.__fixedForceVector__()
 model.__rearrangement__()
 model.__solver__()
+model.__displacementVector__()
+#model.__nodalMqn__()
+
 ## rearrnge all of them
 ## create Kee, ...
 ##  solve
-
 
 
 print(time() - t1)
