@@ -6,10 +6,8 @@ from functools import wraps
 from sqlalchemy import create_engine
 from parser_ import parser
 import pandas as pd
-from sqlalchemy.ext.declarative import declarative_base
 import dxfgrabber
 import models
-import numpy as np
 from computations import main
 from save_db import save_db
 
@@ -26,7 +24,7 @@ app.debug = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # set global engine
-engine = create_engine('mysql+pymysql://root:pass@localhost/yellow')
+engine = create_engine('mysql://root:pass@localhost/yellow')
 
 
 @app.route('/')
@@ -203,18 +201,6 @@ def save():
     return render_template('editor.html')
 
 
-# yellow save
-@app.route('/autosave', methods=["GET", "POST"])
-def autosave():
-    if request.method == 'POST':
-        print('yellooooow')
-        # engine = create_engine('mysql+pymysql://bucketuser:dencopc@localhost/bucketlist')
-        data = request.get_json()
-        user_id = session['username']
-        elements, nodes, point_loads, sections, materials, dist_loads = parser(user_id, data, engine)
-        save_db(user_id, engine, elements=elements, nodes=nodes, point_loads=point_loads, sections=sections,
-                materials=materials, dist_loads=dist_loads)
-
 
 @app.route('/yellow', methods=["GET", "POST"])
 def run_analysis():
@@ -266,18 +252,6 @@ def run_analysis():
                     'deformed': deformed})
     # render_template('editor.html')
 
-
-@app.route('/getReactions', methods=["POST"])
-def get_reactions():
-    if request.method == 'POST':
-        data = pd.DataFrame(columns=['nn', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz'])
-        user_id = session['username']
-        # reactions = pd.read_sql("SELECT * from reactions WHERE user_id='" + user_id + "'", engine)
-        mqn = pd.read_sql("SELECT * from mqn WHERE user_id='" + user_id + "'", engine)
-        print(mqn.to_json(orient='table', index=False))
-        print('')
-        print('alooooo')
-    return mqn.to_json(orient='table', index=False)
 
 
 if __name__ == '__main__':

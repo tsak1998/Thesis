@@ -22,13 +22,13 @@ def dxf_import(dxf):
         nodei = (round(line.start[0], prcs), round(line.start[1], prcs), round(line.start[2], prcs))
         nodej = (round(line.end[0], prcs), round(line.end[1], prcs), round(line.end[2], prcs))
         try:
-            i = NODES.index(nodei)+1
+            i = NODES.index(nodei) + 1
         except:
             NODES.append(nodei)
             i = len(NODES)
 
         try:
-            j = NODES.index(nodej)+1
+            j = NODES.index(nodej) + 1
         except:
             NODES.append(nodej)
             j = len(NODES)
@@ -58,3 +58,33 @@ def dxf_import(dxf):
     print('DXF', time.time() - t1)
     print(elm)
     return nd, elm
+
+
+'''
+import pandas as pd
+
+# DXFin: Read lines from DXF and returns two LISTs: NDS[X,Y,Z] & ELMS[NDSi,NDSj]
+
+# Read lines and store them into LIST all_lines
+all_lines = [entity for entity in dxf.entities if entity.dxftype == 'LINE']
+
+# Set the precision to prcs
+prcs=4
+
+# Store coordinates (precision prcs) of start & end of each line into the LIST NODES
+NODES=[]
+for line in all_lines:
+    NODES.append([round(line.start[0], prcs),round(line.start[1], prcs),round(line.start[2], prcs)])
+    NODES.append([round(line.end[0], prcs),round(line.end[1], prcs),round(line.end[2], prcs)])
+
+# Store unique coordinates of LIST NODES into LIST NDS
+NDS=[]
+[NDS.append(x) for x in NODES if x not in NDS]
+
+# Store index from NDS of start & end node for each line into the LIST ELMS
+ELMS=[]
+for line in all_lines:
+    ndi=[round(line.start[0], prcs),round(line.start[1], prcs),round(line.start[2], prcs)]
+    ndj=[round(line.end[0], prcs),round(line.end[1], prcs),round(line.end[2], prcs)]
+    ELMS.append([NDS.index(ndi),NDS.index(ndj)])
+'''

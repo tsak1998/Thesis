@@ -22,7 +22,7 @@ def load_data(user_id, engine):
     sections = pd.read_sql("SELECT * from sections WHERE user_id='" + user_id + "'", engine)
     materials = pd.read_sql("SELECT * from materials WHERE user_id='" + user_id + "'", engine)
     point_loads = pd.read_sql("SELECT * from point_loads WHERE user_id='" + user_id + "'", engine)
-    #del point_loads['id']
+    # del point_loads['id']
     # sections = pd.read_csv('model_test/test_1/sections.csv')
     dist_loads = pd.read_sql("SELECT * from dist_loads WHERE user_id='" + user_id + "'", engine)
     temp_loads_group = point_loads.groupby(['number', 'c'])
@@ -449,7 +449,6 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
 
     point_loads_local = pd.DataFrame(point_loads_loc, columns=point_loads.columns)
 
-
     point_loads_local = pd.concat([point_loads_local, nodal_point_loads])
 
     for index, d_load in dist_loads.iterrows():
@@ -467,7 +466,7 @@ def rotate_loads(elements, point_loads, dist_loads, transf_arrays):
 
     dist_loads_local = pd.DataFrame(dist_loads_loc, columns=dist_loads.columns)
 
-    return point_loads_local, dist_loads_local
+    return point_loads_local, dist_loads
 
 
 def dist_to_pload(element, d_load, number):
@@ -568,7 +567,7 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads, n):
         my = np.zeros(len(pz) + 2)
         my[0] = Myi
         my[1:] += dx * Qz[1:]
-        my = np.cumsum(my)
+        my = -np.cumsum(my)
         # my[-1] = Myj
 
         temp = np.zeros(len(pz) + 2)
@@ -597,7 +596,7 @@ def mqn_member(elements, MQN_nodes, point_loads, dist_loads, n):
 
 
 def displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays, node_dofs):
-    n = 50
+    n = 25
     dd = []
     dg = []
     for index, element in elements.iterrows():
@@ -616,16 +615,15 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         cy = (y2 - y1) / L
         cz = (z2 - z1) / L
 
-        global_x = np.linspace(x1,x2, n)
+        global_x = np.linspace(x1, x2, n)
         global_y = np.linspace(y1, y2, n)
         global_z = np.linspace(z1, z2, n)
 
         rot = transf_arrays[index][:3]
         d_local = np.zeros((n, 5))
         d = local_displacements[index]
-        L = element.length+(d[6][0]- d[0][0])
+        L = element.length + (d[6][0] - d[0][0])
         x = np.linspace(0, L, n)
-
 
         # z
         d = local_displacements[index]
@@ -642,7 +640,9 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         yB_ = yB + dx * math.tan(d[10])
         # fit me 3rd order polyonimial
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        #d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        q = x/L
+        d_z = 1000*shape_function(q, d[2], d[8], -d[4], -d[10], L)
 
         dx = 0.2
         xA = 0
@@ -655,25 +655,25 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         yB_ = yB - dx * math.tan(d[11])
         # fit me 3rd order polyonimial
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        #d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        q = x / L
+        d_y = 1000*shape_function(q, d[1], d[7], d[5], d[11], L)
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
-        d_local[:, 2] = np.linspace(d[0][0], d[6][0])
+        d_local[:, 2] = np.linspace(d[0][0], d[6][0], n)
         d_local[:, 3] = d_y
         d_local[:, 4] = d_z
 
         d_global = np.zeros((n, 4))
         d_global[:, 0] = element.number
-        d_global[:, 1] = global_x + np.linspace(d[0][0], d[6][0])
+        d_global[:, 1] = global_x + np.linspace(d[0][0], d[6][0], n)
         d_global[:, 2] = global_x - d_y
         d_global[:, 3] = global_x + d_z
 
         dd.append(d_local)
         dg.append(d_global)
-        #global deformations
-
-
+        # global deformations
 
         # df = pd.DataFrame(d_local, columns=['number', 'x', 'u_y', 'u_z'])
         # D_LOCAL = pd.concat([D_LOCAL, df], axis=0).reset_index(drop=True)
@@ -746,8 +746,8 @@ def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
     return reactions
 
 
-def length(x1,x2,y1,y2,z1,z2):
-    return math.sqrt((x1-x2)**2+(y1-y2)**2+(z1-z2)**2)
+def length(x1, x2, y1, y2, z1, z2):
+    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2)
 
 
 def calculate_deformed(elements, nodes, nodal_displacements):
@@ -794,14 +794,7 @@ def calculate_deformed(elements, nodes, nodal_displacements):
         t[:, 3] = Y + dY
         t[:, 4] = Z + dZ
         tmp.append(t)
-        # plt.plot([nodei[3]+d_i[3],nodej[3]+d_j[3]], [nodei[4]+d_i[4],nodej[4]+d_j[4]], [nodei[5]+d_i[5],nodej[5]+d_j[5]], color='r')
-        if elmnt.number == 2 or elmnt.number == 3 or elmnt.number == 4 or elmnt.number == 5:
-            pass
-        else:
-            print(elmnt.number)
-            print(d_i[7], d_j[7])
-            print(max(dY))
-            plt.plot(x, dY, label=str(elmnt.number))
+
 
     deformed = pd.DataFrame(np.concatenate(tmp[:]), columns=['id', 'number', 'x', 'y', 'z'])
 
@@ -815,12 +808,6 @@ def save_results(user_id, engine, **kwargs):
                            chunksize=None, dtype=None)
 
 
-def plot_results(user_id, mqn, displacements):
-    from plots import plot_mqn, plot_displacements
-    plot_mqn(user_id, mqn)
-    plot_displacements(user_id, displacements)
-
-
 def shape_function(q, v1, v2, theta1, theta2, L):
     N1 = 1 - 3 * q ** 2 + 2 * q ** 3
     N2 = L * q * (1 - 2 * q + q ** 2)
@@ -828,11 +815,12 @@ def shape_function(q, v1, v2, theta1, theta2, L):
     N4 = L * q ** 2 * (q - 1)
     return N1 * v1 + N2 * theta1 + N3 * v2 + N4 * theta2
 
-def calculate_denco(d, nodes):
-    nodei = nodes.loc[nodes.number==1]
-    nodej = nodes.loc[nodes.number ==2]
 
-    xi = nodei.coord_x.get_values()+d[0]
+def calculate_denco(d, nodes):
+    nodei = nodes.loc[nodes.number == 1]
+    nodej = nodes.loc[nodes.number == 2]
+
+    xi = nodei.coord_x.get_values() + d[0]
     yi = nodei.coord_y.get_values() + d[1]
     zi = nodei.coord_z.get_values() + d[2]
     xj = nodej.coord_x.get_values() + d[6]
@@ -853,7 +841,7 @@ def calculate_denco(d, nodes):
     sin5 = math.sin(d[10])
     sin6 = math.sin(d[11])
 
-    a = (xj*cos3-yj*sin3)+(xj*cos2+zj*sin2)+xj
+    a = (xj * cos3 - yj * sin3) + (xj * cos2 + zj * sin2) + xj
     b = (xj * sin3 - yj * cos3) + (yj * cos1 - zj * sin1) + yj
     c = (-xj * sin2 - zj * cos2) + (yj * sin1 + zj * cos1) + zj
 
@@ -862,6 +850,7 @@ def calculate_denco(d, nodes):
     dd = (-xi * sin5 - zi * cos5) + (yi * sin4 + zi * cos4) + zi
     print()
     return None
+
 
 def main(user_id, engine):
     t_whole = time.time()
@@ -897,7 +886,7 @@ def main(user_id, engine):
     d_local, d_global = displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays,
                                      node_dofs)
     d_global['user_id'] = user_id
-    d_global['id'] = range(1, len(d_global)+1)
+    d_global['id'] = range(1, len(d_global) + 1)
 
     print('displacements: ', time.time() - t)
 
@@ -905,12 +894,14 @@ def main(user_id, engine):
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
 
-    nodal_displacements = pd.DataFrame(np.reshape(global_dispalecements, (len(nodes),6)), columns=['ux', 'uy', 'uz', 'rx', 'ry', 'rz'])
+    nodal_displacements = pd.DataFrame(np.reshape(global_dispalecements, (len(nodes), 6)),
+                                       columns=['ux', 'uy', 'uz', 'rx', 'ry', 'rz'])
     nodal_displacements['user_id'] = user_id
     nodal_displacements['number'] = nodes.number
     reactions = assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs)
 
-    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions, nodal_displacements=nodal_displacements, deformed = d_global)
+    save_results(user_id, engine, mqn=MQN_values, displacements=d_local, reactions=reactions,
+                 nodal_displacements=nodal_displacements, deformed=d_global)
     print('not plots: ', time.time() - t_whole)
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)

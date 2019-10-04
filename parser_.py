@@ -1,11 +1,10 @@
 import pandas as pd
-from section_properties import section_properties
-
 
 def parser(user_id, data, engine):
     # data contains dicts of elements, labels, loads and sections
     elements = pd.DataFrame(data[0])
     elements['user_id'] = user_id
+    #elements['index_'] = [i for i in range(len(elements))]
     del elements['type'], elements['label_position'], elements['xLocal'], elements['yLocal'], elements['zLocal']
     nodes = pd.DataFrame(data[1])
     nodes['user_id'] = user_id
