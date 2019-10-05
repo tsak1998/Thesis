@@ -160,7 +160,7 @@ Menubar.Run = function ( editor ) {
 					reactDiv.innerHTML = ''
 					reactDiv.appendChild(buildTable( JSON.parse(data['reactions']).data, headers, 'react-table' ));
 
-					headers = ['Node', 'ux', 'uy', 'uz', 'ux', 'uy', 'uz']
+					headers = ['Node', 'ux', 'uy', 'uz', 'rx', 'ry', 'rz']
 					
 					reactDiv = document.getElementById( 'nodal_displ-table' );
 					reactDiv.innerHTML = ''

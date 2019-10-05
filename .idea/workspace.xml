@@ -2,30 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1634665e-1097-4fb9-8f71-13322ffbde15" name="Default Changelist" comment=".......">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dxf_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/dxf_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1.dxf" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1.dxf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/displac.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/dist_loads.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/imported_model.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/materialsl.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/model_with_extra_elements.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/model_with_loads.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/model_with_loads_extra_elements.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.JPG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/Reactions.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/Reactions.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model_test/test_1/mqn.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/mqn.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/nodal_displ.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/point_loads.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/reactions.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/sections.JPG" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/sections.JPG" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/supports.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_test/test_1/whole_app.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser_.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/save_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/save_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_test/test_1/reactions.JPG" beforeDir="false" afterPath="$PROJECT_DIR$/model_test/test_1/reactions.JPG" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/Menubar.Run.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/Menubar.Run.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/resusltsDisplacements.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editor.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -35,12 +16,15 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3400">
-              <caret line="7" column="19" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
+            <state relative-caret-position="442">
+              <caret line="56" column="76" lean-forward="true" selection-start-line="56" selection-start-column="76" selection-end-line="56" selection-end-column="77" />
+              <folding>
+                <element signature="e#0#108#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -48,8 +32,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/computations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="292">
-              <caret line="894" column="71" selection-start-line="894" selection-start-column="71" selection-end-line="894" selection-end-column="71" />
+            <state relative-caret-position="478">
+              <caret line="664" column="25" lean-forward="true" selection-start-line="664" selection-start-column="25" selection-end-line="664" selection-end-column="25" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -60,8 +44,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dxf_import.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="31" column="15" lean-forward="true" selection-start-line="31" selection-start-column="15" selection-end-line="31" selection-end-column="15" />
+            <state relative-caret-position="527">
+              <caret line="31" column="15" selection-start-line="31" selection-start-column="15" selection-end-line="31" selection-end-column="15" />
             </state>
           </provider>
         </entry>
@@ -69,7 +53,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/parser_.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-142">
+            <state relative-caret-position="102">
               <caret line="6" column="5" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
             </state>
           </provider>
@@ -78,7 +62,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/save_db.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
+            <state relative-caret-position="221">
               <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -95,6 +79,12 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>rot.dot</find>
+      <find>100</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -124,6 +114,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -135,7 +126,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -323,13 +313,13 @@
     <frame x="-8" y="0" width="1294" height="1047" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.33150986" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39869988" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33150986" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39824945" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -404,18 +394,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>683</line>
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>919</line>
+          <line>921</line>
           <option name="timeStamp" value="51" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/computations.py</url>
-          <line>385</line>
-          <option name="timeStamp" value="58" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/load_model.py</url>
@@ -426,6 +406,11 @@
           <url>file://$PROJECT_DIR$/save_db.py</url>
           <line>14</line>
           <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/computations.py</url>
+          <line>663</line>
+          <option name="timeStamp" value="64" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -444,6 +429,26 @@
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>np.linspace(0, L, n)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>rot</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>rot[:3,:3].dot(d_local[1,:3])</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>rot[:3,:3].dot(d_local[:,:3])</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>kwargs[key]</expression-string>
         <language-id>Python</language-id>
@@ -465,16 +470,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/dxf_import.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="31" column="15" selection-start-line="31" selection-start-column="15" selection-end-line="31" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/parser_.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-142">
+        <state relative-caret-position="102">
           <caret line="6" column="5" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/save_db.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
+        <state relative-caret-position="221">
           <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
@@ -484,22 +496,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3400">
-          <caret line="7" column="19" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dxf_import.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="31" column="15" lean-forward="true" selection-start-line="31" selection-start-column="15" selection-end-line="31" selection-end-column="15" />
+        <state relative-caret-position="442">
+          <caret line="56" column="76" lean-forward="true" selection-start-line="56" selection-start-column="76" selection-end-line="56" selection-end-column="77" />
+          <folding>
+            <element signature="e#0#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/computations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="292">
-          <caret line="894" column="71" selection-start-line="894" selection-start-column="71" selection-end-line="894" selection-end-column="71" />
+        <state relative-caret-position="478">
+          <caret line="664" column="25" lean-forward="true" selection-start-line="664" selection-start-column="25" selection-end-line="664" selection-end-column="25" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

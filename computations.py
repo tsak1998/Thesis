@@ -622,9 +622,11 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         rot = transf_arrays[index][:3]
         d_local = np.zeros((n, 5))
         d = local_displacements[index]
-        L = element.length + (d[6][0] - d[0][0])
-        x = np.linspace(0, L, n)
+        d_glob = transf_arrays[index].dot(d)
 
+        L = element.length
+        x = np.linspace(0, L, n)
+        x[-1] = L
         # z
         d = local_displacements[index]
         print(L + (d[6] - d[0]))
@@ -640,9 +642,9 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         yB_ = yB + dx * math.tan(d[10])
         # fit me 3rd order polyonimial
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
-        #d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
+        d_z = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
         q = x/L
-        d_z = 1000*shape_function(q, d[2], d[8], -d[4], -d[10], L)
+        d_z = shape_function(q, d[2], d[8], -d[4], -d[10], L)
 
         dx = 0.2
         xA = 0
@@ -657,7 +659,7 @@ def displ_member(nodes, elements, local_displacements, global_dispalecements, tr
         coef = np.polyfit([xA, xA_, xB_, xB], [yA, yA_, yB_, yB], 3)
         #d_y = x ** 3 * coef[0] + x ** 2 * coef[1] + x * coef[2] + coef[3]
         q = x / L
-        d_y = 1000*shape_function(q, d[1], d[7], d[5], d[11], L)
+        d_y = shape_function(q, d[1], d[7], d[5], d[11], L)
 
         d_local[:, 0] = element.number
         d_local[:, 1] = x
@@ -720,6 +722,7 @@ def fit_points(num_points, **kwargs):
 
 
 def assign_reactions(user_id, nodes, P_whole, node_dofs, arranged_dofs):
+
     reactions = pd.DataFrame(columns=['user_id', 'number', 'Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz'])
     for index, node in node_dofs.iterrows():
         dofs = [node.dof_dx, node.dof_dy, node.dof_dz, node.dof_rx, node.dof_ry, node.dof_rz]
@@ -880,7 +883,7 @@ def main(user_id, engine):
                                                point_loads, fixed_forces)
     print('nodal_mqn: ', time.time() - t)
     t = time.time()
-    MQN_values = mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr, 400)
+    MQN_values = mqn_member(elements, MQN_nodes, point_loads_tr, dist_loads_tr, 480)
     print('member: ', time.time() - t)
     t = time.time()
     d_local, d_global = displ_member(nodes, elements, local_displacements, global_dispalecements, transf_arrays,
@@ -893,7 +896,7 @@ def main(user_id, engine):
     MQN_values['user_id'] = user_id
     d_local['user_id'] = user_id
     P_whole = np.round(K_ol.dot(global_dispalecements) + S - P_nodal, 3)
-
+    global_dispalecements = np.round(global_dispalecements, 5)
     nodal_displacements = pd.DataFrame(np.reshape(global_dispalecements, (len(nodes), 6)),
                                        columns=['ux', 'uy', 'uz', 'rx', 'ry', 'rz'])
     nodal_displacements['user_id'] = user_id
@@ -906,7 +909,6 @@ def main(user_id, engine):
     # plot_results(user_id, MQN_values, d_local)
     print('whole: ', time.time() - t_whole)
 
-    calculate_denco(global_dispalecements[:12], nodes)
     MQN_values.to_csv('model_test/test_1/mqn.csv')
     # global_dispalecements = pd.DataFrame(global_dispalecements)# .tosup_dofs)
 

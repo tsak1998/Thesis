@@ -1,0 +1,32 @@
+LINEAR STATIC ANALYSIS REPORT
+SkyCiv Structural 3D v4.2.2
+Date: Sat Oct 05 2019 02:55:53 GMT+0300 (Eastern European Summer Time)
+
+File Name: lol
+Job Name: Empty
+Designer: Empty
+Job Description: Empty
+
+
+
+==============================================================================
+                               NODAL RESULTS
+==============================================================================
+
+-------------------
+NODAL DISPLACEMENTS (mm)
+-------------------
+
+                    X             Y             Z         Total
+   Node   Translation   Translation   Translation   Translation
+
+      1          0.00          0.00          0.00          0.00
+      2        -20.00       -147.42         -0.15        148.77
+      3          0.00          0.00          0.00          0.00
+      4        -33.31       -147.55          0.01        151.26
+      5          0.00          0.00          0.00          0.00
+      6        -16.92        -81.88         -0.02         83.61
+
+
+
+END
